@@ -38,7 +38,7 @@ WHEN NOT MATCHED THEN
     INSERT ( empno
                 , ename ) 
     VALUES ( src.empno
-                , src.ename
+                , src.ename )
 WHEN MATCHED THEN 
     UPDATE SET tar.ename = src.ename
     WHERE delete_flag = 'N'
@@ -187,8 +187,7 @@ WITH ex AS (
                     ON c.id_currency = fxr.id_currency_from
         GROUP BY b.code )
 SELECT /*+ parallel */ a.code code
-    , Lpad(' ', 4 * (a.GL_LEVEL - 1), ' ') || 
-        a.code format_code format_code
+    , Lpad(' ', 4 * (a.GL_LEVEL - 1), ' ') ||  a.code format_code
     , b.description
     , c.balance_bc
     , c1.balance_bc

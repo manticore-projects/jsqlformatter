@@ -38,10 +38,15 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.select.OrderByElement.NullOrdering;
 import net.sf.jsqlparser.statement.update.Update;
 
-/** @author Andreas Reichel <andreas@manticore-projects.com> */
+/**
+ * A powerful Java SQL Formatter based on the JSQLParser.
+ * 
+* @author <a href="mailto:andreas@manticore-projects.com">Andreas Reichel</a> 
+* @version 0.1 
+*/
 public class JSQLFormatter {
 
-  public enum BreakLine {
+  private enum BreakLine {
     NEVER // keep all arguments on one line
     ,
     AS_NEEDED // only when more than 3 arguments
@@ -51,85 +56,12 @@ public class JSQLFormatter {
     ALWAYS // break all arguments to a new line
   }
 
+  /**
+   *
+   * @param args The Command Line Parameters.
+   */
   public static void main(String[] args) {
-    String sqlStr =
-        "-- INSERT INTO LEDGER BRANCH BALANCE\n"
-            + "-- INSERT INTO cfe.LEDGER_BRANCH_BALANCE \n\n"
-            + "WITH scope\n"
-            + "     AS (SELECT *\n"
-            + "         FROM   cfe.accounting_scope\n"
-            + "         WHERE  id_status = 'C'\n"
-            + "                AND id_accounting_scope_code = :SCOPE),\n"
-            + "     ex\n"
-            + "     AS (SELECT *\n"
-            + "         FROM   cfe.execution\n"
-            + "         WHERE  id_status = 'R'\n"
-            + "                AND value_date = (SELECT Max(value_date)\n"
-            + "                                  FROM   cfe.execution\n"
-            + "                                  WHERE  id_status = 'R'\n"
-            + "                                         AND ( :VALUE_DATE IS NULL\n"
-            + "                                                OR value_date <= :VALUE_DATE ))),\n"
-            + "     fxr\n"
-            + "     AS (SELECT id_currency_from\n"
-            + "                , fxrate\n"
-            + "         FROM   common.fxrate_hst f\n"
-            + "                inner join ex\n"
-            + "                    ON f.value_date <= ex.value_date\n"
-            + "         WHERE  f.value_date = (SELECT Max(value_date)\n"
-            + "                                FROM   common.fxrate_hst\n"
-            + "                                WHERE  id_currency_from = f.id_currency_from\n"
-            + "                                       AND id_currency_into = f.id_currency_into\n"
-            + "                                       AND value_date <= ex.value_date)\n"
-            + "                AND id_currency_into = :BOOK_CURRENCY\n"
-            + "         UNION ALL\n"
-            + "         SELECT :BOOK_CURRENCY\n"
-            + "                , 1\n"
-            + "         FROM   dual)\n"
-            + "SELECT /*+parallel*/ scope.id_accounting_scope\n"
-            + "       , ex.value_date\n"
-            + "       , ex.posting_date\n"
-            + "       , a.GL_LEVEL\n"
-            + "       , a.code\n"
-            + "       , b.description\n"
-            + "       , c.balance_bc\n"
-            + "FROM   ex\n"
-            + "       , scope\n"
-            + "         inner join cfe.ledger_branch_branch a\n"
-            + "                 ON a.id_accounting_scope = scope.id_accounting_scope\n"
-            + "                    AND a.code = a.code_inferior\n"
-            + "         inner join cfe.ledger_branch b\n"
-            + "                 ON b.id_accounting_scope = scope.id_accounting_scope\n"
-            + "                    AND b.code = a.code\n"
-            + "         inner join (SELECT b.code\n"
-            + "                            , Round(SUM(d.balance * fxr.fxrate), 2) balance_bc\n"
-            + "                     FROM   scope\n"
-            + "                            inner join cfe.ledger_branch_branch b\n"
-            + "                                    ON b.id_accounting_scope = scope.id_accounting_scope\n"
-            + "                            inner join cfe.ledger_account c\n"
-            + "                                    ON b.code_inferior = c.code\n"
-            + "                                       AND c.id_accounting_scope_code = scope.id_accounting_scope_code\n"
-            + "                            inner join (SELECT id_account\n"
-            + "                                               , SUM(amount) balance\n"
-            + "                                        FROM   (SELECT id_account_credit id_account\n"
-            + "                                                       , amount\n"
-            + "                                                FROM   cfe.ledger_account_entry\n"
-            + "                                                       inner join ex\n"
-            + "                                                               ON ledger_account_entry.posting_date <= ex.posting_date\n"
-            + "                                                UNION ALL\n"
-            + "                                                SELECT id_account_debit\n"
-            + "                                                       , -amount\n"
-            + "                                                FROM   cfe.ledger_account_entry\n"
-            + "                                                       inner join ex\n"
-            + "                                                               ON ledger_account_entry.posting_date <= ex.posting_date)\n"
-            + "                                        GROUP  BY id_account) d\n"
-            + "                                    ON c.id_account = d.id_account\n"
-            + "                            inner join fxr\n"
-            + "                                    ON c.id_currency = fxr.id_currency_from\n"
-            + "                     GROUP  BY b.code) c\n"
-            + "                 ON c.code = a.code\n"
-            + ";  ";
-
-    // sqlStr = "with a as (SELECT 1 FROM b UNION ALL select 1 FROM c) select * from a;";
+    String sqlStr = "with a as (SELECT 1 FROM b UNION ALL select 1 FROM c) select * from a;";
 
     try {
       sqlStr = JSQLFormatter.format(sqlStr);
@@ -139,6 +71,14 @@ public class JSQLFormatter {
     }
   }
 
+  /**
+   * Format a list of SQL Statements.
+   * <p> SELECT, INSERT, UPDATE and MERGE statements are supported.
+   *
+   * @param sqlStr The ugly unformatted SQL Statements, semi-colon separated.
+   * @return The beautifully formatted SQL Statements, semi-colon separated.
+   * @throws Exception Any parsing exception.
+   */
   public static String format(String sqlStr) throws Exception {
     StringBuilder builder = new StringBuilder();
 
@@ -153,271 +93,26 @@ public class JSQLFormatter {
     int indent = 0;
 
     Statements statements = CCJSqlParserUtil.parseStatements(sqlStr);
-    for (Statement st : statements.getStatements()) {
-      if (st instanceof Select) {
-        Select select = (Select) st;
+    for (Statement statement : statements.getStatements()) {
+      if (statement instanceof Select) {
+        Select select = (Select) statement;
         appendSelect(select, builder, indent, true);
-      } else if (st instanceof Update) {
-        int i = 0;
 
-        Update update = (Update) st;
+      } else if (statement instanceof Update) {
+        Update update = (Update) statement;
+        appendUpdate(builder, update, indent);
 
-        builder.append("UPDATE ");
+      } else if (statement instanceof Insert) {
+        Insert insert = (Insert) statement;
+        appendInsert(builder, insert, indent);
 
-        Table table = update.getTable();
-        Alias alias = table.getAlias();
-
-        appendFromItem(table, alias, builder, indent, 0);
-
-        i = 0;
-        builder.append("\n");
-        for (int j = 0; j < indent; j++) builder.append("    ");
-        builder.append("SET ");
-
-        if (update.isUseSelect()) {
-          builder.append("( ");
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-
-          int subIndent = lastLineLength / 4;
-
-          List<Column> columns = update.getColumns();
-          if (columns != null)
-            for (Column column : columns) {
-              appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
-              i++;
-            }
-          builder.append(" ) = ");
-
-          Select select = update.getSelect();
-          builder.append("( ");
-          lastIndex = builder.lastIndexOf("\n");
-          lastLineLength = builder.length() - lastIndex + 1;
-
-          subIndent = lastLineLength / 4;
-
-          appendSelect(select, builder, subIndent, false);
-          builder.append(" ) ");
-        } else {
-          List<Column> columns = update.getColumns();
-          List<Expression> expressions = update.getExpressions();
-
-          if (columns != null)
-            for (Column column : columns) {
-              appendExpression(column, null, builder, indent, i, true, BreakLine.AFTER_FIRST);
-              builder.append(" = ");
-              appendExpression(
-                  expressions.get(i), null, builder, indent, 0, false, BreakLine.AFTER_FIRST);
-              i++;
-            }
-        }
-
-        List<Join> joins = update.getJoins();
-        appendJoins(joins, builder, indent, i);
-
-        Expression whereExpression = update.getWhere();
-        appendWhere(whereExpression, builder, indent);
-
-        List<OrderByElement> orderByElements = update.getOrderByElements();
-        appendOrderByElements(orderByElements, i, builder, indent);
-
-      } else if (st instanceof Insert) {
-        Insert insert = (Insert) st;
-
-        int i = 0;
-
-        builder.append("INSERT INTO ");
-
-        Table table = insert.getTable();
-        Alias alias = table.getAlias();
-
-        appendFromItem(table, alias, builder, indent, 0);
-
-        List<Column> columns = insert.getColumns();
-        if (columns != null) {
-          builder.append("(");
-          for (Column column : columns) {
-            appendExpression(column, null, builder, indent , i, true, BreakLine.ALWAYS);
-            i++;
-          }
-          builder.append(" ) ");
-        }
-
-        if (insert.isUseValues()) {
-          builder.append("\n");
-          for (int j = 0; j < indent; j++) builder.append("    ");
-          builder.append("VALUES ( ");
-
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-
-          int subIndent = lastLineLength / 4;
-
-          ItemsList itemsList = insert.getItemsList();
-          appendItemsList(itemsList, builder, alias, subIndent, BreakLine.AFTER_FIRST);
-          builder.append(" ) ");
-        } else {
-          Select select = insert.getSelect();
-          builder.append("( ");
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-
-          int subIndent = lastLineLength / 4;
-
-          appendSelect(select, builder, subIndent, false);
-          builder.append(") ");
-        }
-
-      } else if (st instanceof Merge) {
-        Merge merge = (Merge) st;
-
-        int i = 0;
-
-        builder.append("MERGE INTO ");
-
-        Table table = merge.getTable();
-        Alias alias = table.getAlias();
-
-        appendFromItem(table, alias, builder, indent, 0);
-
-        builder.append("\n");
-        for (int j = 0; j < indent + 1; j++) builder.append("    ");
-        builder.append("USING ");
-
-        SubSelect select = merge.getUsingSelect();
-        if (select != null) {
-          alias = merge.getUsingAlias();
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-
-          int subIndent = lastLineLength / 4;
-
-          appendExpression(select, alias, builder, subIndent, i, false, BreakLine.AFTER_FIRST);
-        }
-
-        table = merge.getUsingTable();
-        if (table != null) {
-          alias = table.getAlias();
-          appendFromItem(table, alias, builder, indent, 0);
-        }
-
-        Expression onExpression = merge.getOnCondition();
-        if (onExpression != null) {
-          builder.append("\n");
-          for (int j = 0; j < indent + 2; j++) builder.append("    ");
-          builder.append("ON ( ");
-
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-          int subIndent = lastLineLength / 4;
-
-          appendExpression(onExpression, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
-          builder.append(" ) ");
-        }
-
-        MergeInsert insert = merge.getMergeInsert();
-        if (insert != null) {
-          builder.append("\n");
-          for (int j = 0; j < indent; j++) builder.append("    ");
-          builder.append("WHEN NOT MATCHED THEN ");
-
-          builder.append("\n");
-          for (int j = 0; j < indent + 1; j++) builder.append("    ");
-          builder.append("INSERT ");
-
-          List<Column> columns = insert.getColumns();
-          List<Expression> expressions = insert.getValues();
-
-          if (columns != null) {
-            builder.append("( ");
-            int lastIndex = builder.lastIndexOf("\n");
-            int lastLineLength = builder.length() - lastIndex + 1;
-            int subIndent = lastLineLength / 4;
-
-            for (Column column : columns) {
-              appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
-              i++;
-            }
-            builder.append(" ) ");
-          }
-
-          i = 0;
-          builder.append("\n");
-          for (int j = 0; j < indent + 1; j++) builder.append("    ");
-          builder.append("VALUES ( ");
-
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-          int subIndent = lastLineLength / 4;
-          if (expressions != null)
-            for (Expression expression : expressions) {
-              appendExpression(
-                  expression, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
-              i++;
-            }
-           builder.append(" ) ");
-        }
-
-        MergeUpdate update = merge.getMergeUpdate();
-        if (update != null) {
-          i = 0;
-
-          builder.append("\n");
-          for (int j = 0; j < indent; j++) builder.append("    ");
-          builder.append("WHEN MATCHED THEN ");
-
-          builder.append("\n");
-          for (int j = 0; j < indent + 1; j++) builder.append("    ");
-          builder.append("UPDATE SET ");
-
-          int lastIndex = builder.lastIndexOf("\n");
-          int lastLineLength = builder.length() - lastIndex + 1;
-          int subIndent = lastLineLength / 4;
-
-          List<Column> columns = update.getColumns();
-          List<Expression> expressions = update.getValues();
-
-          if (columns != null)
-            for (Column column : columns) {
-              appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
-              builder.append(" = ");
-              appendExpression(
-                  expressions.get(i), null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
-              i++;
-            }
-
-          Expression whereCondition = update.getWhereCondition();
-          if (whereCondition != null) {
-            builder.append("\n");
-            for (int j = 0; j < indent + 1; j++) builder.append("    ");
-            builder.append("WHERE ");
-
-            lastIndex = builder.lastIndexOf("\n");
-            lastLineLength = builder.length() - lastIndex + 1;
-            subIndent = lastLineLength / 4;
-
-            appendExpression(
-                whereCondition, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
-          }
-
-          Expression deleteWhereCondition = update.getDeleteWhereCondition();
-          if (deleteWhereCondition != null) {
-            builder.append("\n");
-            for (int j = 0; j < indent + 1; j++) builder.append("    ");
-            builder.append("DELETE WHERE ");
-
-            lastIndex = builder.lastIndexOf("\n");
-            lastLineLength = builder.length() - lastIndex + 1;
-            subIndent = lastLineLength / 4;
-
-            appendExpression(
-                deleteWhereCondition, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
-          }
-        }
+      } else if (statement instanceof Merge) {
+        Merge merge = (Merge) statement;
+        insertMerge(builder, merge, indent);
 
       } else {
         throw new UnsupportedOperationException(
-            "The " + st.getClass().getName() + " Statement is not supported yet.");
+            "The " + statement.getClass().getName() + " Statement is not supported yet.");
       }
 
       builder.append("\n;");
@@ -426,7 +121,258 @@ public class JSQLFormatter {
     return builder.toString().trim();
   }
 
-  public static void appendSelect(
+  private static void insertMerge(StringBuilder builder, Merge merge, int indent) {
+    int i = 0;
+
+    builder.append("MERGE INTO ");
+
+    Table table = merge.getTable();
+    Alias alias = table.getAlias();
+
+    appendFromItem(table, alias, builder, indent, 0);
+
+    builder.append("\n");
+    for (int j = 0; j < indent + 1; j++) builder.append("    ");
+    builder.append("USING ");
+
+    SubSelect select = merge.getUsingSelect();
+    if (select != null) {
+      alias = merge.getUsingAlias();
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+
+      int subIndent = lastLineLength / 4;
+
+      appendExpression(select, alias, builder, subIndent, i, false, BreakLine.AFTER_FIRST);
+    }
+
+    table = merge.getUsingTable();
+    if (table != null) {
+      alias = table.getAlias();
+      appendFromItem(table, alias, builder, indent, 0);
+    }
+
+    Expression onExpression = merge.getOnCondition();
+    if (onExpression != null) {
+      builder.append("\n");
+      for (int j = 0; j < indent + 2; j++) builder.append("    ");
+      builder.append("ON ( ");
+
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+      int subIndent = lastLineLength / 4;
+
+      appendExpression(onExpression, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
+      builder.append(" ) ");
+    }
+
+    MergeInsert insert = merge.getMergeInsert();
+    if (insert != null) {
+      builder.append("\n");
+      for (int j = 0; j < indent; j++) builder.append("    ");
+      builder.append("WHEN NOT MATCHED THEN ");
+
+      builder.append("\n");
+      for (int j = 0; j < indent + 1; j++) builder.append("    ");
+      builder.append("INSERT ");
+
+      List<Column> columns = insert.getColumns();
+      List<Expression> expressions = insert.getValues();
+
+      if (columns != null) {
+        builder.append("( ");
+        int lastIndex = builder.lastIndexOf("\n");
+        int lastLineLength = builder.length() - lastIndex + 1;
+        int subIndent = lastLineLength / 4;
+
+        for (Column column : columns) {
+          appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
+          i++;
+        }
+        builder.append(" ) ");
+      }
+
+      i = 0;
+      builder.append("\n");
+      for (int j = 0; j < indent + 1; j++) builder.append("    ");
+      builder.append("VALUES ( ");
+
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+      int subIndent = lastLineLength / 4;
+      if (expressions != null)
+        for (Expression expression : expressions) {
+          appendExpression(expression, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
+          i++;
+        }
+      builder.append(" ) ");
+    }
+
+    MergeUpdate update = merge.getMergeUpdate();
+    if (update != null) {
+      i = 0;
+
+      builder.append("\n");
+      for (int j = 0; j < indent; j++) builder.append("    ");
+      builder.append("WHEN MATCHED THEN ");
+
+      builder.append("\n");
+      for (int j = 0; j < indent + 1; j++) builder.append("    ");
+      builder.append("UPDATE SET ");
+
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+      int subIndent = lastLineLength / 4;
+
+      List<Column> columns = update.getColumns();
+      List<Expression> expressions = update.getValues();
+
+      if (columns != null)
+        for (Column column : columns) {
+          appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
+          builder.append(" = ");
+          appendExpression(
+              expressions.get(i), null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
+          i++;
+        }
+
+      Expression whereCondition = update.getWhereCondition();
+      if (whereCondition != null) {
+        builder.append("\n");
+        for (int j = 0; j < indent + 1; j++) builder.append("    ");
+        builder.append("WHERE ");
+
+        lastIndex = builder.lastIndexOf("\n");
+        lastLineLength = builder.length() - lastIndex + 1;
+        subIndent = lastLineLength / 4;
+
+        appendExpression(whereCondition, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
+      }
+
+      Expression deleteWhereCondition = update.getDeleteWhereCondition();
+      if (deleteWhereCondition != null) {
+        builder.append("\n");
+        for (int j = 0; j < indent + 1; j++) builder.append("    ");
+        builder.append("DELETE WHERE ");
+
+        lastIndex = builder.lastIndexOf("\n");
+        lastLineLength = builder.length() - lastIndex + 1;
+        subIndent = lastLineLength / 4;
+
+        appendExpression(
+            deleteWhereCondition, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
+      }
+    }
+  }
+
+  private static void appendInsert(StringBuilder builder, Insert insert, int indent) {
+    int i = 0;
+
+    builder.append("INSERT INTO ");
+
+    Table table = insert.getTable();
+    Alias alias = table.getAlias();
+
+    appendFromItem(table, alias, builder, indent, 0);
+
+    List<Column> columns = insert.getColumns();
+    if (columns != null) {
+      builder.append("(");
+      for (Column column : columns) {
+        appendExpression(column, null, builder, indent, i, true, BreakLine.ALWAYS);
+        i++;
+      }
+      builder.append(" ) ");
+    }
+
+    if (insert.isUseValues()) {
+      builder.append("\n");
+      for (int j = 0; j < indent; j++) builder.append("    ");
+      builder.append("VALUES ( ");
+
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+
+      int subIndent = lastLineLength / 4;
+
+      ItemsList itemsList = insert.getItemsList();
+      appendItemsList(itemsList, builder, alias, subIndent, BreakLine.AFTER_FIRST);
+      builder.append(" ) ");
+    } else {
+      Select select = insert.getSelect();
+      builder.append("( ");
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+
+      int subIndent = lastLineLength / 4;
+
+      appendSelect(select, builder, subIndent, false);
+      builder.append(") ");
+    }
+  }
+
+  private static void appendUpdate(StringBuilder builder, Update update, int indent) {
+    builder.append("UPDATE ");
+
+    Table table = update.getTable();
+    Alias alias = table.getAlias();
+
+    appendFromItem(table, alias, builder, indent, 0);
+
+    int i = 0;
+    builder.append("\n");
+    for (int j = 0; j < indent; j++) builder.append("    ");
+    builder.append("SET ");
+
+    if (update.isUseSelect()) {
+      builder.append("( ");
+      int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+
+      int subIndent = lastLineLength / 4;
+
+      List<Column> columns = update.getColumns();
+      if (columns != null)
+        for (Column column : columns) {
+          appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
+          i++;
+        }
+      builder.append(" ) = ");
+
+      Select select = update.getSelect();
+      builder.append("( ");
+      lastIndex = builder.lastIndexOf("\n");
+      lastLineLength = builder.length() - lastIndex + 1;
+
+      subIndent = lastLineLength / 4;
+
+      appendSelect(select, builder, subIndent, false);
+      builder.append(" ) ");
+    } else {
+      List<Column> columns = update.getColumns();
+      List<Expression> expressions = update.getExpressions();
+
+      if (columns != null)
+        for (Column column : columns) {
+          appendExpression(column, null, builder, indent, i, true, BreakLine.AFTER_FIRST);
+          builder.append(" = ");
+          appendExpression(
+              expressions.get(i), null, builder, indent, 0, false, BreakLine.AFTER_FIRST);
+          i++;
+        }
+    }
+
+    List<Join> joins = update.getJoins();
+    appendJoins(joins, builder, indent, i);
+
+    Expression whereExpression = update.getWhere();
+    appendWhere(whereExpression, builder, indent);
+
+    List<OrderByElement> orderByElements = update.getOrderByElements();
+    appendOrderByElements(orderByElements, i, builder, indent);
+  }
+
+  private static void appendSelect(
       Select select, StringBuilder builder, int indent, boolean breakLineBefore) {
     List<WithItem> withItems = select.getWithItemsList();
     if (withItems != null && withItems.size() > 0) {
@@ -547,7 +493,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendOrderByElements(
+  private static void appendOrderByElements(
       List<OrderByElement> orderByElements, int i, StringBuilder builder, int indent) {
     if (orderByElements != null) {
       i = 0;
@@ -573,7 +519,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendHavingExpression(
+  private static void appendHavingExpression(
       Expression havingExpression, StringBuilder builder, int indent) {
     int i;
     if (havingExpression != null) {
@@ -586,7 +532,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendGroupByElement(
+  private static void appendGroupByElement(
       GroupByElement groupByElement, StringBuilder builder, int indent)
       throws UnsupportedOperationException {
     int i;
@@ -612,7 +558,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendWhere(Expression whereExpression, StringBuilder builder, int indent) {
+  private static void appendWhere(Expression whereExpression, StringBuilder builder, int indent) {
     int i;
     if (whereExpression != null) {
       i = 0;
@@ -624,7 +570,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendJoins(List<Join> joins, StringBuilder builder, int indent, int i) {
+  private static void appendJoins(List<Join> joins, StringBuilder builder, int indent, int i) {
     if (joins != null)
       for (Join join : joins) {
         builder.append("\n");
@@ -781,7 +727,7 @@ public class JSQLFormatter {
       BinaryExpression binaryExpression = (BinaryExpression) expression;
       builder.append(binaryExpression.getLeftExpression()).append(" ");
       builder.append(binaryExpression.getStringExpression()).append(" ");
-      
+
       appendExpression(
           binaryExpression.getRightExpression(),
           null,
@@ -790,7 +736,7 @@ public class JSQLFormatter {
           i,
           false,
           BreakLine.NEVER);
-      
+
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
       builder.append(equalsTo.getLeftExpression());
@@ -963,7 +909,8 @@ public class JSQLFormatter {
       appendSelectBody(selectBody, alias, builder, subIndent, withItems != null);
       builder.append(" ) ");
     } else {
-      throw new UnsupportedOperationException("Expression " + expression.getClass().getName() +" is not supported yet.");
+      throw new UnsupportedOperationException(
+          "Expression " + expression.getClass().getName() + " is not supported yet.");
     }
 
     if (alias != null) {
@@ -977,7 +924,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendItemsList(
+  private static void appendItemsList(
       ItemsList itemsList, StringBuilder builder, Alias alias, int indent, BreakLine breakLine) {
     // All Known Implementing Classes:
     // ExpressionList, MultiExpressionList, NamedExpressionList, SubSelect
@@ -986,26 +933,23 @@ public class JSQLFormatter {
       int i = 0;
       // @todo: pretty print the Expression List Items
       for (Expression expression : expressionList.getExpressions()) {
-        
+
         switch (breakLine) {
           case AS_NEEDED:
-            BreakLine bl =
-              i % 3 == 0
-                ? BreakLine.AFTER_FIRST
-                : BreakLine.NEVER;
+            BreakLine bl = i % 3 == 0 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
 
             appendExpression(expression, null, builder, indent, i, true, bl);
             break;
-            default:
+          default:
             appendExpression(expression, null, builder, indent, i, true, breakLine);
         }
 
-//        BreakLine bl =
-//            BreakLine.AS_NEEDED.equals(breakLine) && i % 3 == 0
-//                ? BreakLine.AFTER_FIRST
-//                : BreakLine.NEVER;
-//
-//        appendExpression(expression, null, builder, indent, i, true, bl);
+        //        BreakLine bl =
+        //            BreakLine.AS_NEEDED.equals(breakLine) && i % 3 == 0
+        //                ? BreakLine.AFTER_FIRST
+        //                : BreakLine.NEVER;
+        //
+        //        appendExpression(expression, null, builder, indent, i, true, bl);
         i++;
       }
     } else if (itemsList instanceof MultiExpressionList) {
@@ -1050,7 +994,7 @@ public class JSQLFormatter {
     }
   }
 
-  public static void appendSubSelect(
+  private static void appendSubSelect(
       SubSelect subSelect, StringBuilder builder, boolean useBrackets) {
     if (subSelect.isUseBrackets() && useBrackets) {
       builder.append(" ( ");
