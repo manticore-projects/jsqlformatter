@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jsqlformatter;
+package com.manticore.jsqlformatter;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -24,14 +24,14 @@ import org.junit.runners.Parameterized.Parameters;
 
 /** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
-public class StandardUpdateTest extends StandardSelectTest {
+public class StandardMergeTest extends StandardSelectTest {
   
   @Parameters(name = "{index}: {0}")
   public static Iterable<Object[]> getSqlMap() {
-    return getSqlMap(StandardUpdateTest.class);
+    return getSqlMap(StandardMergeTest.class);
   }
 
-  public StandardUpdateTest(String input, String expected) {
+  public StandardMergeTest(String input, String expected) {
     super(input, expected);
   }
 }

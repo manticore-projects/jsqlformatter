@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package jsqlformatter;
+package com.manticore.jsqlformatter;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

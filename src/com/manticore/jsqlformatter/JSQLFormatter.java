@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package jsqlformatter;
+package com.manticore.jsqlformatter;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -355,6 +355,7 @@ public class JSQLFormatter {
                   expression, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
               i++;
             }
+           builder.append(" ) ");
         }
 
         MergeUpdate update = merge.getMergeUpdate();
@@ -734,8 +735,6 @@ public class JSQLFormatter {
       Column column = (Column) expression;
       builder.append(column.getFullyQualifiedName());
 
-      // if (alias != null) builder.append(alias.toString());
-
     } else if (expression instanceof AndExpression) {
       AndExpression andExpression = (AndExpression) expression;
       appendExpression(
@@ -782,14 +781,16 @@ public class JSQLFormatter {
       BinaryExpression binaryExpression = (BinaryExpression) expression;
       builder.append(binaryExpression.getLeftExpression()).append(" ");
       builder.append(binaryExpression.getStringExpression()).append(" ");
+      
       appendExpression(
           binaryExpression.getRightExpression(),
-          alias,
+          null,
           builder,
           indent + 1,
           i,
           false,
-          BreakLine.AFTER_FIRST);
+          BreakLine.NEVER);
+      
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
       builder.append(equalsTo.getLeftExpression());
@@ -895,7 +896,7 @@ public class JSQLFormatter {
       builder.append(jdbcParameter.toString());
     } else if (expression instanceof Function) {
       Function function = (Function) expression;
-      builder.append(function.toString());
+      builder.append(function.getName());
 
     } else if (expression instanceof IsNullExpression) {
       IsNullExpression isNullExpression = (IsNullExpression) expression;
@@ -962,7 +963,7 @@ public class JSQLFormatter {
       appendSelectBody(selectBody, alias, builder, subIndent, withItems != null);
       builder.append(" ) ");
     } else {
-      System.out.println(expression.getClass().getName());
+      throw new UnsupportedOperationException("Expression " + expression.getClass().getName() +" is not supported yet.");
     }
 
     if (alias != null) {
