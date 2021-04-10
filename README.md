@@ -4,10 +4,32 @@ Java SQL Formatter, Beautifier and Pretty Printer
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
 * supports complex SELECT, INSERT INTO, MERGE, UPDATE statements
+
+
 * simple usage 
+
+	
   ```java
+  import com.manticore.jsqlformatter.JSqlFormatter;
+  ...
   String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
   ```
+
+
+    with Maven Artifact:
+    
+  	```xml
+	<dependency>
+	  <groupId>com.manticore-projects.jsqlformatter</groupId>
+	  <artifactId>jsqlformatter</artifactId>
+	  <version>0.1.1</version>
+	</dependency>
+	```
+	
+* Binaries: [jsqlformatter-0.1.1.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar)
+(18.1kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar.sha1))
+
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
 * tested against hundreds of complex, real life SQL statements of the [Manticore IFRS Accounting Software](http://manticore-projects.com)
 
@@ -17,7 +39,7 @@ Java SQL Formatter, Beautifier and Pretty Printer
 * add formatting options as per SQL dialect (e. g. Comma first/last, Greedy Spaces, Upper-/Lower-/Camel-Case Names)
 * beautify complex Functions()
 * export or copy to Java, XML/HTML, RTF
-* implement OS natice standalone package and a Netbeans Plugin
+* implement OS native standalone package and a Netbeans Plugin
 
 ## Samples
 
