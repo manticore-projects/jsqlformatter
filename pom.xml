@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.manticore.jsqlformatter</groupId>
+  <groupId>com.manticore-projects.jsqlformatter</groupId>
   <artifactId>jsqlformatter</artifactId>
   <version>0.1.0</version>
   <packaging>jar</packaging>
   <name>JSQLFormatter</name>
   <description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
-  <url>https://github.com/vertical-blank/sql-formatter</url>
+  <url>https://github.com/manticore-projects/jsqlformatter</url>
   <licenses>
     <license>
       <name>The AGPL-3.0 License</name>
@@ -21,8 +21,7 @@
     </developer>
   </developers>
   <scm>
-    <connection>https://github.com/manticore-projects/jsqlformatter.git</connection>
-    <developerConnection>https://github.com/manticore-projects/jsqlformatter.git</developerConnection>
+    <connection>scm:git:https://github.com/manticore-projects/jsqlformatter</connection>
     <url>https://github.com/manticore-projects/jsqlformatter</url>
   </scm>
 
@@ -190,13 +189,14 @@
   </profiles>
 
   <distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-    </repository>
     <snapshotRepository>
-      <id>sonatype-nexus-snapshot</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
+      </url>
+    </repository>
   </distributionManagement>
 </project>
