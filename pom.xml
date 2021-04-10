@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.manticore-projects.jsqlformatter</groupId>
   <artifactId>jsqlformatter</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>JSQLFormatter</name>
   <description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
@@ -23,7 +23,7 @@
   <scm>
     <connection>scm:git:https://github.com/manticore-projects/jsqlformatter</connection>
     <url>https://github.com/manticore-projects/jsqlformatter</url>
-    <tag>jsqlformatter-0.1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
