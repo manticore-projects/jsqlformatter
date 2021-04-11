@@ -3,7 +3,7 @@ Java SQL Formatter, Beautifier and Pretty Printer
 
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
-* supports complex SELECT, INSERT INTO, MERGE, UPDATE statements
+* supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE statements
 
 
 * simple usage 
@@ -22,19 +22,20 @@ Java SQL Formatter, Beautifier and Pretty Printer
 	<dependency>
 	  <groupId>com.manticore-projects.jsqlformatter</groupId>
 	  <artifactId>jsqlformatter</artifactId>
-	  <version>0.1.1</version>
+	  <version>0.1.2</version>
 	</dependency>
 	```
 	
-* Binaries: [jsqlformatter-0.1.1.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar)
-(18.1kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.1/jsqlformatter-0.1.1.jar.sha1))
 
+* Binaries: [jsqlformatter-0.1.2.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar)
+(18.1kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.sha1))
+* Ueber-Jar including an enhanced version of JSQLParser (applied fixes awaiting approval in the upstream repo)
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
 * tested against hundreds of complex, real life SQL statements of the [Manticore IFRS Accounting Software](http://manticore-projects.com)
 
 ## Todo/Planned
-* add support for CREATE, ALTER, DELETE, SELECT INTO statements
+* add support for ALTER, SELECT INTO statements
 * detect and quote reserved keyword names
 * add formatting options as per SQL dialect (e. g. Comma first/last, Greedy Spaces, Upper-/Lower-/Camel-Case Names)
 * beautify complex Functions()
