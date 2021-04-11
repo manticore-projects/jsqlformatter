@@ -28,7 +28,7 @@ Java SQL Formatter, Beautifier and Pretty Printer
 	
 
 * Binaries: [jsqlformatter-0.1.2.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar)
-(18.1kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.asc)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.asc)
 , checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.sha1))
 * Ueber-Jar including an enhanced version of JSQLParser (applied fixes awaiting approval in the upstream repo)
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
