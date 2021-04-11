@@ -18,9 +18,13 @@
 
 package com.manticore.jsqlformatter;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.util.stream.Collectors.joining;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -28,38 +32,77 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.ReferentialAction;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.create.index.CreateIndex;
+import net.sf.jsqlparser.statement.create.table.*;
+import net.sf.jsqlparser.statement.create.view.CreateView;
+import net.sf.jsqlparser.statement.create.view.ForceOption;
+import net.sf.jsqlparser.statement.create.view.TemporaryOption;
+import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.merge.Merge;
 import net.sf.jsqlparser.statement.merge.MergeInsert;
 import net.sf.jsqlparser.statement.merge.MergeUpdate;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.select.OrderByElement.NullOrdering;
+import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
- * 
-* @author <a href="mailto:andreas@manticore-projects.com">Andreas Reichel</a> 
-* @version 0.1 
-*/
+ *
+ * @author <a href="mailto:andreas@manticore-projects.com">Andreas Reichel</a>
+ * @version 0.1
+ */
 public class JSQLFormatter {
 
-  private enum BreakLine {
-    NEVER // keep all arguments on one line
-    ,
-    AS_NEEDED // only when more than 3 arguments
-    ,
-    AFTER_FIRST // break all after the first argument
-    ,
-    ALWAYS // break all arguments to a new line
+  private static void appendDelete(StringBuilder builder, Delete delete, int indent) {
+    int i = 0;
+
+    builder.append("DELETE ");
+
+    /* @todo: activate when PR is accepted
+    OracleHint oracleHint = delete.getOracleHint();
+    if (oracleHint != null) builder.append(oracleHint.toString()).append(" ");
+    * */
+
+    List<Table> tables = delete.getTables();
+    if (tables != null && tables.size() > 0) {
+      //            b.append(" ");
+      //            b.append(tables.stream()
+      //                    .map(t -> t.toString())
+      //                    .collect(joining(", ")));
+
+      // @todo: implement Table List in DELETE
+      throw new UnsupportedOperationException("Table List in DELETE is not supported yet.");
+    }
+
+    builder.append("FROM ");
+
+    Table table = delete.getTable();
+    Alias alias = table.getAlias();
+
+    appendFromItem(table, alias, builder, indent, 0);
+
+    List<Join> joins = delete.getJoins();
+    appendJoins(joins, builder, indent, i);
+
+    Expression whereExpression = delete.getWhere();
+    appendWhere(whereExpression, builder, indent);
+
+    List<OrderByElement> orderByElements = delete.getOrderByElements();
+    appendOrderByElements(orderByElements, i, builder, indent);
+
+    Limit limit = delete.getLimit();
+    if (limit != null) {
+      // @todo: implement limit in DELETE
+      throw new UnsupportedOperationException("Limit in DELETE is not supported yet.");
+    }
   }
 
-  /**
-   *
-   * @param args The Command Line Parameters.
-   */
+  /** @param args The Command Line Parameters. */
   public static void main(String[] args) {
     String sqlStr = "with a as (SELECT 1 FROM b UNION ALL select 1 FROM c) select * from a;";
 
@@ -73,7 +116,8 @@ public class JSQLFormatter {
 
   /**
    * Format a list of SQL Statements.
-   * <p> SELECT, INSERT, UPDATE and MERGE statements are supported.
+   *
+   * <p>SELECT, INSERT, UPDATE and MERGE statements are supported.
    *
    * @param sqlStr The ugly unformatted SQL Statements, semi-colon separated.
    * @return The beautifully formatted SQL Statements, semi-colon separated.
@@ -108,20 +152,42 @@ public class JSQLFormatter {
 
       } else if (statement instanceof Merge) {
         Merge merge = (Merge) statement;
-        insertMerge(builder, merge, indent);
+        appendMerge(builder, merge, indent);
 
-      } else {
-        throw new UnsupportedOperationException(
-            "The " + statement.getClass().getName() + " Statement is not supported yet.");
+      } else if (statement instanceof Delete) {
+        Delete delete = (Delete) statement;
+        appendDelete(builder, delete, indent);
+
+      } else if (statement instanceof Truncate) {
+        Truncate truncate = (Truncate) statement;
+        appendTruncate(builder, truncate, indent);
+
+      } else if (statement instanceof CreateTable) {
+        CreateTable createTable = (CreateTable) statement;
+        appendCreateTable(builder, createTable, indent);
+
+      } else if (statement instanceof CreateIndex) {
+        CreateIndex createIndex = (CreateIndex) statement;
+        appendCreateIndex(builder, createIndex, indent);
+
+      } else if (statement instanceof CreateView) {
+        CreateView createView = (CreateView) statement;
+        appendCreateView(builder, createView, indent);
+
+      } else if (statement != null) {
+        try {
+          builder.append("\n").append(statement.toString());
+        } catch (Exception ex) {
+          throw new UnsupportedOperationException(
+              "The " + statement.getClass().getName() + " Statement is not supported yet.");
+        }
       }
-
       builder.append("\n;");
     }
-
     return builder.toString().trim();
   }
 
-  private static void insertMerge(StringBuilder builder, Merge merge, int indent) {
+  private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
     int i = 0;
 
     builder.append("MERGE INTO ");
@@ -659,6 +725,40 @@ public class JSQLFormatter {
     }
     builder.append(allColumns.toString());
   }
+  
+  private static void appendStringList(
+      Collection<String> strings,
+      Alias alias,
+      StringBuilder builder,
+      int indent,
+      boolean commaSeparated,
+      BreakLine breakLine) {
+    int i = 0;
+    for (String s: strings) {
+      appendString(s, alias, builder, indent, i, commaSeparated, breakLine);
+      i++;
+    }
+  }
+  
+  private static void appendString(
+      String s,
+      Alias alias,
+      StringBuilder builder,
+      int indent,
+      int i,
+      boolean commaSeparated,
+      BreakLine breakLine) {
+
+    if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
+      if (!breakLine.equals(BreakLine.NEVER)) {
+        builder.append("\n");
+        for (int j = 0; j < indent; j++) builder.append("    ");
+      }
+      if (commaSeparated && i > 0) builder.append(", ");
+    }
+
+     builder.append(s);
+  }
 
   private static void appendExpression(
       Expression expression,
@@ -769,7 +869,7 @@ public class JSQLFormatter {
             whenClause.getWhenExpression(),
             null,
             builder,
-            indent + 1,
+            indent + 3,
             0,
             false,
             BreakLine.AFTER_FIRST);
@@ -846,7 +946,21 @@ public class JSQLFormatter {
 
     } else if (expression instanceof IsNullExpression) {
       IsNullExpression isNullExpression = (IsNullExpression) expression;
-      builder.append(isNullExpression.toString());
+      appendExpression(
+          isNullExpression.getLeftExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          false,
+          BreakLine.AFTER_FIRST);
+
+      if (isNullExpression.isUseIsNull()) {
+        builder.append(isNullExpression.isNot() ? " NOT" : "").append(" ISNULL");
+      } else {
+        builder.append(" IS").append(isNullExpression.isNot() ? " NOT" : "").append(" NULL");
+      }
+
     } else if (expression instanceof NullValue) {
       NullValue nullValue = (NullValue) expression;
       builder.append(nullValue.toString());
@@ -909,8 +1023,7 @@ public class JSQLFormatter {
       appendSelectBody(selectBody, alias, builder, subIndent, withItems != null);
       builder.append(" ) ");
     } else {
-      throw new UnsupportedOperationException(
-          "Expression " + expression.getClass().getName() + " is not supported yet.");
+      builder.append(expression);
     }
 
     if (alias != null) {
@@ -1074,5 +1187,385 @@ public class JSQLFormatter {
     } else if (setOperation != null)
       throw new UnsupportedOperationException(
           setOperation.getClass().getName() + " is not supported yet.");
+  }
+
+  private static void appendTruncate(StringBuilder builder, Truncate truncate, int indent) {
+    Table table = truncate.getTable();
+    boolean cascade = truncate.getCascade();
+
+    builder.append("TRUNCATE TABLE ").append(table.getFullyQualifiedName());
+    if (cascade) {
+      builder.append(" CASCADE");
+    }
+  }
+
+  private static void appendCreateTable(
+      StringBuilder builder, CreateTable createTable, int indent) {
+
+    int i = 0;
+    BreakLine breakLine = BreakLine.ALWAYS;
+    boolean commaSeparated = true;
+
+    List<String> createOptionsString = createTable.getCreateOptionsStrings();
+    String createOps =
+        createOptionsString != null && createOptionsString.size() > 0
+            ? PlainSelect.getStringList(createOptionsString, false, false)
+            : null;
+
+    boolean unlogged = createTable.isUnlogged();
+    boolean ifNotExists = createTable.isIfNotExists();
+
+    Table table = createTable.getTable();
+    builder
+        .append("CREATE ")
+        .append(unlogged ? "UNLOGGED " : "")
+        .append(createOps != null ? createOps + " " : "")
+        .append("TABLE ")
+        .append(ifNotExists ? "IF NOT EXISTS " : "")
+        .append(table.getFullyQualifiedName());
+
+    List<ColumnDefinition> columnDefinitions = createTable.getColumnDefinitions();
+    if (columnDefinitions != null && !columnDefinitions.isEmpty()) {
+      builder.append(" (");
+
+      int colWidth = 0;
+      int typeWidth = 0;
+
+      for (ColumnDefinition columnDefinition : columnDefinitions) {
+        String columnName = columnDefinition.getColumnName();
+        // @todo: please get rid of that Replace workaround
+        String colDataType = columnDefinition.getColDataType().toString().replace(", ", ",");
+
+        if (colWidth < columnName.length()) colWidth = columnName.length();
+
+        if (typeWidth < colDataType.length()) typeWidth = colDataType.length();
+      }
+
+      // int typeIndex = (((indent +1)* "    ".length() + colWidth + 1) / "    ".length()) * ("
+      // ".length() + 1);
+
+      int typeIndex = indent + (colWidth / "    ".length()) + 3;
+
+      int specIndex = indent + typeIndex + (typeWidth / "    ".length()) + 1;
+
+      for (ColumnDefinition columnDefinition : columnDefinitions) {
+        if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
+          if (!breakLine.equals(BreakLine.NEVER)) {
+            builder.append("\n");
+            for (int j = 0; j <= indent; j++) builder.append("    ");
+          }
+          if (commaSeparated && i > 0) builder.append(", ");
+        }
+
+        String columnName = columnDefinition.getColumnName();
+        ColDataType colDataType = columnDefinition.getColDataType();
+        List<String> columnSpecs = columnDefinition.getColumnSpecs();
+
+        builder.append(columnName);
+
+        int lastIndex = builder.lastIndexOf("\n");
+        int lastLineLength = builder.length() - lastIndex + 1;
+
+        for (int j = lastLineLength; j <= typeIndex * 4; j++) builder.append(" ");
+        // @todo: please get rid of that Replace workaround
+        builder.append(colDataType.toString().replace(", ", ","));
+
+        lastLineLength = builder.length() - lastIndex + 1;
+
+        if (columnSpecs != null && !columnSpecs.isEmpty()) {
+          for (int j = lastLineLength; j <= specIndex * 4; j++) builder.append(" ");
+          builder.append(PlainSelect.getStringList(columnSpecs, false, false));
+        }
+        i++;
+      }
+
+      // Direct Known Subclasses:
+      // ExcludeConstraint, NamedConstraint
+
+      // Direct Known Subclasses:
+      // CheckConstraint, ForeignKeyIndex
+
+      List<Index> indexes = createTable.getIndexes();
+      if (indexes != null && !indexes.isEmpty()) {
+        for (Index index : indexes) {
+          if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
+            if (!breakLine.equals(BreakLine.NEVER)) {
+              builder.append("\n");
+              for (int j = 0; j <= indent; j++) builder.append("    ");
+            }
+            if (commaSeparated && i > 0) builder.append(", ");
+          }
+
+          if (index instanceof ForeignKeyIndex) {
+            ForeignKeyIndex foreignKeyIndex = (ForeignKeyIndex) index;
+
+            String type = foreignKeyIndex.getType();
+            String name = foreignKeyIndex.getName();
+            List<String> columnsNames = foreignKeyIndex.getColumnsNames();
+            List<Index.ColumnParams> columnParams = foreignKeyIndex.getColumns();
+            List<String> idxSpec = foreignKeyIndex.getIndexSpec();
+            String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
+
+            // @todo: beautify the expression
+            // @todo: add a test case
+            builder.append((name != null ? "CONSTRAINT " + name + " " : ""));
+
+            builder.append("\n");
+            for (int j = 0; j <= indent + 1; j++) builder.append("    ");
+            builder.append(
+                type
+                    + " "
+                    + PlainSelect.getStringList(columnsNames, true, true)
+                    + (!"".equals(idxSpecText) ? " " + idxSpecText : ""));
+
+            Table foreignTable = foreignKeyIndex.getTable();
+            List<String> referencedColumnNames = foreignKeyIndex.getReferencedColumnNames();
+
+            builder.append("\n");
+            for (int j = 0; j <= indent + 1; j++) builder.append("    ");
+            builder
+                .append("REFERENCES ")
+                .append(foreignTable)
+                .append(PlainSelect.getStringList(referencedColumnNames, true, true));
+
+            ReferentialAction updateAction =
+                foreignKeyIndex.getReferentialAction(ReferentialAction.Type.UPDATE);
+            if (updateAction != null) {
+              builder.append("\n");
+              for (int j = 0; j <= indent + 2; j++) builder.append("    ");
+              builder.append(updateAction);
+            }
+
+            ReferentialAction deleteAction =
+                foreignKeyIndex.getReferentialAction(ReferentialAction.Type.DELETE);
+            if (deleteAction != null) {
+              builder.append("\n");
+              for (int j = 0; j <= indent + 2; j++) builder.append("    ");
+              builder.append(deleteAction);
+            }
+
+          } else if (index instanceof CheckConstraint) {
+            CheckConstraint checkConstraint = (CheckConstraint) index;
+
+            String contraintName = checkConstraint.getName();
+            Expression expression = checkConstraint.getExpression();
+
+            builder.append("CONSTRAINT " + contraintName);
+            builder.append("\n");
+            for (int j = 0; j <= indent + 1; j++) builder.append("    ");
+
+            builder.append(" CHECK (" + expression + ")");
+
+          } else if (index instanceof NamedConstraint) {
+            NamedConstraint namedConstraint = (NamedConstraint) index;
+
+            String type = namedConstraint.getType();
+            String name = namedConstraint.getName();
+            List<String> columnsNames = namedConstraint.getColumnsNames();
+            List<Index.ColumnParams> columnParams = namedConstraint.getColumns();
+            List<String> idxSpec = namedConstraint.getIndexSpec();
+            String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
+
+            // @todo: beautify the expression
+            // @todo: add a test case
+            builder.append((name != null ? "CONSTRAINT " + name + " " : ""));
+            builder.append("\n");
+            for (int j = 0; j <= indent + 1; j++) builder.append("    ");
+            builder.append(type).append(" ");
+            builder.append(
+                PlainSelect.getStringList(columnsNames, true, true)
+                    + (!"".equals(idxSpecText) ? " " + idxSpecText : ""));
+
+          } else if (index instanceof ExcludeConstraint) {
+            ExcludeConstraint excludeConstraint = (ExcludeConstraint) index;
+            Expression expression = excludeConstraint.getExpression();
+
+            // @todo: beautify the expression
+            // @todo: add a test case
+
+            builder.append("EXCLUDE WHERE ");
+            builder.append("(");
+            builder.append(expression);
+            builder.append(")");
+
+          } else {
+            String type = index.getType();
+            String name = index.getName();
+            List<Index.ColumnParams> columnParams = index.getColumns();
+            List<String> idxSpec = index.getIndexSpec();
+            String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
+
+            builder.append(
+                type
+                    + (!name.isEmpty() ? " " + name : "")
+                    + " "
+                    + PlainSelect.getStringList(columnParams, true, true)
+                    + (!"".equals(idxSpecText) ? " " + idxSpecText : ""));
+          }
+          i++;
+        }
+      }
+      builder.append("\n  )");
+    }
+    List<String> tableOptionsStrings = createTable.getTableOptionsStrings();
+    String options = PlainSelect.getStringList(tableOptionsStrings, false, false);
+    if (options != null && options.length() > 0) {
+      builder.append(" ").append(options);
+    }
+
+    RowMovement rowMovement = createTable.getRowMovement();
+    if (rowMovement != null) {
+      // @todo: beautify this part
+      // @todo: provide test cases
+      builder.append(" " + rowMovement.getMode().toString() + " ROW MOVEMENT");
+    }
+
+    Select select = createTable.getSelect();
+    boolean selectParenthesis = createTable.isSelectParenthesis();
+    if (select != null) {
+      builder.append("\n");
+      for (int j = 0; j <= indent; j++) builder.append("    ");
+      builder.append("AS ");
+
+      if (selectParenthesis) builder.append("( ");
+
+      appendSelect(select, builder, indent + 2, false);
+
+      if (selectParenthesis) builder.append(" )");
+    }
+
+    Table likeTable = createTable.getLikeTable();
+    if (likeTable != null) {
+
+      builder.append(" AS ");
+      if (selectParenthesis) builder.append("( ");
+
+      Alias alias = likeTable.getAlias();
+
+      appendFromItem(likeTable, alias, builder, indent + 1, i);
+
+      if (selectParenthesis) builder.append(" )");
+    }
+  }
+
+  private static void appendCreateIndex(
+      StringBuilder builder, CreateIndex createIndex, int indent) {
+
+    Index index = createIndex.getIndex();
+    Table table = createIndex.getTable();
+
+    List<String> tailParameters = createIndex.getTailParameters();
+
+    builder.append("CREATE ");
+
+    if (index.getType() != null) {
+      builder.append(index.getType());
+      builder.append(" ");
+    }
+
+    builder.append("INDEX ");
+    builder.append(index.getName());
+    
+    builder.append("\n");
+    for (int j = 0; j <= indent; j++) builder.append("    ");
+    builder.append("ON ");
+    builder.append(table.getFullyQualifiedName());
+
+    if (index.getUsing() != null) {
+      builder.append(" USING ");
+      builder.append(index.getUsing());
+    }
+
+    if (index.getColumnsNames() != null) {
+      builder.append(" ( ");
+      
+       int lastIndex = builder.lastIndexOf("\n");
+      int lastLineLength = builder.length() - lastIndex + 1;
+
+      int subIndent = lastLineLength / 4;
+      
+      List<Index.ColumnParams> columnsParameters = index.getColumns();
+      int i=0;
+      for ( Index.ColumnParams param: columnsParameters) {
+        appendString(
+            param.getColumnName(),
+            null,
+            builder,
+            subIndent,
+            i,
+            true,
+            columnsParameters.size() > 3 
+                    ? BreakLine.AFTER_FIRST 
+                    : BreakLine.NEVER);
+        i++;
+      }
+
+      builder.append(" )");
+
+      if (tailParameters != null) {
+        for (String param : tailParameters) {
+          builder.append(" ").append(param);
+        }
+      }
+    }
+  }
+
+  private static void appendCreateView(StringBuilder builder, CreateView createView, int indent) {
+    boolean isOrReplace = createView.isOrReplace();
+    ForceOption force = createView.getForce();
+    TemporaryOption temp= createView.getTemporary();
+    boolean isMaterialized = createView.isMaterialized();
+    
+    Table view = createView.getView();
+    
+    List<String> columnNames = createView.getColumnNames();
+    Select select = createView.getSelect();
+    boolean isWithReadOnly = createView.isWithReadOnly();
+    
+    
+    builder.append("CREATE ");
+        if (isOrReplace) {
+            builder.append("OR REPLACE ");
+        }
+        switch (force) {
+            case FORCE:
+                builder.append("FORCE ");
+                break;
+            case NO_FORCE:
+                builder.append("NO FORCE ");
+                break;
+        }
+
+        if (temp != TemporaryOption.NONE) {
+            builder.append(temp.name()).append(" ");
+        }
+
+        if (isMaterialized) {
+            builder.append("MATERIALIZED ");
+        }
+        builder.append("VIEW ");
+        builder.append(view);
+        if (columnNames != null) {
+            builder.append(PlainSelect.getStringList(columnNames, true, true));
+        }
+        
+        builder.append("\n");
+        for (int j = 0; j <= indent; j++) builder.append("    ");
+        builder.append("AS  ");
+        appendSelect(select, builder, indent+2, false);
+        
+        if (isWithReadOnly) {
+            builder.append(" WITH READ ONLY");
+        }
+  }
+
+  private enum BreakLine {
+    NEVER // keep all arguments on one line
+    ,
+    AS_NEEDED // only when more than 3 arguments
+    ,
+    AFTER_FIRST // break all after the first argument
+    ,
+    ALWAYS // break all arguments to a new line
   }
 }
