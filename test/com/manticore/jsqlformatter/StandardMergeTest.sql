@@ -164,6 +164,7 @@ WHEN NOT MATCHED THEN
                 , status ) 
     VALUES ( b.object_id
                 , b.status ) 
+    WHERE b.status != 'VALID'
 WHEN MATCHED THEN 
     UPDATE SET a.status = b.status
     WHERE b.status != 'VALID'

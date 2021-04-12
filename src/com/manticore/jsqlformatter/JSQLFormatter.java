@@ -19,12 +19,9 @@
 package com.manticore.jsqlformatter;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static java.util.stream.Collectors.joining;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -272,6 +269,19 @@ public class JSQLFormatter {
           i++;
         }
       builder.append(" ) ");
+      
+      Expression whereCondition = insert.getWhereCondition();
+      if (whereCondition != null) {
+        builder.append("\n");
+        for (int j = 0; j < indent + 1; j++) builder.append("    ");
+        builder.append("WHERE ");
+
+        lastIndex = builder.lastIndexOf("\n");
+        lastLineLength = builder.length() - lastIndex + 1;
+        subIndent = lastLineLength / 4;
+
+        appendExpression(whereCondition, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
+      }
     }
 
     MergeUpdate update = merge.getMergeUpdate();
