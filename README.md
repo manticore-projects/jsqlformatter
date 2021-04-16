@@ -1,6 +1,8 @@
 # jsqlformatter
 Java SQL Formatter, Beautifier and Pretty Printer
 
+[![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
+
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
 * supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE statements

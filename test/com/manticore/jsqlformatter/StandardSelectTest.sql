@@ -78,7 +78,7 @@ WITH scope AS (
         SELECT *
         FROM cfe.execution
         WHERE id_status = 'R'
-            AND value_date = ( SELECT Max
+            AND value_date = ( SELECT Max(value_date)
                                 FROM cfe.execution
                                 WHERE id_status = 'R'
                                     AND ( :VALUE_DATE IS NULL
@@ -89,7 +89,7 @@ WITH scope AS (
         FROM common.fxrate_hst f
                 INNER JOIN ex
                     ON f.value_date <= ex.value_date
-        WHERE f.value_date = ( SELECT Max
+        WHERE f.value_date = ( SELECT Max(value_date)
                                 FROM common.fxrate_hst
                                 WHERE id_currency_from = f.id_currency_from
                                     AND id_currency_into = f.id_currency_into
@@ -153,7 +153,7 @@ WITH scope AS (
         SELECT *
         FROM cfe.execution
         WHERE id_status = 'R'
-            AND value_date = ( SELECT Max
+            AND value_date = ( SELECT Max(value_date)
                                 FROM cfe.execution
                                 WHERE id_status = 'R'
                                     AND ( :VALUE_DATE IS NULL
@@ -164,7 +164,7 @@ WITH scope AS (
         FROM common.fxrate_hst f
                 INNER JOIN ex
                     ON f.value_date <= ex.value_date
-        WHERE f.value_date = ( SELECT Max
+        WHERE f.value_date = ( SELECT Max(value_date)
                                 FROM common.fxrate_hst
                                 WHERE id_currency_from = f.id_currency_from
                                     AND id_currency_into = f.id_currency_into
@@ -255,7 +255,7 @@ FROM cfe.collateral a
         INNER JOIN  ( SELECT *
                             FROM common.collateral_type d1
                             WHERE id_status IN  ( 'C', 'H' ) 
-                                AND id_collateral_type_ref = ( SELECT Max
+                                AND id_collateral_type_ref = ( SELECT Max(id_collateral_type_ref)
                                                                 FROM common.collateral_type
                                                                 WHERE id_status IN  ( 'C', 'H' ) 
                                                                     AND id_collateral_type = d1.id_collateral_type )  )  d
@@ -268,10 +268,10 @@ WITH ex AS (
             , posting_date
         FROM cfe.execution x
         WHERE id_status IN  ( 'R', 'H' ) 
-            AND value_date = ( SELECT Max
+            AND value_date = ( SELECT Max(value_date)
                                 FROM cfe.execution
                                 WHERE id_status IN  ( 'R', 'H' )  ) 
-            AND posting_date = ( SELECT Max
+            AND posting_date = ( SELECT Max(posting_date)
                                 FROM cfe.execution
                                 WHERE id_status IN  ( 'R', 'H' ) 
                                     AND value_date = x.value_date )  )
@@ -281,7 +281,7 @@ WITH ex AS (
         FROM common.fxrate_hst f
         WHERE f.value_date <= ( SELECT value_date
                                 FROM ex ) 
-            AND f.value_date = ( SELECT Max
+            AND f.value_date = ( SELECT Max(value_date)
                                 FROM common.fxrate_hst
                                 WHERE id_currency_from = f.id_currency_from
                                     AND id_currency_into = f.id_currency_into ) 
@@ -403,4 +403,12 @@ ORDER BY ( SELECT code
             AND code_inferior = a.code
             AND gl_level = 7 ) NULLS FIRST 
     , code
+;
+
+-- ESCAPRE
+INSERT INTO table(
+    id
+    , col_name ) 
+VALUES ( 1
+            , 'this''s value' ) 
 ;

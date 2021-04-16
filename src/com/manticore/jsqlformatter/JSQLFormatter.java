@@ -18,10 +18,21 @@
 
 package com.manticore.jsqlformatter;
 
+import com.diogonunes.jcolor.AnsiFormat;
+import com.diogonunes.jcolor.Attribute;
+import static com.diogonunes.jcolor.Attribute.BOLD;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -32,6 +43,10 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.ReferentialAction;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.alter.Alter;
+import net.sf.jsqlparser.statement.alter.AlterExpression;
+import net.sf.jsqlparser.statement.alter.AlterOperation;
+import net.sf.jsqlparser.statement.alter.ConstraintState;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.create.view.CreateView;
@@ -46,6 +61,12 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.select.OrderByElement.NullOrdering;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
+import org.apache.commons.cli.*;
+import org.apache.commons.io.IOUtils;
+import org.graalvm.nativeimage.IsolateThread;
+import org.graalvm.nativeimage.c.function.CEntryPoint;
+import org.graalvm.nativeimage.c.type.CCharPointer;
+import org.graalvm.nativeimage.c.type.CTypeConversion;
 
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
@@ -55,10 +76,115 @@ import net.sf.jsqlparser.statement.update.Update;
  */
 public class JSQLFormatter {
 
+  private enum OutputFormat {
+    PLAIN,
+    ANSI,
+    HTML,
+    RTF
+  };
+
+  private static OutputFormat outputFormat = OutputFormat.ANSI;
+
+  private static final Logger LOGGER = Logger.getLogger(JSQLFormatter.class.getName());
+
+  private static final AnsiFormat ANSI_FORMAT_KEYWORD =
+      new AnsiFormat(Attribute.BLUE_TEXT(), BOLD());
+
+  private static final AnsiFormat ANSI_FORMAT_HINT = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT());
+
+  private static final AnsiFormat ANSI_FORMAT_OPERATOR = new AnsiFormat(Attribute.BLUE_TEXT());
+
+  private static final AnsiFormat ANSI_FORMAT_PARAMETER =
+      new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
+
+  private static final AnsiFormat ANSI_FORMAT_ALIAS =
+      new AnsiFormat(Attribute.RED_TEXT(), BOLD(), Attribute.DESATURATED());
+
+  private static StringBuilder appendKeyWord(
+      StringBuilder builder, OutputFormat format, String keyword, String before, String after) {
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(keyword).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_KEYWORD.format(keyword)).append(after);
+        break;
+      default:
+        builder.append(before).append(keyword).append(after);
+        break;
+    }
+    return builder;
+  }
+
+  private static StringBuilder appendHint(
+      StringBuilder builder, OutputFormat format, String hint, String before, String after) {
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(hint).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_HINT.format(hint)).append(after);
+        break;
+      default:
+        builder.append(before).append(hint).append(after);
+        break;
+    }
+    return builder;
+  }
+
+  private static StringBuilder appendOperator(
+      StringBuilder builder, OutputFormat format, String operator, String before, String after) {
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(operator).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_OPERATOR.format(operator)).append(after);
+        break;
+      default:
+        builder.append(before).append(operator).append(after);
+        break;
+    }
+    return builder;
+  }
+
+  private static StringBuilder appendValue(
+      StringBuilder builder, OutputFormat format, String value, String before, String after) {
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(value).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_PARAMETER.format(value)).append(after);
+        break;
+      default:
+        builder.append(before).append(value).append(after);
+        break;
+    }
+    return builder;
+  }
+
+  private static StringBuilder appendAlias(
+      StringBuilder builder, OutputFormat format, String alias, String before, String after) {
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(alias).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_ALIAS.format(alias)).append(after);
+        break;
+      default:
+        builder.append(before).append(alias).append(after);
+        break;
+    }
+    return builder;
+  }
+
   private static void appendDelete(StringBuilder builder, Delete delete, int indent) {
     int i = 0;
 
-    builder.append("DELETE ");
+    // der.append(com.diogonunes.jcolor.Ansi.generateCode(CLEAR()));
+    appendKeyWord(builder, outputFormat, "DELETE", "", " ");
 
     /* @todo: activate when PR is accepted
     OracleHint oracleHint = delete.getOracleHint();
@@ -76,7 +202,7 @@ public class JSQLFormatter {
       throw new UnsupportedOperationException("Table List in DELETE is not supported yet.");
     }
 
-    builder.append("FROM ");
+    appendKeyWord(builder, outputFormat, "FROM", "", " ");
 
     Table table = delete.getTable();
     Alias alias = table.getAlias();
@@ -99,15 +225,108 @@ public class JSQLFormatter {
     }
   }
 
-  /** @param args The Command Line Parameters. */
-  public static void main(String[] args) {
-    String sqlStr = "with a as (SELECT 1 FROM b UNION ALL select 1 FROM c) select * from a;";
+  public static File getAbsoluteFile(String filename) {
+    String homePath = new File(System.getProperty("user.home")).toURI().getPath();
 
+    filename = filename.replaceFirst("~", Matcher.quoteReplacement(homePath));
+    filename = filename.replaceFirst("\\$\\{user.home\\}", Matcher.quoteReplacement(homePath));
+
+    File f = new File(filename);
+
+    if (!f.isAbsolute()) {
+      Path basePath = Paths.get("").toAbsolutePath();
+
+      Path resolvedPath = basePath.resolve(filename);
+      Path absolutePath = resolvedPath.normalize();
+      f = absolutePath.toFile();
+    }
+    return f;
+  }
+
+  public static String getAbsoluteFileName(String filename) {
+    return getAbsoluteFile(filename).getAbsolutePath();
+  }
+
+  /** @param args The Command Line Parameters. */
+  public static void main(String[] args) throws Exception {
+    Options options = new Options();
+
+    //    options.addOption("l", "lib-dir", true, "(Relative) Folder containing the H2 jar files.");
+    //    options.addOption("f", "version-from", true, "Old H2 version of the existing database.");
+    //    options.addOption("t", "version-to", true, "New H2 version to upgrade to.");
+    //    options.addOption(
+    //            "d", "db-file", true, "The (relative) existing H2 database file (in the old
+    // format).");
+    //    options.addOption("u", "user", true, "The database username.");
+    //    options.addOption("p", "password", true, "The database password.");
+    options.addOption("i", "input-file", true, "The input SQL file or folder.");
+    options.addOption("o", "output-file", true, "The out SQL file for the formatted statements.");
+    //    options.addOption("c", "compression", true, "The compression method [ZIP, GZIP]");
+    options.addOption(
+        Option.builder("f")
+            .longOpt("format")
+            .hasArgs()
+            .valueSeparator(' ')
+            .desc("The output-format [PLAIN ANSI HTML RTF]")
+            .build());
+    options.addOption("h", "help", false, "Show the help message.");
+
+    // create the parser
+    CommandLineParser parser = new DefaultParser();
     try {
-      sqlStr = JSQLFormatter.format(sqlStr);
-      System.out.println(sqlStr);
-    } catch (Exception ex) {
-      Logger.getLogger(JSQLFormatter.class.getName()).log(Level.SEVERE, null, ex);
+      // parse the command line arguments
+      CommandLine line = parser.parse(options, args);
+
+      if (line.hasOption("help") || (line.getOptions().length == 0 && line.getArgs().length == 0)) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.setOptionComparator((Comparator<Option>) null);
+
+        String startupCommand =
+            System.getProperty("java.vm.name").equalsIgnoreCase("Substrate VM")
+                ? "./JSQLFormatter"
+                : "java -jar JSQLFormatter.jar";
+
+        formatter.printHelp(startupCommand, options, true);
+        return;
+      }
+
+      File inputFile = null;
+      if (line.hasOption("input-file")) {
+        inputFile = getAbsoluteFile(line.getOptionValue("input-file"));
+
+        if (!inputFile.canRead())
+          throw new Exception(
+              "Can't read the specified INPUT-FILE " + inputFile.getCanonicalPath());
+
+        try (FileInputStream inputStream = new FileInputStream(inputFile); ) {
+          String sqlStr = IOUtils.toString(inputStream, Charset.defaultCharset());
+          System.out.println("\n-- FROM " + inputFile.getName() + "\n" + format(sqlStr));
+        } catch (Exception ex) {
+          throw new Exception(
+              "Error when reading from INPUT FILE " + inputFile.getAbsolutePath(), ex);
+        }
+      }
+
+      List<String> argsList = line.getArgList();
+      if (argsList.isEmpty() && !line.hasOption("input-file"))
+        throw new Exception("No SQL statements provided for formatting.");
+      else
+        for (String s : argsList) {
+          try {
+            System.out.println("\n-- FROM ARGUMENT LIST\n" + format(s));
+          } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to format statement\n" + s, ex);
+          }
+        }
+
+    } catch (ParseException ex) {
+      LOGGER.log(Level.FINE, "Parsing failed.  Reason: " + ex.getMessage(), ex);
+
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.setOptionComparator((Comparator<Option>) null);
+      formatter.printHelp("java -jar H2MigrationTool.jar", options, true);
+
+      throw new Exception("Could not parse the Command Line Arguments.", ex);
     }
   }
 
@@ -116,10 +335,26 @@ public class JSQLFormatter {
    *
    * <p>SELECT, INSERT, UPDATE and MERGE statements are supported.
    *
-   * @param sqlStr The ugly unformatted SQL Statements, semi-colon separated.
+   * @param thread
+   * @param sql
    * @return The beautifully formatted SQL Statements, semi-colon separated.
-   * @throws Exception Any parsing exception.
    */
+  @CEntryPoint(name = "format")
+  public static CCharPointer format(IsolateThread thread, CCharPointer sql) {
+    String sqlStr = CTypeConversion.toJavaString(sql);
+
+    try {
+      sqlStr = format(sqlStr);
+    } catch (Exception ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    try (final CTypeConversion.CCharPointerHolder holder = CTypeConversion.toCString(sqlStr)) {
+      final CCharPointer result = holder.get();
+      return result;
+    }
+  }
+
   public static String format(String sqlStr) throws Exception {
     StringBuilder builder = new StringBuilder();
 
@@ -171,6 +406,10 @@ public class JSQLFormatter {
         CreateView createView = (CreateView) statement;
         appendCreateView(builder, createView, indent);
 
+      } else if (statement instanceof Alter) {
+        Alter alter = (Alter) statement;
+        appendAlter(builder, alter, indent);
+
       } else if (statement != null) {
         try {
           builder.append("\n").append(statement.toString());
@@ -179,15 +418,15 @@ public class JSQLFormatter {
               "The " + statement.getClass().getName() + " Statement is not supported yet.");
         }
       }
-      builder.append("\n;");
+      builder.append("\n;\n\n");
     }
-    return builder.toString().trim();
+    return builder.toString();
   }
 
   private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
     int i = 0;
 
-    builder.append("MERGE INTO ");
+    appendKeyWord(builder, outputFormat, "MERGE INTO", "", " ");
 
     Table table = merge.getTable();
     Alias alias = table.getAlias();
@@ -196,7 +435,7 @@ public class JSQLFormatter {
 
     builder.append("\n");
     for (int j = 0; j < indent + 1; j++) builder.append("    ");
-    builder.append("USING ");
+    appendKeyWord(builder, outputFormat, "USING", "", " ");
 
     SubSelect select = merge.getUsingSelect();
     if (select != null) {
@@ -219,7 +458,7 @@ public class JSQLFormatter {
     if (onExpression != null) {
       builder.append("\n");
       for (int j = 0; j < indent + 2; j++) builder.append("    ");
-      builder.append("ON ( ");
+      appendKeyWord(builder, outputFormat, "ON", "", " ( ");
 
       int lastIndex = builder.lastIndexOf("\n");
       int lastLineLength = builder.length() - lastIndex + 1;
@@ -233,11 +472,11 @@ public class JSQLFormatter {
     if (insert != null) {
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("WHEN NOT MATCHED THEN ");
+      appendKeyWord(builder, outputFormat, "WHEN NOT MATCHED THEN", "", " ");
 
       builder.append("\n");
       for (int j = 0; j < indent + 1; j++) builder.append("    ");
-      builder.append("INSERT ");
+      appendKeyWord(builder, outputFormat, "INSERT", "", " ");
 
       List<Column> columns = insert.getColumns();
       List<Expression> expressions = insert.getValues();
@@ -258,7 +497,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent + 1; j++) builder.append("    ");
-      builder.append("VALUES ( ");
+      appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
 
       int lastIndex = builder.lastIndexOf("\n");
       int lastLineLength = builder.length() - lastIndex + 1;
@@ -269,12 +508,12 @@ public class JSQLFormatter {
           i++;
         }
       builder.append(" ) ");
-      
+
       Expression whereCondition = insert.getWhereCondition();
       if (whereCondition != null) {
         builder.append("\n");
         for (int j = 0; j < indent + 1; j++) builder.append("    ");
-        builder.append("WHERE ");
+        appendKeyWord(builder, outputFormat, "WHERE", "", " ");
 
         lastIndex = builder.lastIndexOf("\n");
         lastLineLength = builder.length() - lastIndex + 1;
@@ -290,11 +529,11 @@ public class JSQLFormatter {
 
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("WHEN MATCHED THEN ");
+      appendKeyWord(builder, outputFormat, "WHEN MATCHED THEN", "", " ");
 
       builder.append("\n");
       for (int j = 0; j < indent + 1; j++) builder.append("    ");
-      builder.append("UPDATE SET ");
+      appendKeyWord(builder, outputFormat, "UPDATE SET", "", " ");
 
       int lastIndex = builder.lastIndexOf("\n");
       int lastLineLength = builder.length() - lastIndex + 1;
@@ -316,7 +555,7 @@ public class JSQLFormatter {
       if (whereCondition != null) {
         builder.append("\n");
         for (int j = 0; j < indent + 1; j++) builder.append("    ");
-        builder.append("WHERE ");
+        appendKeyWord(builder, outputFormat, "WHERE", "", " ");
 
         lastIndex = builder.lastIndexOf("\n");
         lastLineLength = builder.length() - lastIndex + 1;
@@ -329,7 +568,7 @@ public class JSQLFormatter {
       if (deleteWhereCondition != null) {
         builder.append("\n");
         for (int j = 0; j < indent + 1; j++) builder.append("    ");
-        builder.append("DELETE WHERE ");
+        appendKeyWord(builder, outputFormat, "DELETE WHERE", "", " ");
 
         lastIndex = builder.lastIndexOf("\n");
         lastLineLength = builder.length() - lastIndex + 1;
@@ -344,7 +583,7 @@ public class JSQLFormatter {
   private static void appendInsert(StringBuilder builder, Insert insert, int indent) {
     int i = 0;
 
-    builder.append("INSERT INTO ");
+    appendKeyWord(builder, outputFormat, "INSERT INTO", "", " ");
 
     Table table = insert.getTable();
     Alias alias = table.getAlias();
@@ -364,7 +603,7 @@ public class JSQLFormatter {
     if (insert.isUseValues()) {
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("VALUES ( ");
+      appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
 
       int lastIndex = builder.lastIndexOf("\n");
       int lastLineLength = builder.length() - lastIndex + 1;
@@ -388,7 +627,7 @@ public class JSQLFormatter {
   }
 
   private static void appendUpdate(StringBuilder builder, Update update, int indent) {
-    builder.append("UPDATE ");
+    appendKeyWord(builder, outputFormat, "UPDATE", "", " ");
 
     Table table = update.getTable();
     Alias alias = table.getAlias();
@@ -398,7 +637,7 @@ public class JSQLFormatter {
     int i = 0;
     builder.append("\n");
     for (int j = 0; j < indent; j++) builder.append("    ");
-    builder.append("SET ");
+    appendKeyWord(builder, outputFormat, "SET", "", " ");
 
     if (update.isUseSelect()) {
       builder.append("( ");
@@ -453,7 +692,7 @@ public class JSQLFormatter {
     List<WithItem> withItems = select.getWithItemsList();
     if (withItems != null && withItems.size() > 0) {
       int i = 0;
-      builder.append("WITH ");
+      appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
       for (WithItem withItem : withItems) {
         appendWithItem(withItem, null, builder, indent, i);
@@ -481,10 +720,10 @@ public class JSQLFormatter {
         builder.append("\n");
         for (int j = 0; j < indent; j++) builder.append("    ");
       }
-      builder.append("SELECT ");
+      appendKeyWord(builder, outputFormat, "SELECT", "", " ");
 
       OracleHint oracleHint = plainSelect.getOracleHint();
-      if (oracleHint != null) builder.append(oracleHint.toString()).append(" ");
+      if (oracleHint != null) appendHint(builder, outputFormat, oracleHint.toString(), "", " ");
 
       Distinct distinct = plainSelect.getDistinct();
       if (distinct != null) {
@@ -498,10 +737,12 @@ public class JSQLFormatter {
           throw new UnsupportedOperationException(
               "DISTINCT on select items are not supported yet.");
         }
-        builder.append("DISTINCT ");
+        appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
       }
 
       for (SelectItem selectItem : plainSelect.getSelectItems()) {
+        // All Known Implementing Classes:
+        // AllColumns, AllTableColumns, SelectExpressionItem
         if (selectItem instanceof SelectExpressionItem) {
           SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
 
@@ -512,8 +753,11 @@ public class JSQLFormatter {
         } else if (selectItem instanceof AllColumns) {
           AllColumns allColumns = (AllColumns) selectItem;
           appendAllColumns(allColumns, builder, indent, i);
-        } else {
-          System.out.println(selectItem.getClass().getName());
+        } else if (selectItem instanceof AllTableColumns) {
+          AllTableColumns allTableColumns = (AllTableColumns) selectItem;
+          appendAllTableColumns(allTableColumns, builder, indent, i);
+        } else if (selectItem != null) {
+          throw new UnsupportedOperationException(selectItem.getClass().getName());
         }
 
         i++;
@@ -526,7 +770,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("FROM ");
+      appendKeyWord(builder, outputFormat, "FROM", "", " ");
 
       appendFromItem(fromItem, builder, indent, i);
 
@@ -564,8 +808,8 @@ public class JSQLFormatter {
           k++;
         }
       }
-    } else {
-      System.out.println(selectBody.getClass().getName());
+    } else if (selectBody != null) {
+      throw new UnsupportedOperationException(selectBody.getClass().getName());
     }
   }
 
@@ -575,7 +819,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("ORDER BY ");
+      appendKeyWord(builder, outputFormat, "ORDER BY", "", " ");
 
       for (OrderByElement orderByElement : orderByElements) {
         Expression expression = orderByElement.getExpression();
@@ -583,12 +827,15 @@ public class JSQLFormatter {
 
         NullOrdering nullOrdering = orderByElement.getNullOrdering();
         if (NullOrdering.NULLS_FIRST.equals(nullOrdering))
-          builder.append("NULLS FIRST").append(" ");
+          appendKeyWord(builder, outputFormat, "NULLS FIRST", "", " ");
 
-        if (NullOrdering.NULLS_LAST.equals(nullOrdering)) builder.append("NULLS LAST").append(" ");
+        if (NullOrdering.NULLS_LAST.equals(nullOrdering))
+          appendKeyWord(builder, outputFormat, "NULLS LAST", "", " ");
 
-        if (orderByElement.isAscDescPresent())
-          builder.append(orderByElement.isAsc() ? "ASC " : "DESC");
+        if (orderByElement.isAscDescPresent()) {
+          if (orderByElement.isAsc()) appendKeyWord(builder, outputFormat, "ASC", "", " ");
+          else appendKeyWord(builder, outputFormat, "DESC", "", " ");
+        }
 
         i++;
       }
@@ -602,7 +849,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("HAVING ");
+      appendKeyWord(builder, outputFormat, "HAVING", "", " ");
 
       appendExpression(havingExpression, null, builder, indent, i, false, BreakLine.AFTER_FIRST);
     }
@@ -616,7 +863,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("GROUP BY ");
+      appendKeyWord(builder, outputFormat, "GROUP BY", "", " ");
 
       List groupingSets = groupByElement.getGroupingSets();
       List<Expression> groupByExpressions = groupByElement.getGroupByExpressions();
@@ -640,7 +887,7 @@ public class JSQLFormatter {
       i = 0;
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("WHERE ");
+      appendKeyWord(builder, outputFormat, "WHERE", "", " ");
 
       appendExpression(whereExpression, null, builder, indent, i, false, BreakLine.AFTER_FIRST);
     }
@@ -657,15 +904,15 @@ public class JSQLFormatter {
         } else {
           for (int j = 0; j <= indent + 1; j++) builder.append("    ");
 
-          if (join.isInner()) builder.append("INNER ");
-          if (join.isLeft()) builder.append("LEFT ");
-          if (join.isRight()) builder.append("RIGHT ");
-          if (join.isNatural()) builder.append("NATURAL ");
-          if (join.isCross()) builder.append("CROSS ");
-          if (join.isOuter()) builder.append("OUTER ");
-          if (join.isFull()) builder.append("FULL ");
+          if (join.isInner()) appendKeyWord(builder, outputFormat, "INNER", "", " ");
+          if (join.isLeft()) appendKeyWord(builder, outputFormat, "LEFT", "", " ");
+          if (join.isRight()) appendKeyWord(builder, outputFormat, "RIGHT", "", " ");
+          if (join.isNatural()) appendKeyWord(builder, outputFormat, "NATURAL", "", " ");
+          if (join.isCross()) appendKeyWord(builder, outputFormat, "CROSS", "", " ");
+          if (join.isOuter()) appendKeyWord(builder, outputFormat, "OUTER", "", " ");
+          if (join.isFull()) appendKeyWord(builder, outputFormat, "FULL", "", " ");
 
-          builder.append("JOIN ");
+          appendKeyWord(builder, outputFormat, "JOIN", "", " ");
         }
 
         FromItem rightFromItem = join.getRightItem();
@@ -675,7 +922,7 @@ public class JSQLFormatter {
         if (onExpression != null) {
           builder.append("\n");
           for (int j = 0; j <= indent + 2; j++) builder.append("    ");
-          builder.append("ON ");
+          appendKeyWord(builder, outputFormat, "ON", "", " ");
 
           appendExpression(
               onExpression, null, builder, indent + 3, 0, false, BreakLine.AFTER_FIRST);
@@ -685,7 +932,7 @@ public class JSQLFormatter {
         if (usingColumns != null && usingColumns.size() > 0) {
           builder.append("\n");
           for (int j = 0; j <= indent + 2; j++) builder.append("    ");
-          builder.append("USING ( ");
+          appendKeyWord(builder, outputFormat, "USING", "", " ( ");
           int k = 0;
           for (Column column : usingColumns) {
             appendExpression(column, null, builder, indent + 3, k, true, BreakLine.AFTER_FIRST);
@@ -707,7 +954,7 @@ public class JSQLFormatter {
       builder.append(", ");
     }
 
-    builder.append(withItem.getName());
+    appendAlias(builder, outputFormat, withItem.getName(), "", " ");
 
     List<SelectItem> selectItems = withItem.getWithItemList();
     if (selectItems != null && selectItems.size() > 0) {
@@ -721,7 +968,7 @@ public class JSQLFormatter {
       builder.append(")");
     }
 
-    builder.append(" AS ( ");
+    appendKeyWord(builder, outputFormat, "AS", "", " ( ");
     appendSelectBody(withItem.getSelectBody(), null, builder, indent + 2, true);
     builder.append(" )");
   }
@@ -735,7 +982,7 @@ public class JSQLFormatter {
     }
     builder.append(allColumns.toString());
   }
-  
+
   private static void appendStringList(
       Collection<String> strings,
       Alias alias,
@@ -744,12 +991,12 @@ public class JSQLFormatter {
       boolean commaSeparated,
       BreakLine breakLine) {
     int i = 0;
-    for (String s: strings) {
+    for (String s : strings) {
       appendString(s, alias, builder, indent, i, commaSeparated, breakLine);
       i++;
     }
   }
-  
+
   private static void appendString(
       String s,
       Alias alias,
@@ -767,7 +1014,7 @@ public class JSQLFormatter {
       if (commaSeparated && i > 0) builder.append(", ");
     }
 
-     builder.append(s);
+    builder.append(s);
   }
 
   private static void appendExpression(
@@ -804,7 +1051,7 @@ public class JSQLFormatter {
 
       builder.append("\n");
       for (int j = 0; j <= indent; j++) builder.append("    ");
-      builder.append("AND ");
+      appendOperator(builder, outputFormat, "AND", "", " ");
 
       appendExpression(
           andExpression.getRightExpression(),
@@ -822,7 +1069,7 @@ public class JSQLFormatter {
 
       builder.append("\n");
       for (int j = 0; j <= indent; j++) builder.append("    ");
-      builder.append("OR ");
+      appendOperator(builder, outputFormat, "OR", "", " ");
 
       appendExpression(
           orExpression.getRightExpression(),
@@ -850,7 +1097,7 @@ public class JSQLFormatter {
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
       builder.append(equalsTo.getLeftExpression());
-      builder.append(" = ");
+      appendOperator(builder, outputFormat, "=", " ", " ");
       // builder.append(equalsTo.getRightExpression());
       appendExpression(
           equalsTo.getRightExpression(),
@@ -860,21 +1107,23 @@ public class JSQLFormatter {
           i,
           false,
           BreakLine.AFTER_FIRST);
+
     } else if (expression instanceof Parenthesis) {
       Parenthesis parenthesis = (Parenthesis) expression;
       builder.append("( ");
       appendExpression(
           parenthesis.getExpression(), null, builder, indent + 1, i, false, BreakLine.AFTER_FIRST);
       builder.append(" )");
+
     } else if (expression instanceof CaseExpression) {
       CaseExpression caseExpression = (CaseExpression) expression;
-      builder.append("CASE ");
+      appendKeyWord(builder, outputFormat, "CASE", "", " ");
 
       List<WhenClause> whenClauses = caseExpression.getWhenClauses();
       for (WhenClause whenClause : whenClauses) {
         builder.append("\n");
         for (int j = 0; j <= indent + 1; j++) builder.append("    ");
-        builder.append("WHEN ");
+        appendKeyWord(builder, outputFormat, "WHEN", "", " ");
         appendExpression(
             whenClause.getWhenExpression(),
             null,
@@ -886,7 +1135,7 @@ public class JSQLFormatter {
 
         builder.append("\n");
         for (int j = 0; j <= indent + 2; j++) builder.append("    ");
-        builder.append("THEN ");
+        appendKeyWord(builder, outputFormat, "THEN", "", " ");
         appendExpression(
             whenClause.getThenExpression(),
             null,
@@ -901,27 +1150,32 @@ public class JSQLFormatter {
       if (elseExpression != null) {
         builder.append("\n");
         for (int j = 0; j <= indent + 1; j++) builder.append("    ");
-        builder.append("ELSE ");
+        appendKeyWord(builder, outputFormat, "ELSE", "", " ");
         appendExpression(
             elseExpression, null, builder, indent + 1, 0, false, BreakLine.AFTER_FIRST);
       }
 
       builder.append("\n");
       for (int j = 0; j <= indent; j++) builder.append("    ");
-      builder.append(" END ");
+      appendKeyWord(builder, outputFormat, "END", "", " ");
 
+    } else if (expression instanceof StringValue) {
+      StringValue stringValue = (StringValue) expression;
+      appendValue(builder, outputFormat, stringValue.toString(), "", "");
     } else if (expression instanceof LongValue) {
       LongValue longValue = (LongValue) expression;
-      builder.append(longValue.toString());
+      appendValue(builder, outputFormat, longValue.toString(), "", "");
     } else if (expression instanceof DateValue) {
       DateValue dateValue = (DateValue) expression;
-      builder.append(dateValue.toString());
+      appendValue(builder, outputFormat, dateValue.toString(), "", "");
     } else if (expression instanceof DoubleValue) {
       DoubleValue doubleValue = (DoubleValue) expression;
-      builder.append(doubleValue.toString());
+      appendValue(builder, outputFormat, doubleValue.toString(), "", "");
     } else if (expression instanceof NotExpression) {
       NotExpression notExpression = (NotExpression) expression;
-      builder.append(notExpression.isExclamationMark() ? "!" : "NOT ");
+      if (notExpression.isExclamationMark()) appendOperator(builder, outputFormat, "!", "", "");
+      else appendOperator(builder, outputFormat, "NOT", "", " ");
+
       appendExpression(
           notExpression.getExpression(),
           null,
@@ -932,7 +1186,9 @@ public class JSQLFormatter {
           BreakLine.AFTER_FIRST);
     } else if (expression instanceof ExistsExpression) {
       ExistsExpression existsExpression = (ExistsExpression) expression;
-      builder.append(existsExpression.isNot() ? "NOT EXISTS " : "EXISTS ");
+      if (existsExpression.isNot()) appendOperator(builder, outputFormat, "NOT EXISTS", "", "");
+      else appendOperator(builder, outputFormat, "EXISTS", "", " ");
+
       appendExpression(
           existsExpression.getRightExpression(),
           null,
@@ -946,13 +1202,13 @@ public class JSQLFormatter {
       builder.append(stringValue.toString());
     } else if (expression instanceof JdbcNamedParameter) {
       JdbcNamedParameter jdbcNamedParameter = (JdbcNamedParameter) expression;
-      builder.append(jdbcNamedParameter.toString());
+      appendValue(builder, outputFormat, jdbcNamedParameter.toString(), "", "");
     } else if (expression instanceof JdbcParameter) {
       JdbcParameter jdbcParameter = (JdbcParameter) expression;
-      builder.append(jdbcParameter.toString());
+      appendValue(builder, outputFormat, jdbcParameter.toString(), "", "");
     } else if (expression instanceof Function) {
       Function function = (Function) expression;
-      builder.append(function.getName());
+      builder.append(function.toString());
 
     } else if (expression instanceof IsNullExpression) {
       IsNullExpression isNullExpression = (IsNullExpression) expression;
@@ -966,22 +1222,24 @@ public class JSQLFormatter {
           BreakLine.AFTER_FIRST);
 
       if (isNullExpression.isUseIsNull()) {
-        builder.append(isNullExpression.isNot() ? " NOT" : "").append(" ISNULL");
+        if (isNullExpression.isNot()) appendOperator(builder, outputFormat, "NOT ISNULL", " ", "");
+        else appendOperator(builder, outputFormat, "ISNULL", " ", "");
       } else {
-        builder.append(" IS").append(isNullExpression.isNot() ? " NOT" : "").append(" NULL");
+        if (isNullExpression.isNot()) appendOperator(builder, outputFormat, "IS NOT NULL", " ", "");
+        else appendOperator(builder, outputFormat, "IS NULL", " ", "");
       }
 
     } else if (expression instanceof NullValue) {
       NullValue nullValue = (NullValue) expression;
-      builder.append(nullValue.toString());
+      appendValue(builder, outputFormat, nullValue.toString(), "", "");
     } else if (expression instanceof TimeKeyExpression) {
       TimeKeyExpression timeKeyExpression = (TimeKeyExpression) expression;
-      builder.append(timeKeyExpression.toString());
+      appendValue(builder, outputFormat, timeKeyExpression.toString(), "", "");
     } else if (expression instanceof InExpression) {
       InExpression inExpression = (InExpression) expression;
       builder.append(inExpression.getLeftExpression());
-      if (inExpression.isNot()) builder.append(" NOT IN ");
-      else builder.append(" IN ");
+      if (inExpression.isNot()) appendOperator(builder, outputFormat, "NOT IN", " ", " ");
+      else appendOperator(builder, outputFormat, "IN", " ", " ");
 
       ItemsList itemsList = inExpression.getRightItemsList();
       if (itemsList != null) {
@@ -1019,7 +1277,7 @@ public class JSQLFormatter {
       List<WithItem> withItems = subSelect.getWithItemsList();
       if (withItems != null && withItems.size() > 0) {
         int j = 0;
-        builder.append("WITH ");
+        appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
         for (WithItem withItem : withItems) {
           appendWithItem(withItem, null, builder, subIndent, j);
@@ -1041,9 +1299,9 @@ public class JSQLFormatter {
 
       if (!builder.substring(length - 1).equalsIgnoreCase(" ")) builder.append(" ");
 
-      if (alias.isUseAs()) builder.append("AS ");
+      if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
 
-      builder.append(alias.getName());
+      appendAlias(builder, outputFormat, alias.getName(), "", " ");
     }
   }
 
@@ -1156,9 +1414,9 @@ public class JSQLFormatter {
 
     builder.append(table.getFullyQualifiedName());
     if (alias != null) {
-      if (alias.isUseAs()) builder.append(" AS");
+      if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", " ", "");
 
-      builder.append(" ").append(alias.getName());
+      appendAlias(builder, outputFormat, alias.getName(), " ", " ");
     }
   }
 
@@ -1172,28 +1430,28 @@ public class JSQLFormatter {
 
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("UNION ");
+      appendOperator(builder, outputFormat, "UNION", "", " ");
 
-      if (unionOp.isAll()) builder.append("ALL ");
+      if (unionOp.isAll()) appendOperator(builder, outputFormat, "ALL", "", " ");
     } else if (setOperation instanceof MinusOp) {
       MinusOp minusOp = (MinusOp) setOperation;
 
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("MINUS ");
+      appendOperator(builder, outputFormat, "MINUS", "", " ");
     } else if (setOperation instanceof IntersectOp) {
       IntersectOp intersectOp = (IntersectOp) setOperation;
 
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("INTERSECT ");
+      appendOperator(builder, outputFormat, "INTERSECT", "", " ");
 
     } else if (setOperation instanceof ExceptOp) {
       ExceptOp exceptOp = (ExceptOp) setOperation;
 
       builder.append("\n");
       for (int j = 0; j < indent; j++) builder.append("    ");
-      builder.append("EXCEPT ");
+      appendOperator(builder, outputFormat, "EXCEPT", "", " ");
     } else if (setOperation != null)
       throw new UnsupportedOperationException(
           setOperation.getClass().getName() + " is not supported yet.");
@@ -1203,9 +1461,10 @@ public class JSQLFormatter {
     Table table = truncate.getTable();
     boolean cascade = truncate.getCascade();
 
-    builder.append("TRUNCATE TABLE ").append(table.getFullyQualifiedName());
+    appendKeyWord(builder, outputFormat, "TRUNCATE TABLE", "", " ")
+        .append(table.getFullyQualifiedName());
     if (cascade) {
-      builder.append(" CASCADE");
+      appendOperator(builder, outputFormat, "CASCADE", " ", "");
     }
   }
 
@@ -1427,7 +1686,7 @@ public class JSQLFormatter {
     if (rowMovement != null) {
       // @todo: beautify this part
       // @todo: provide test cases
-      builder.append(" " + rowMovement.getMode().toString() + " ROW MOVEMENT");
+      builder.append(" ").append(rowMovement.getMode()).append(" ROW MOVEMENT");
     }
 
     Select select = createTable.getSelect();
@@ -1475,7 +1734,7 @@ public class JSQLFormatter {
 
     builder.append("INDEX ");
     builder.append(index.getName());
-    
+
     builder.append("\n");
     for (int j = 0; j <= indent; j++) builder.append("    ");
     builder.append("ON ");
@@ -1488,15 +1747,15 @@ public class JSQLFormatter {
 
     if (index.getColumnsNames() != null) {
       builder.append(" ( ");
-      
-       int lastIndex = builder.lastIndexOf("\n");
+
+      int lastIndex = builder.lastIndexOf("\n");
       int lastLineLength = builder.length() - lastIndex + 1;
 
       int subIndent = lastLineLength / 4;
-      
+
       List<Index.ColumnParams> columnsParameters = index.getColumns();
-      int i=0;
-      for ( Index.ColumnParams param: columnsParameters) {
+      int i = 0;
+      for (Index.ColumnParams param : columnsParameters) {
         appendString(
             param.getColumnName(),
             null,
@@ -1504,9 +1763,7 @@ public class JSQLFormatter {
             subIndent,
             i,
             true,
-            columnsParameters.size() > 3 
-                    ? BreakLine.AFTER_FIRST 
-                    : BreakLine.NEVER);
+            columnsParameters.size() > 3 ? BreakLine.AFTER_FIRST : BreakLine.NEVER);
         i++;
       }
 
@@ -1523,50 +1780,224 @@ public class JSQLFormatter {
   private static void appendCreateView(StringBuilder builder, CreateView createView, int indent) {
     boolean isOrReplace = createView.isOrReplace();
     ForceOption force = createView.getForce();
-    TemporaryOption temp= createView.getTemporary();
+    TemporaryOption temp = createView.getTemporary();
     boolean isMaterialized = createView.isMaterialized();
-    
+
     Table view = createView.getView();
-    
+
     List<String> columnNames = createView.getColumnNames();
     Select select = createView.getSelect();
     boolean isWithReadOnly = createView.isWithReadOnly();
-    
-    
+
     builder.append("CREATE ");
-        if (isOrReplace) {
-            builder.append("OR REPLACE ");
-        }
-        switch (force) {
-            case FORCE:
-                builder.append("FORCE ");
-                break;
-            case NO_FORCE:
-                builder.append("NO FORCE ");
-                break;
+    if (isOrReplace) {
+      builder.append("OR REPLACE ");
+    }
+    switch (force) {
+      case FORCE:
+        builder.append("FORCE ");
+        break;
+      case NO_FORCE:
+        builder.append("NO FORCE ");
+        break;
+    }
+
+    if (temp != TemporaryOption.NONE) {
+      builder.append(temp.name()).append(" ");
+    }
+
+    if (isMaterialized) {
+      builder.append("MATERIALIZED ");
+    }
+    builder.append("VIEW ");
+    builder.append(view);
+    if (columnNames != null) {
+      builder.append(PlainSelect.getStringList(columnNames, true, true));
+    }
+
+    builder.append("\n");
+    for (int j = 0; j <= indent; j++) builder.append("    ");
+    builder.append("AS  ");
+    appendSelect(select, builder, indent + 2, false);
+
+    if (isWithReadOnly) {
+      builder.append(" WITH READ ONLY");
+    }
+  }
+
+  private static void appendAllTableColumns(
+      AllTableColumns allColumns, StringBuilder builder, int indent, int i) {
+    if (i > 0) {
+      builder.append("\n");
+      for (int j = 0; j <= indent; j++) builder.append("    ");
+      builder.append(", ");
+    }
+    builder.append(allColumns.toString());
+  }
+
+  private static void appendAlter(StringBuilder builder, Alter alter, int indent) {
+    boolean useOnly = alter.isUseOnly();
+    Table table = alter.getTable();
+    List<AlterExpression> alterExpressions = alter.getAlterExpressions();
+
+    builder.append("ALTER TABLE ");
+    if (useOnly) {
+      builder.append("ONLY ");
+    }
+    builder.append(table.getFullyQualifiedName()).append(" ");
+    int i = 0;
+
+    if (alterExpressions != null) {
+      for (AlterExpression alterExpression : alterExpressions) {
+        if (i > 0) {
+          builder.append("\n");
+          for (int j = 0; j <= indent; j++) builder.append("    ");
+          builder.append(", ");
         }
 
-        if (temp != TemporaryOption.NONE) {
-            builder.append(temp.name()).append(" ");
-        }
+        AlterOperation operation = alterExpression.getOperation();
+        String commentText = alterExpression.getCommentText();
+        String columnName = alterExpression.getColumnName();
+        String columnOldName = alterExpression.getColumnOldName();
 
-        if (isMaterialized) {
-            builder.append("MATERIALIZED ");
-        }
-        builder.append("VIEW ");
-        builder.append(view);
-        if (columnNames != null) {
-            builder.append(PlainSelect.getStringList(columnNames, true, true));
-        }
-        
+        List<AlterExpression.ColumnDataType> colDataTypeList = alterExpression.getColDataTypeList();
+        String optionalSpecifier = alterExpression.getOptionalSpecifier();
+
+        List<AlterExpression.ColumnDropNotNull> columnDropNotNullList =
+            alterExpression.getColumnDropNotNullList();
+
+        String constraintName = alterExpression.getConstraintName();
+        boolean constraintIfExists = alterExpression.isConstraintIfExists();
+
+        List<String> pkColumns = alterExpression.getPkColumns();
+        List<String> ukColumns = alterExpression.getUkColumns();
+        String ukName = alterExpression.getUkName();
+        boolean uk = alterExpression.getUk();
+
+        List<String> fkColumns = alterExpression.getFkColumns();
+        String fkSourceTable = alterExpression.getFkSourceTable();
+        List<String> fkSourceColumns = alterExpression.getFkSourceColumns();
+
+        ReferentialAction deleteAction =
+            alterExpression.getReferentialAction(ReferentialAction.Type.DELETE);
+        ReferentialAction updateAction =
+            alterExpression.getReferentialAction(ReferentialAction.Type.UPDATE);
+
+        Index index = alterExpression.getIndex();
+
+        List<ConstraintState> constraints = alterExpression.getConstraints();
+        boolean useEqual = alterExpression.getUseEqual();
+
+        List<String> parameters = alterExpression.getParameters();
+
         builder.append("\n");
         for (int j = 0; j <= indent; j++) builder.append("    ");
-        builder.append("AS  ");
-        appendSelect(select, builder, indent+2, false);
-        
-        if (isWithReadOnly) {
-            builder.append(" WITH READ ONLY");
+        builder.append(operation).append(" ");
+
+        if (commentText != null) {
+          if (columnName != null) {
+            builder.append(columnName).append(" COMMENT ");
+          }
+          builder.append(commentText);
+        } else if (columnName != null) {
+          if (alterExpression.hasColumn()) builder.append("COLUMN ");
+          if (operation == AlterOperation.RENAME) {
+            builder.append(columnOldName).append(" TO ");
+          }
+          builder.append(columnName);
+        } else if (colDataTypeList != null) {
+          if (operation == AlterOperation.CHANGE) {
+            if (optionalSpecifier != null) {
+              builder.append(optionalSpecifier).append(" ");
+            }
+            builder.append(columnOldName).append(" ");
+          } else if (colDataTypeList.size() > 1) {
+            builder.append("(");
+          } else {
+            if (alterExpression.hasColumn()) builder.append("COLUMN ");
+          }
+          builder.append(PlainSelect.getStringList(colDataTypeList));
+          if (colDataTypeList.size() > 1) {
+            builder.append(")");
+          }
+        } else if (columnDropNotNullList != null) {
+          if (operation == AlterOperation.CHANGE) {
+            if (optionalSpecifier != null) {
+              builder.append(optionalSpecifier).append(" ");
+            }
+            builder.append(columnOldName).append(" ");
+          } else if (columnDropNotNullList.size() > 1) {
+            builder.append("(");
+          } else {
+            if (alterExpression.hasColumn()) builder.append("COLUMN ");
+          }
+          builder.append(PlainSelect.getStringList(columnDropNotNullList));
+          if (columnDropNotNullList.size() > 1) {
+            builder.append(")");
+          }
+        } else if (constraintName != null) {
+          builder.append("CONSTRAINT ");
+          if (constraintIfExists) {
+            builder.append("IF EXISTS ");
+          }
+          builder.append(constraintName);
+        } else if (pkColumns != null) {
+          builder.append("PRIMARY KEY (").append(PlainSelect.getStringList(pkColumns)).append(')');
+        } else if (ukColumns != null) {
+          builder.append("UNIQUE");
+          if (ukName != null) {
+            if (uk) {
+              builder.append(" KEY ");
+            } else {
+              builder.append(" INDEX ");
+            }
+            builder.append(ukName);
+          }
+          builder.append(" (").append(PlainSelect.getStringList(ukColumns)).append(")");
+        } else if (fkColumns != null) {
+          builder.append("FOREIGN KEY (").append(PlainSelect.getStringList(fkColumns)).append(")");
+
+          builder.append("\n");
+          for (int j = 0; j <= indent + 1; j++) builder.append("    ");
+
+          builder
+              .append("REFERENCES ")
+              .append(fkSourceTable)
+              .append(" (")
+              .append(PlainSelect.getStringList(fkSourceColumns))
+              .append(")");
+          // referentialActions.forEach(b::append);
+          if (updateAction != null) builder.append(updateAction);
+
+          if (deleteAction != null) builder.append(deleteAction);
+        } else if (index != null) {
+          builder.append(index);
         }
+        if (constraints != null && !constraints.isEmpty()) {
+          builder.append(' ').append(PlainSelect.getStringList(constraints, false, false));
+        }
+        if (useEqual) {
+          builder.append('=');
+        }
+        if (parameters != null && !parameters.isEmpty()) {
+          builder.append(' ').append(PlainSelect.getStringList(parameters, false, false));
+        }
+
+        i++;
+      }
+    }
+
+    Iterator<AlterExpression> altIter = alterExpressions.iterator();
+
+    //        while (altIter.hasNext()) {
+    //            builder.append(altIter.next().toString());
+    //
+    //            // Need to append whitespace after each ADD or DROP statement
+    //            // but not the last one
+    //            if (altIter.hasNext()) {
+    //                builder.append(", ");
+    //            }
+    //        }
   }
 
   private enum BreakLine {
