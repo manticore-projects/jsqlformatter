@@ -102,6 +102,6 @@ public class StandardSelectTest {
     System.out.println("\n-- " + input);
     System.out.println(formatted);
 
-    assertEquals(expected, formatted);
+    assertEquals(expected.trim(), formatted.trim());
   }
 }

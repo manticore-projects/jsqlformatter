@@ -115,7 +115,7 @@ FROM ex
             ON b.id_accounting_scope = scope.id_accounting_scope
                 AND b.code = a.code
         INNER JOIN  ( SELECT b.code
-                                , Round balance_bc
+                                , Round( d.amount * fxr.fxrate, 2) balance_bc
                             FROM scope
                                     INNER JOIN cfe.ledger_branch_branch b
                                         ON b.id_accounting_scope = scope.id_accounting_scope
@@ -123,7 +123,7 @@ FROM ex
                                         ON b.code_inferior = c.code
                                             AND c.id_accounting_scope_code = scope.id_accounting_scope_code
                                     INNER JOIN  ( SELECT id_account
-                                                            , SUM balance
+                                                            , SUM(amount) balance
                                                         FROM  ( SELECT id_account_credit id_account
                                                                         , amount
                                                                     FROM cfe.ledger_account_entry
@@ -190,7 +190,7 @@ FROM ex
             ON b.id_accounting_scope = scope.id_accounting_scope
                 AND b.code = a.code
         INNER JOIN  ( SELECT b.code
-                                , Round
+                                , Round( d.amount * fxr.fxrate, 2)
                             FROM scope
                                     INNER JOIN cfe.ledger_branch_branch b
                                         ON b.id_accounting_scope = scope.id_accounting_scope
@@ -198,7 +198,7 @@ FROM ex
                                         ON b.code_inferior = c.code
                                             AND c.id_accounting_scope_code = scope.id_accounting_scope_code
                                     INNER JOIN  ( SELECT id_account
-                                                            , SUM
+                                                            , Sum(amount)
                                                         FROM  ( SELECT id_account_credit
                                                                         , amount
                                                                     FROM cfe.ledger_account_entry
@@ -302,7 +302,7 @@ WITH ex AS (
             AND id_accounting_scope_code = 'NGAAP' )
 , c AS ( 
         SELECT b.code
-            , Round balance_bc
+            , Round( d.amount * fxr.fxrate, 2) balance_bc
         FROM scope
                 INNER JOIN cfe.ledger_branch_branch b
                     ON b.id_accounting_scope = scope.id_accounting_scope
@@ -326,7 +326,7 @@ WITH ex AS (
         GROUP BY b.code )
 , c1 AS ( 
         SELECT b.code
-            , Round balance_bc
+            , Round( d.amount * fxr.fxrate, 2) balance_bc
         FROM scope1
                 INNER JOIN cfe.ledger_branch_branch b
                     ON b.id_accounting_scope = scope1.id_accounting_scope
