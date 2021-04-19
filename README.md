@@ -1,4 +1,4 @@
-# jsqlformatter
+# jsqlformatter 0.1.3
 Java SQL Formatter, Beautifier and Pretty Printer
 
 [![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
@@ -46,9 +46,9 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	
 
 * Multi Platform Binaries:
-	1) JVM: [jsqlformatter-0.1.2.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar)
-(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.sha1))
+	1) JVM: [jsqlformatter-0.1.3.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.sha1))
 	2) Native Linux AMD64:
 	3) Native Windows AMD64:
 	4) Native MacOS is planned
