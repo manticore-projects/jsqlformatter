@@ -5,10 +5,26 @@ Java SQL Formatter, Beautifier and Pretty Printer
 
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
-* supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE statements
+* supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE, ALTER statements
+* ANSI syntax highlighting
+![image](https://user-images.githubusercontent.com/18080123/115190509-53106a00-a112-11eb-88f0-6ee693d6e4d3.png)
 
+* Command Line Option (CLI)
+```
+are@ryzen ~/d/s/jsqlformatter (main) [1]> ./JSQLFormatter
+usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
+       [--indent <arg>] [-2] [-8]
+ -i,--input-file <arg>    The input SQL file or folder.
+ -o,--output-file <arg>   The out SQL file for the formatted statements.
+ -f,--format <arg>        The output-format [PLAIN* ANSI HTML RTF]
+    --ansi                Output ANSI annotated text.
+    --html                Output HTML annotated text.
+    --indent <arg>        The indent width [2 4* 8]
+ -2                       Indent with 2 characters.
+ -8                       Indent with 8 characters.
+```
 
-* simple usage 
+* simple usage of the Java library
 
 	
   ```java
@@ -29,15 +45,19 @@ Java SQL Formatter, Beautifier and Pretty Printer
 	```
 	
 
-* Binaries: [jsqlformatter-0.1.2.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar)
+* Multi Platform Binaries:
+	1) JVM: [jsqlformatter-0.1.2.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar)
 (585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.asc)
 , checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.2/jsqlformatter-0.1.2.jar.sha1))
-* Ueber-Jar including an enhanced version of JSQLParser (applied fixes awaiting approval in the upstream repo)
+	2) Native Linux AMD64:
+	3) Native Windows AMD64:
+	4) Native MacOS is planned
+
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
 * tested against hundreds of complex, real life SQL statements of the [Manticore IFRS Accounting Software](http://manticore-projects.com)
 
 ## Todo/Planned
-* add support for ALTER, SELECT INTO statements
+* add support for SELECT INTO statements
 * detect and quote reserved keyword names
 * add formatting options as per SQL dialect (e. g. Comma first/last, Greedy Spaces, Upper-/Lower-/Camel-Case Names)
 * beautify complex Functions()
