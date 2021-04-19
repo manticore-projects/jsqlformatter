@@ -20,7 +20,7 @@ VALUES ( ?
 ;
 
 -- INSERT TMP_CCF
-INSERT INTO RISK.TMP_CCF(
+INSERT INTO RISK.TMP_CCF (
     "ID_INSTRUMENT"
     , "TENOR"
     , "STATUS"
@@ -33,8 +33,8 @@ VALUES ( '1000042339'
             , 0
             , 'DEFAULT'
             , {d '2020-02-27'}
-            , -142574953.65
+            , - 142574953.65
             , 300000000
-            , -142574953.65
+            , - 142574953.65
             , 157425046.35 ) 
 ;

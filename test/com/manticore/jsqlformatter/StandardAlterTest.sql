@@ -32,12 +32,14 @@ ALTER TABLE risk.collateral
 
 -- ORACLE ADD MULTIPLE COLUMNS
 ALTER TABLE customers 
-    ADD (customer_name varchar2 (45), city varchar2 (40) DEFAULT 'Seattle')
+    ADD (   customer_name    varchar2 (45)
+            , city           varchar2 (40)   DEFAULT 'Seattle')
 ;
 
 -- ORACLE MODIFY MULTIPLE COLUMNS
 ALTER TABLE customers 
-    MODIFY (customer_name varchar2 (100) NOT NULL, city varchar2 (75) DEFAULT 'Seattle' NOT NULL)
+    MODIFY (    customer_name    varchar2 (100)  NOT NULL
+                , city           varchar2 (75)   DEFAULT 'Seattle' NOT NULL)
 ;
 
 -- RENAME

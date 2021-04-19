@@ -5,3 +5,15 @@ upx --lzma JSQLFormatter
 
 export LD_LIBRARY_PATH=.
 clang -I. -L. -o sqlformatter1 sqlformatter.c libSQLFormatter.so
+
+
+
+Activate support globally by default, persistently, via the registry, as detailed in this SU answer.
+
+    In short: In registry key [HKEY_CURRENT_USER\Console], create or set the VirtualTerminalLevel DWORD value to 1
+        From PowerShell, you can do this programmatically as follows:
+        Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1
+        From cmd.exe (also works from PowerShell):
+        reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1
+    Open a new console window for changes to take effect.
+
