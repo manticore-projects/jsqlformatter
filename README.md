@@ -44,12 +44,12 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	
 
 * Multi Platform Binaries:
-	1) JVM: [jsqlformatter-0.1.3.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar)
+	JVM: [jsqlformatter-0.1.3.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar)
 (585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.asc)
 , checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.sha1))
-	2) Native Linux AMD64:
-	3) Native Windows AMD64:
-	4) Native MacOS is planned
+	Linux AMD64:
+	Windows AMD64:
+	MacOS is planned
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
 * tested against hundreds of complex, real life SQL statements of the [Manticore IFRS Accounting Software](http://manticore-projects.com)
