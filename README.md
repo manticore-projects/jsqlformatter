@@ -47,8 +47,8 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	- JVM: [jsqlformatter-0.1.3.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar)
 (585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.asc)
 , checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.sha1))
-	- Linux AMD64:
-	- Windows AMD64:
+	- Linux AMD64: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter) (2.8 MB)
+	- Windows AMD64: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter.exe) (2.8 MB)
 	- MacOS is planned
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
