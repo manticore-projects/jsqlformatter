@@ -38,7 +38,7 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	<dependency>
 	  <groupId>com.manticore-projects.jsqlformatter</groupId>
 	  <artifactId>jsqlformatter</artifactId>
-	  <version>0.1.2</version>
+	  <version>0.1.3</version>
 	</dependency>
 	```
 	
