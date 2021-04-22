@@ -43,8 +43,3 @@ Download
         Windows 64 Binary :downloads:`JSQLFormatter.exe <0.1.3/JSQLFormatter.exe>` (2.8 MB)
         
         Java Binary :downloads:`JSQLFormatter.jar <0.1.3/JSQLFormatter.jar>` (2.8 MB)              
-
-
-Install the package (or add it to your ``requirements.txt`` file):
-
-
