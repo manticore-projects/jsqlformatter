@@ -1751,47 +1751,45 @@
 <span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span>
--- INSERT COUNTERPARTY COUNTERPARTY RELATIONSHIP
-INSERT INTO risk.counterparty_counterparty
-VALUES ( :id_counterparty_ref
-            , :id_counterparty_beneficiary
-            , :id_instrument_guarantee
-            , :priority
-            , :type
-            , :description
-            , :limit_amout
-            , :id_currency
-            , :end_date ) 
-;
+<span class="normal">39</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">-- INSERT COUNTERPARTY COUNTERPARTY RELATIONSHIP</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">risk</span><span class="p">.</span><span class="n">counterparty_counterparty</span>
+<span class="k">VALUES</span> <span class="p">(</span> <span class="p">:</span><span class="n">id_counterparty_ref</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">id_counterparty_beneficiary</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">id_instrument_guarantee</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">priority</span>
+            <span class="p">,</span> <span class="p">:</span><span class="k">type</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">description</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">limit_amout</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">id_currency</span>
+            <span class="p">,</span> <span class="p">:</span><span class="n">end_date</span> <span class="p">)</span> 
+<span class="p">;</span>
 
--- INSERT RATIO COLLECTION RATIOS
-INSERT INTO risk.counterparty_ratio
-VALUES ( ?
-            , ?
-            , ? ) 
-;
+<span class="c1">-- INSERT RATIO COLLECTION RATIOS</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">risk</span><span class="p">.</span><span class="n">counterparty_ratio</span>
+<span class="k">VALUES</span> <span class="p">(</span> <span class="o">?</span>
+            <span class="p">,</span> <span class="o">?</span>
+            <span class="p">,</span> <span class="o">?</span> <span class="p">)</span> 
+<span class="p">;</span>
 
--- INSERT TMP_CCF
-INSERT INTO RISK.TMP_CCF (
-    &quot;ID_INSTRUMENT&quot;
-    , &quot;TENOR&quot;
-    , &quot;STATUS&quot;
-    , &quot;OBSERVATION_DATE&quot;
-    , &quot;BALANCE&quot;
-    , &quot;LIMIT&quot;
-    , &quot;DR_BALANCE&quot;
-    , &quot;OPEN_LIMIT&quot; ) 
-VALUES ( &#39;1000042339&#39;
-            , 0
-            , &#39;DEFAULT&#39;
-            , {d &#39;2020-02-27&#39;}
-            , - 142574953.65
-            , 300000000
-            , - 142574953.65
-            , 157425046.35 ) 
-;
+<span class="c1">-- INSERT TMP_CCF</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">RISK</span><span class="p">.</span><span class="n">TMP_CCF</span> <span class="p">(</span>
+    <span class="ss">&quot;ID_INSTRUMENT&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;TENOR&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;STATUS&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;OBSERVATION_DATE&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;BALANCE&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;LIMIT&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;DR_BALANCE&quot;</span>
+    <span class="p">,</span> <span class="ss">&quot;OPEN_LIMIT&quot;</span> <span class="p">)</span> 
+<span class="k">VALUES</span> <span class="p">(</span> <span class="s1">&#39;1000042339&#39;</span>
+            <span class="p">,</span> <span class="mi">0</span>
+            <span class="p">,</span> <span class="s1">&#39;DEFAULT&#39;</span>
+            <span class="p">,</span> <span class="err">{</span><span class="n">d</span> <span class="s1">&#39;2020-02-27&#39;</span><span class="err">}</span>
+            <span class="p">,</span> <span class="o">-</span> <span class="mi">142574953</span><span class="p">.</span><span class="mi">65</span>
+            <span class="p">,</span> <span class="mi">300000000</span>
+            <span class="p">,</span> <span class="o">-</span> <span class="mi">142574953</span><span class="p">.</span><span class="mi">65</span>
+            <span class="p">,</span> <span class="mi">157425046</span><span class="p">.</span><span class="mi">35</span> <span class="p">)</span> 
+<span class="p">;</span>
 </pre></div>
 </td></tr></table></div>
 </div>
