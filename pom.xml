@@ -21,11 +21,12 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://github.com/manticore-projects/jsqlformatter</connection>
+    <connection>scm:git:git@github.com:manticore-projects/jsqlformatter.git</connection>
     <url>https://github.com/manticore-projects/jsqlformatter</url>
     <tag>HEAD</tag>
   </scm>
 
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -122,6 +123,28 @@
           -->
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <scmBranch>gh_pages</scmBranch>
+          <tryUpdate>true</tryUpdate>
+          <content>${project.reporting.outputDirectory}</content><!-- mono-module doesn't require site:stage -->
+        </configuration>
+        <executions>
+          <execution>
+            <id>gh_pages</id>
+            <phase>site-deploy</phase><!-- deploy site with maven-scm-publish-plugin -->
+            <goals>
+              <goal>publish-scm</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <version>2.1.2</version>
@@ -251,6 +274,30 @@
     
     </plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.9</version>
+        <reportSets>
+          <reportSet>
+            <reports />
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>sphinx-maven-plugin</artifactId>
+        <version>2.10.0</version>
+        <configuration>
+          <binaryUrl>file:///usr/bin/sphinx-build</binaryUrl>
+          <builder>html</builder>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <profiles>
     <profile>

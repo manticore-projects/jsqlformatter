@@ -1,5 +1,7 @@
-# jsqlformatter 0.1.3
-Java SQL Formatter, Beautifier and Pretty Printer [![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
+# jsqlformatter
+Java SQL Formatter, Beautifier and Pretty Printer
+
+[![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
 
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
