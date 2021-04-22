@@ -339,5 +339,10 @@
       <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
       </url>
     </repository>
+    <site>
+      <id>gh_pages</id>
+      <!--<url>scm:git:ssh://git@github.com/manticore-projects/manticore-projects.github.io.git</url> -->
+      <url>scm:git:ssh://git@github.com/manticore-projects/jsqlformatter.git</url>
+    </site>
   </distributionManagement>
 </project>
