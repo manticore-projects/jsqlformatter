@@ -12,6 +12,7 @@ Create
 
 .. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardCreateIndexTest.sql
   :language: SQL
+  :force:
   :linenos:
 
 Alter
@@ -27,6 +28,7 @@ Select
 
 .. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardSelectTest.sql
   :language: SQL
+  :force:
   :linenos:
   
 
@@ -35,6 +37,7 @@ Merge
 
 .. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardMergeTest.sql
   :language: SQL
+  :force:
   :linenos:
 
 Insert
@@ -42,6 +45,7 @@ Insert
 
 .. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardInsertTest.sql
   :language: SQL
+  :force:
   :linenos:
 
 
@@ -50,4 +54,5 @@ Update
 
 .. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardUpdateTest.sql
   :language: SQL
+  :force:
   :linenos:

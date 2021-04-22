@@ -29,9 +29,19 @@ developerName = root.find("xmlns:developers/xmlns:developer[1]/xmlns:name", name
 ####################################
 
 email_support = "andreas@manticore-projects.com"
+
 rst_epilog = """
-.. |email_support| replace:: {0}
-"""
+.. |EMAIL| replace:: {0}
+.. |VERSION| replace:: {1}
+""".format(email_support, versionName)
+
+rst_prolog = """
+.. |EMAIL| replace:: {0}
+.. |VERSION| replace:: {1}
+""".format(email_support, versionName)
+
+extlinks = {'downloads': ('https://github.com/manticore-projects/jsqlformatter/releases/download/%s', '%s')}
+
 #rst_epilog = """
 #.. |email_support| replace:: {0}
 #""".format(email_support)
@@ -46,7 +56,7 @@ master_doc = 'index'
 pygments_style = 'colorful'
 add_function_parentheses = True
 
-extensions = ['recommonmark', 'sphinx.ext.autodoc', 'sphinxcontrib.plantuml', 'sphinx_rtd_theme', 'sphinx_git', 'sphinx.ext.githubpages']
+extensions = ['recommonmark', 'sphinx.ext.autodoc', 'sphinxcontrib.plantuml', 'sphinx_rtd_theme', 'sphinx_git', 'sphinx.ext.githubpages', 'sphinx_tabs.tabs', 'sphinx.ext.extlinks', 'sphinx-prompt', 'sphinx_substitution_extensions']
 
 templates_path = ['templates']
 exclude_trees = ['.build']
