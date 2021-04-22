@@ -2,55 +2,49 @@
 Installation
 ************
 
-Install the package (or add it to your ``requirements.txt`` file):
+Git
+===================
+.. code:: Bash
+    
+   git clone https://github.com/manticore-projects/jsqlformatter.git
+   cd jsqlformatter
+   
+.. tabs::
 
-.. code:: console
+   .. tab:: Maven 
 
-    $ pip install sphinx_rtd_theme
+      .. code:: Bash
+      
+        mvn install
 
-In your ``conf.py`` file:
+   .. tab:: Ant
 
-.. code:: python
+      .. code:: Bash
 
-    import sphinx_rtd_theme
-
-    extensions = [
-        ...
-        'sphinx_rtd_theme',
-    ]
-
-    html_theme = "sphinx_rtd_theme"
+        ant jar
 
 
-.. note::
-
-   Adding this theme as an extension is what enables localization of theme
-   strings in your translated output. If these strings are not translated in
-   your output, either we lack the localized strings for your locale, or you
-   are using an old version of the theme.
-
-Via Git or Download
+Maven Repo
 ===================
 
-.. warning::
+.. code-block:: xml
+   :substitutions:
+     
+    <dependency>
+        <groupId>com.manticore-projects.jsqlformatter</groupId>
+        <artifactId>jsqlformatter</artifactId>
+        <version>|VERSION|</version>
+    </dependency>
 
-   Installing directly from the repo is deprecated.
-   Static assets won't be included in the repo in a future release.
+Download
+===================
+        Linux Static Binary :downloads:`JSQLFormatter <0.1.3/JSQLFormatter>` (2.8 MB)
+        
+        Windows 64 Binary :downloads:`JSQLFormatter.exe <0.1.3/JSQLFormatter.exe>` (2.8 MB)
+        
+        Java Binary :downloads:`JSQLFormatter.jar <0.1.3/JSQLFormatter.jar>` (2.8 MB)              
 
-Symlink or subtree the ``sphinx_rtd_theme/sphinx_rtd_theme`` repository into your documentation at
-``docs/_themes/sphinx_rtd_theme`` then add the following two settings to your Sphinx
-``conf.py`` file:
 
-.. code:: python
+Install the package (or add it to your ``requirements.txt`` file):
 
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = ["_themes", ]
-
-Compatibility
--------------
-
-``sphinx_rtd_theme`` depends on at least Sphinx 1.6 although,
-we recommend at least Sphinx 2 to take advantage of the html5 writer.
-The html4 writer is still supported however,
-it is deprecated and support will be removed in the near future.
 
