@@ -56,3 +56,25 @@ Update
   :language: SQL
   :force:
   :linenos:
+
+
+Comments
+--------------
+
+.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardCommentTest.sql
+  :language: SQL
+  :force:
+  :linenos:
+
+MS Sql Server
+-------------------
+
+.. literalinclude:: ../../../test/com/manticore/jsqlformatter/BracketQuotationTest.sql
+  :language: SQL
+  :force:
+  :linenos:
+
+.. literalinclude:: ../../../test/com/manticore/jsqlformatter/MsSqlServerTest.sql
+  :language: SQL
+  :force:
+  :linenos:

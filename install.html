@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>1. Installation &mdash; JSQLFormatter 0.1.3 documentation</title>
+  <title>1. Installation &mdash; JSQLFormatter 0.1.4 documentation</title>
   
 
   
@@ -44,7 +44,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="JSQLFormatter 0.1.3 documentation" href="index.html"/>
+    <link rel="top" title="JSQLFormatter 0.1.4 documentation" href="index.html"/>
         <link rel="next" title="2. How to use it" href="usage.html"/>
         <link rel="prev" title="Welcome" href="index.html"/> 
 
@@ -100,7 +100,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">1. Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#git">1.1. Git</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#maven-repo">1.2. Maven Repo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#download">1.3. Download</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#download">1.3. Download</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#static-binaries">1.3.1. Static Binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#native-dynamic-libraries">1.3.2. Native Dynamic Libraries</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">2. How to use it</a><ul>
@@ -118,12 +122,15 @@
 <li class="toctree-l2"><a class="reference internal" href="samples.html#merge">3.4. Merge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samples.html#insert">3.5. Insert</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samples.html#update">3.6. Update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samples.html#comments">3.7. Comments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samples.html#ms-sql-server">3.8. MS Sql Server</a></li>
 </ul>
 </li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#latest-changes">Latest Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-4">Changes 0.1.4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-3">Changes 0.1.3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-2">Changes 0.1.2</a></li>
 </ul>
@@ -207,18 +214,54 @@
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span> <span class="nt">&lt;dependency&gt;</span>
      <span class="nt">&lt;groupId&gt;</span>com.manticore-projects.jsqlformatter<span class="nt">&lt;/groupId&gt;</span>
      <span class="nt">&lt;artifactId&gt;</span>jsqlformatter<span class="nt">&lt;/artifactId&gt;</span>
-     <span class="nt">&lt;version&gt;</span>0.1.3<span class="nt">&lt;/version&gt;</span>
+     <span class="nt">&lt;version&gt;</span>0.1.4<span class="nt">&lt;/version&gt;</span>
  <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="download">
 <h2><span class="section-number">1.3. </span>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="static-binaries">
+<h3><span class="section-number">1.3.1. </span>Static Binaries<a class="headerlink" href="#static-binaries" title="Permalink to this headline">¶</a></h3>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Direct Download Links</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Operating System</p></th>
+<th class="head"><p>File</p></th>
+<th class="head"><p>Size</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linux x64</p></td>
+<td><p><a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter">JSQLFormatter</a></p></td>
+<td><p>(2.8 MB)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Windows x64</p></td>
+<td><p><a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter.exe">JSQLFormatter.exe</a></p></td>
+<td><p>(2.8 MB)</p></td>
+</tr>
+<tr class="row-even"><td><p>Java</p></td>
+<td><p><a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter.jar">JSQLFormatter.jar</a></p></td>
+<td><p>(700 kB)</p></td>
+</tr>
+<tr class="row-odd"><td><p>MacOS</p></td>
+<td><p>Comming soon.</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="native-dynamic-libraries">
+<h3><span class="section-number">1.3.2. </span>Native Dynamic Libraries<a class="headerlink" href="#native-dynamic-libraries" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><p>Linux Static Binary <a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter">JSQLFormatter</a> (2.8 MB)</p>
-<p>Windows 64 Binary <a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter.exe">JSQLFormatter.exe</a> (2.8 MB)</p>
-<p>Java Binary <a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter.jar">JSQLFormatter.jar</a> (2.8 MB)</p>
+<div><p>Comming soon.</p>
 </div></blockquote>
+</div>
 </div>
 </div>
 
@@ -263,7 +306,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.3',
+            VERSION:'0.1.4',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE: 'true'
