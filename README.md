@@ -1,5 +1,5 @@
-# jsqlformatter
-Java SQL Formatter, Beautifier and Pretty Printer
+# manticore JSQLFormatter
+Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit our [Website](https://manticore-projects.github.io/jsqlformatter)
 
 [![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
 
@@ -40,17 +40,17 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	<dependency>
 	  <groupId>com.manticore-projects.jsqlformatter</groupId>
 	  <artifactId>jsqlformatter</artifactId>
-	  <version>0.1.3</version>
+	  <version>0.1.4</version>
 	</dependency>
 	```
 	
 
 * Multi Platform Binaries:
-	- JVM: [jsqlformatter-0.1.3.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar)
-(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.3/jsqlformatter-0.1.3.jar.sha1))
-	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
-	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.3/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
+	- JVM: [jsqlformatter-0.1.4.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar.sha1))
+	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
+	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
 	- MacOS is planned
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
