@@ -18,6 +18,8 @@
 
 package com.manticore.jsqlformatter;
 
+import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
+import static com.manticore.jsqlformatter.JSQLFormatter.SQUARED_BRACKET_QUOTATION_PATTERN;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +27,10 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-import org.junit.Test;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
 import static org.junit.Assert.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -90,6 +94,22 @@ public class StandardSelectTest {
     this.expected = expected;
   }
 
+  public static String buildSqlString(final String originalSql, boolean laxDeparsingCheck) {
+    String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
+    if (laxDeparsingCheck) {
+      String s =
+          sql.replaceAll("\\s", " ")
+              .replaceAll("\\s+", " ")
+              .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1")
+              .toLowerCase()
+              .trim();
+      return s.endsWith(";") ? s.substring(0, s.length() - 1) : s;
+
+    } else {
+      return sql;
+    }
+  }
+
   /**
    * Test of format method, of class JSQLFormatter.
    *
@@ -99,6 +119,20 @@ public class StandardSelectTest {
   public void testFormat() throws Exception {
     String formatted = JSQLFormatter.format(expected);
 
+    // Check if the formatted statement still can be parsed and gives the same content
+    String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
+
+    boolean foundSquareBracketQuotes = SQUARED_BRACKET_QUOTATION_PATTERN.matcher(expected).find();
+
+    Statement parsed =
+        CCJSqlParserUtil.parse(
+            formatted, parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
+
+    String sqlStringFromDeparser = buildSqlString(parsed.toString(), true);
+
+    // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
+    //      Check if the formatted statement looks like the expected content
+    
     System.out.println("\n-- " + input);
     System.out.println(formatted);
 

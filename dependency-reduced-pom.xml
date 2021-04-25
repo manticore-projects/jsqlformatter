@@ -21,7 +21,7 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://github.com/manticore-projects/jsqlformatter</connection>
+    <connection>scm:git:git@github.com:manticore-projects/jsqlformatter.git</connection>
     <url>https://github.com/manticore-projects/jsqlformatter</url>
   </scm>
   <build>
@@ -49,6 +49,24 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>gh_pages</id>
+            <phase>site-deploy</phase>
+            <goals>
+              <goal>publish-scm</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <scmBranch>gh_pages</scmBranch>
+          <tryUpdate>true</tryUpdate>
+          <content>${project.reporting.outputDirectory}</content>
         </configuration>
       </plugin>
       <plugin>
@@ -239,6 +257,26 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.9</version>
+        <reportSets>
+          <reportSet />
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>sphinx-maven-plugin</artifactId>
+        <version>2.10.0</version>
+        <configuration>
+          <binaryUrl>file:///usr/bin/sphinx-build</binaryUrl>
+          <builder>html</builder>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <distributionManagement>
     <repository>
       <id>ossrh</id>
@@ -248,9 +286,13 @@
       <id>ossrh</id>
       <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <site>
+      <id>gh_pages</id>
+      <url>scm:git:ssh://git@github.com/manticore-projects/jsqlformatter.git</url>
+    </site>
   </distributionManagement>
   <properties>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 </project>
