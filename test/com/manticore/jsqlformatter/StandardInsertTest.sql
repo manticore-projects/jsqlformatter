@@ -38,3 +38,15 @@ VALUES ( '1000042339'
             , - 142574953.65
             , 157425046.35 ) 
 ;
+
+-- APPEND ATTRIBUTE VALUE REF
+INSERT INTO cfe.ATTRIBUTE_VALUE_REF
+SELECT  cfe.id_attribute_value_ref.nextval
+        , ATTRIBUTE_VALUE
+FROM  ( SELECT DISTINCT 
+            a.ATTRIBUTE_VALUE
+        FROM cfe.instrument_attribute a 
+            LEFT JOIN cfe.ATTRIBUTE_VALUE_REF b 
+                ON a.attribute_value = b.attribute_value
+        WHERE b.attribute_value IS NULL )  a
+;

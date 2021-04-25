@@ -424,3 +424,8 @@ ORDER BY    (   SELECT  code
                     AND gl_level = 7 ) NULLS FIRST 
             , code
 ;
+
+-- ALL COLUMNS FROM TABLE
+SELECT  a.*
+FROM cfe.instrument a 
+;
