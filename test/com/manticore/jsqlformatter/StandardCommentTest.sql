@@ -1,14 +1,15 @@
--- APPEND COLLATERAL REF
-SELECT /*+ PARALLEL */ 
-    cfe.id_collateral_ref.nextval
-    , id_collateral
-FROM  ( SELECT DISTINCT 
-            a.id_collateral
-        FROM cfe.collateral a 
-            LEFT JOIN cfe.collateral_ref b 
-                ON a.id_collateral = b.id_collateral
-        WHERE b.id_collateral_ref IS NULL )
-;
+------------------------------------------------------------------------------------------------------------------------
+-- CONFIGURATION
+------------------------------------------------------------------------------------------------------------------------
+
+-- UPDATE CALENDAR
+update cfe.calendar
+set  year_offset=?                  -- year offset
+     , settlement_shift = ?         -- settlement shit
+     , friday_is_holiday=?          -- friday is a holiday
+     , saturday_is_holiday=?
+     , sunday_is_holiday=?
+where id_calendar=?;
 
 -- BOTH CLAUSES PRESENT 'with a string' AND "a field"
 MERGE /*+ parallel */ INTO test1 /*the target table*/ a 
@@ -22,7 +23,7 @@ WHEN /*comments between keywords!*/ NOT MATCHED THEN
                 , b.status )
 /* UPDATE CLAUSE
 WITH A WHERE CONDITION */ 
-WHEN MATCHED THEN 
+WHEN MATCHED THEN /* Lets rock */ 
     UPDATE SET  a.status = '/*this is no comment!*/ and -- this ain''t either'
     WHERE   b."--status" != 'VALID'
 ;
