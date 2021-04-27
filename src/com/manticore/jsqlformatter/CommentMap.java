@@ -184,23 +184,19 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     int maxPosition = 0;
     while (matcher.find()) {
       i++;
-      String group = matcher.group(0);
       int start = matcher.start(0);
-      int end = matcher.end(0);
 
       int lastLineBreak = builder.lastIndexOf("\n", start);
       int pos = start - lastLineBreak;
       maxPosition = Integer.max(maxPosition, pos);
-      matches.add(new Object[] {group, start, end, pos});
+      matches.add(new Object[] {start, pos});
     }
 
     int subIndent = maxPosition / 4 + (maxPosition % 4 > 0 ? 1 : 0);
     int totalInsertedChars = 0;
     for (Object[] match : matches) {
-      String group = (String) match[0];
-      int start = (int) match[1];
-      int end = (int) match[2];
-      int pos = (int) match[3];
+      int start = (int) match[0];
+      int pos = (int) match[1];
       for (int j = pos; j < subIndent * 4; j++) {
         builder.insert(start + totalInsertedChars, " ");
         totalInsertedChars++;

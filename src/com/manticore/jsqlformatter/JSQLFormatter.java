@@ -507,7 +507,6 @@ public class JSQLFormatter {
 		for (int i=0; m.find(); i++) {
 			semicolons.add(m.start());
 		}
-		LOGGER.info("Found semicolons: " + semicolons.size());
 
     m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
     while (m.find()) {
@@ -520,7 +519,6 @@ public class JSQLFormatter {
 				}
 			}
 		}
-		LOGGER.info("Reduced semicolons: " + semicolons.size());
 		
 		int pos = 0;
 		int length = sqlStr.length();
