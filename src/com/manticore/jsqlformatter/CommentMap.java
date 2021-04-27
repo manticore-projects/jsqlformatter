@@ -143,7 +143,8 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
             int nextBreak = remaining.indexOf('\n');
             if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().length() == 0) {
               builder.append(remaining.substring(nextBreak + 1));
-            }
+            } else
+							builder.append(remaining);
           } else builder.append(remaining);
           break;
         }

@@ -908,7 +908,7 @@ public class JSQLFormatter {
         for (int j = 0; j < indent; j++) builder.append(indentString);
       }
       appendKeyWord(builder, outputFormat, "SELECT", "", " ");
-
+			
       OracleHint oracleHint = plainSelect.getOracleHint();
       if (oracleHint != null) appendHint(builder, outputFormat, oracleHint.toString(), "", " ");
 
@@ -1484,47 +1484,44 @@ public class JSQLFormatter {
       Expression attribute = function.getAttribute();
       String attributeName = function.getAttributeName();
 
-      StringBuilder ans = new StringBuilder();
-      if (escaped) appendFunction(ans, outputFormat, "fn", " {", " ");
+      if (escaped) appendFunction(builder, outputFormat, "fn", " {", " ");
 
-      appendFunction(ans, outputFormat, name, "", "( ");
+      appendFunction(builder, outputFormat, name, "", "( ");
 
       if (parameters != null || namedParameters != null) {
         if (parameters != null) {
           if (distinct) {
-            ans.append("(DISTINCT ");
+            builder.append("(DISTINCT ");
           } else if (allColumns) {
-            ans.append("(ALL ");
+            builder.append("(ALL ");
           }
           int j = 0;
           for (Expression parameter : parameters.getExpressions()) {
-            appendExpression(parameter, null, ans, indent + 1, j, true, BreakLine.NEVER);
+            appendExpression(parameter, null, builder, indent + 1, j, true, BreakLine.NEVER);
             j++;
           }
-          appendNormalizingTrailingWhiteSpace(ans, " )");
+          appendNormalizingTrailingWhiteSpace(builder, " )");
         } else {
           // @todo: implement this properly and add a test case
-          ans.append(namedParameters.toString());
+          builder.append(namedParameters.toString());
         }
       } else if (allColumns) {
-        ans.append(" ( * )");
+        builder.append(" ( * )");
       } else {
-        ans.append(" ()");
+        builder.append(" ()");
       }
 
       if (attribute != null) {
-        ans.append("." + attribute.toString());
+        builder.append("." + attribute.toString());
       } else if (attributeName != null) {
-        ans.append("." + attributeName);
+        builder.append("." + attributeName);
       }
 
       if (keep != null) {
-        ans.append(" " + keep.toString());
+        builder.append(" " + keep.toString());
       }
 
-      if (escaped) ans.append("} ");
-
-      builder.append(ans);
+      if (escaped) builder.append("} ");
 
     } else if (expression instanceof IsNullExpression) {
       IsNullExpression isNullExpression = (IsNullExpression) expression;
@@ -1561,7 +1558,7 @@ public class JSQLFormatter {
 
       ItemsList itemsList = inExpression.getRightItemsList();
       if (itemsList != null) {
-        builder.append(" ( ");
+        builder.append("( ");
 
         int subIndent = getSubIndent(builder, indentWidth, false);
 
