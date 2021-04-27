@@ -1,4 +1,3 @@
-
 -- CREATE TABLE CFE.INTEREST_PERIOD
 CREATE TABLE cfe.interest_period (
     id_instrument                VARCHAR (40)    NOT NULL
@@ -15,7 +14,7 @@ CREATE TABLE cfe.interest_period (
     , fix_amount                 DECIMAL (23,5)
     , id_currency_fix_amount     VARCHAR (3)
     , id_script                  VARCHAR (12)
-  )
+)
 ;
 
 -- SIMPLE
@@ -28,7 +27,7 @@ CREATE TABLE employees (
     , UNIQUE ( employee_name )
     , FOREIGN KEY ( department_id )
         REFERENCES departments ( department_id )
-  ) parallel compress nologging
+) parallel compress nologging
 ;
 
 -- COMPLEX
@@ -42,7 +41,7 @@ CREATE TABLE employees (
     , CONSTRAINT fk_departments
         FOREIGN KEY ( department_id )
         REFERENCES departments ( department_id )
-  ) parallel compress nologging
+) parallel compress nologging
 ;
 
 -- COMPLEX WITH MANY REFERENCES
@@ -62,22 +61,22 @@ CREATE TABLE employees (
         REFERENCES departments (    employee_number
                                     , employee_name
                                     , department_id )
-  ) parallel compress nologging
+) parallel compress nologging
 ;
 
 -- CREATE TABLE CFE.RECONCILIATION_NOMINAL_HST 2
 CREATE TABLE cfe.RECONCILIATION_NOMINAL_hst parallel compress nologging
-    AS ( SELECT /*+ parallel */ 
+    AS ( SELECT /*+ parallel */
             (   SELECT  id_execution_ref
-                FROM cfe.execution_ref c 
-                    INNER JOIN cfe.execution_v d 
+                FROM cfe.execution_ref c
+                    INNER JOIN cfe.execution_v d
                         ON c.value_date = d.value_date
                             AND c.posting_date = d.posting_date
-                            AND d.flag = 'L' ) id_execution_ref 
+                            AND d.flag = 'L' ) id_execution_ref
             , b.ID_INSTRUMENT_REF
             , a.VALUE_DATE
             , a.NOMINAL_BALANCE
-        FROM cfe.RECONCILIATION_NOMINAL a 
-            INNER JOIN cfe.instrument_ref b 
+        FROM cfe.RECONCILIATION_NOMINAL a
+            INNER JOIN cfe.instrument_ref b
                 ON a.id_instrument = b.id_instrument )
 ;

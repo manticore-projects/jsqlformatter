@@ -1,4 +1,3 @@
-
 -- UPDATE COUNTERPARTY
 UPDATE risk.counterparty
 SET id_counterparty = :id_counterparty
@@ -26,18 +25,18 @@ WHERE id_counterparty_ref = :id_counterparty_ref
 UPDATE common.collateral_type
 SET hair_cut = Least
 WHERE id_collateral_type_ref IN  (  SELECT  id_collateral_type_ref
-                                    FROM common.collateral_type a 
+                                    FROM common.collateral_type a
                                     WHERE id_status IN  ( 'C', 'H', 'C'
                                                             , 'H', 'C', 'H'
-                                                            , 'C', 'H' ) 
+                                                            , 'C', 'H' )
                                         AND id_collateral_type_ref = (  SELECT  max( id_collateral_type_ref )
                                                                         FROM common.collateral_type
-                                                                        WHERE id_status IN  ( 'C', 'H' ) 
-                                                                            AND id_collateral_type = a.id_collateral_type ) ) 
+                                                                        WHERE id_status IN  ( 'C', 'H' )
+                                                                            AND id_collateral_type = a.id_collateral_type ) )
 ;
 
 -- UPDATE COUNTERPARTY_INSTRUMENT
-UPDATE risk.counterparty_instrument a1 
+UPDATE risk.counterparty_instrument a1
 SET (   PRIORITY
         , TYPE
         , DESCRIPTION
@@ -49,34 +48,34 @@ SET (   PRIORITY
                                     , a.LIMIT_AMOUT
                                     , a.ID_CURRENCY
                                     , a.END_DATE
-                            FROM risk.imp_counterparty_instrument a 
-                                INNER JOIN risk.counterparty b 
+                            FROM risk.imp_counterparty_instrument a
+                                INNER JOIN risk.counterparty b
                                     ON a.id_counterparty = b.id_counterparty
                                         AND b.id_status = 'C'
-                                INNER JOIN risk.instrument c 
+                                INNER JOIN risk.instrument c
                                     ON a.ID_instrument_BENEFICIARY = c.id_instrument
                                         AND c.id_status = 'C'
-                                INNER JOIN risk.counterparty_instrument e 
+                                INNER JOIN risk.counterparty_instrument e
                                     ON b.id_counterparty_ref = e.id_counterparty_ref
                                         AND e.ID_instrument_BENEFICIARY = a.ID_instrument_BENEFICIARY
                                         AND e.ID_INSTRUMENT_GUARANTEE = a.ID_INSTRUMENT_GUARANTEE
                             WHERE e.id_counterparty_ref = a1.id_counterparty_ref
                                 AND e.ID_instrument_BENEFICIARY = a1.ID_instrument_BENEFICIARY
-                                AND e.ID_INSTRUMENT_GUARANTEE = a1.ID_INSTRUMENT_GUARANTEE ) 
+                                AND e.ID_INSTRUMENT_GUARANTEE = a1.ID_INSTRUMENT_GUARANTEE )
 WHERE EXISTS (  SELECT  a.PRIORITY
                         , a.TYPE
                         , a.DESCRIPTION
                         , a.LIMIT_AMOUT
                         , a.ID_CURRENCY
                         , a.END_DATE
-                FROM risk.imp_counterparty_instrument a 
-                    INNER JOIN risk.counterparty b 
+                FROM risk.imp_counterparty_instrument a
+                    INNER JOIN risk.counterparty b
                         ON a.id_counterparty = b.id_counterparty
                             AND b.id_status = 'C'
-                    INNER JOIN risk.instrument c 
+                    INNER JOIN risk.instrument c
                         ON a.ID_instrument_BENEFICIARY = c.id_instrument
                             AND c.id_status = 'C'
-                    INNER JOIN risk.counterparty_instrument e 
+                    INNER JOIN risk.counterparty_instrument e
                         ON b.id_counterparty_ref = e.id_counterparty_ref
                             AND e.ID_instrument_BENEFICIARY = a.ID_instrument_BENEFICIARY
                             AND e.ID_INSTRUMENT_GUARANTEE = a.ID_INSTRUMENT_GUARANTEE
