@@ -9,6 +9,7 @@ package com.manticore.jsqlformatter;
 import com.diogonunes.jcolor.AnsiFormat;
 import com.diogonunes.jcolor.Attribute;
 import com.manticore.jsqlformatter.JSQLFormatter.OutputFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
@@ -26,6 +27,9 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
           "(\'.*?\'[^'']|\".*?\")"
               + "|(^/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/\\s?\\n?|/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/|--.*?\\r?[\\n])",
           Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
+
+  public static final Pattern LINE_END_COMMENT_PATTERN =
+      Pattern.compile("(\\/\\*.*\\\\*\\/\\s?\\)?\\n)");
 
   private static final Pattern STRING_PATTERN =
       Pattern.compile(
@@ -68,7 +72,6 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
             comment.newLine = true;
             comment.extraNewLine = start > 1 && sqlStr.charAt(start - 2) == '\n';
           }
-
           put(comment.absolutePosition, comment);
         }
       }
@@ -106,9 +109,9 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
       int relativePosition = 0;
       int ansiStarted = -1;
+      boolean wasLastComment = false;
 
       for (int position = 0; position < sqlStrWithoutComments.length(); position++) {
-
         String c = sqlStrWithoutComments.substring(position, position + 1);
 
         if (ansiStarted < 0)
@@ -129,17 +132,21 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
             if (commentIteraror.hasNext()) {
               next = commentIteraror.next();
             } else {
-							String remaining = sqlStrWithoutComments.substring(position);
-              if (next.newLine) {
-                int nextBreak = remaining.indexOf('\n');
-                if (nextBreak>=0 && remaining.substring(0, nextBreak).trim().length() == 0) {
-                  builder.append(remaining.substring(nextBreak+1));
-                }
-              } else  builder.append(remaining);
-							
-              return builder;
+              wasLastComment = true;
+              break;
             }
           }
+
+        if (wasLastComment) {
+          String remaining = sqlStrWithoutComments.substring(position);
+          if (next.newLine) {
+            int nextBreak = remaining.indexOf('\n');
+            if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().length() == 0) {
+              builder.append(remaining.substring(nextBreak + 1));
+            }
+          } else builder.append(remaining);
+          break;
+        }
 
         if (ansiStarted < 0
             && position + 2 <= sqlStrWithoutComments.length()
@@ -167,6 +174,36 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
                   .replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]|\\s", "")
                   .length();
         }
+      }
+    }
+
+    Matcher matcher = LINE_END_COMMENT_PATTERN.matcher(builder);
+    ArrayList<Object[]> matches = new ArrayList<>();
+
+    int i = 0;
+    int maxPosition = 0;
+    while (matcher.find()) {
+      i++;
+      String group = matcher.group(0);
+      int start = matcher.start(0);
+      int end = matcher.end(0);
+
+      int lastLineBreak = builder.lastIndexOf("\n", start);
+      int pos = start - lastLineBreak;
+      maxPosition = Integer.max(maxPosition, pos);
+      matches.add(new Object[] {group, start, end, pos});
+    }
+
+    int subIndent = maxPosition / 4 + (maxPosition % 4 > 0 ? 1 : 0);
+    int totalInsertedChars = 0;
+    for (Object[] match : matches) {
+      String group = (String) match[0];
+      int start = (int) match[1];
+      int end = (int) match[2];
+      int pos = (int) match[3];
+      for (int j = pos; j < subIndent * 4; j++) {
+        builder.insert(start + totalInsertedChars, " ");
+        totalInsertedChars++;
       }
     }
 
