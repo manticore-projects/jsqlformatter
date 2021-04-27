@@ -24,7 +24,7 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
   public static final Pattern COMMENT_PATTERN =
       Pattern.compile(
-          "(\'.*?\'[^'']|\".*?\")"
+          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")"
               + "|(^/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/\\s?\\n?|/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/|--.*?\\r?[\\n])",
           Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
@@ -33,7 +33,7 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
   private static final Pattern STRING_PATTERN =
       Pattern.compile(
-          "(\'.*?\'[^'']|\".*?\")", Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
+          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")", Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
   private static final AnsiFormat ANSI_FORMAT_COMMENT =
       new AnsiFormat(Attribute.CLEAR(), Attribute.BRIGHT_BLACK_TEXT(), Attribute.ITALIC());

@@ -125,30 +125,31 @@ public class JSQLFormatter {
     }
     return builder;
   }
-	
-	private static StringBuilder appendNormalizingTrailingWhiteSpace(StringBuilder builder, String s) {
-		if (builder.length()>0) {
-			int pos = builder.length()-1;
-			char lastChar=builder.charAt(pos);
-			if (lastChar==' ') {
-				while (lastChar==' ' && pos>0) {
-					pos--;
-					lastChar=builder.charAt(pos);
-				}
-				builder.setLength(pos+1);
-			}
-		}
-		builder.append(s);
-		return builder;
-	}
-	
-	private static StringBuilder appendNormalizedLineBreak(StringBuilder builder) {
-		return appendNormalizingTrailingWhiteSpace(builder, "\n");
-	}
-	
-	private static StringBuilder appendNormalizedSpace(StringBuilder builder) {
-		return appendNormalizingTrailingWhiteSpace(builder, " ");
-	}
+
+  private static StringBuilder appendNormalizingTrailingWhiteSpace(
+      StringBuilder builder, String s) {
+    if (builder.length() > 0) {
+      int pos = builder.length() - 1;
+      char lastChar = builder.charAt(pos);
+      if (lastChar == ' ') {
+        while (lastChar == ' ' && pos > 0) {
+          pos--;
+          lastChar = builder.charAt(pos);
+        }
+        builder.setLength(pos + 1);
+      }
+    }
+    builder.append(s);
+    return builder;
+  }
+
+  private static StringBuilder appendNormalizedLineBreak(StringBuilder builder) {
+    return appendNormalizingTrailingWhiteSpace(builder, "\n");
+  }
+
+  private static StringBuilder appendNormalizedSpace(StringBuilder builder) {
+    return appendNormalizingTrailingWhiteSpace(builder, " ");
+  }
 
   private static StringBuilder appendHint(
       StringBuilder builder, OutputFormat format, String hint, String before, String after) {
@@ -499,108 +500,124 @@ public class JSQLFormatter {
 
     int indent = 0;
 
-    final Pattern SQL_DELIMITER_SPLIT =
-        Pattern.compile("((?:(?:'[^']*+')|(?:\"[^\"]*+\")|[^;])*+);");
+		Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
+		Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
+		LinkedList<Integer> semicolons = new LinkedList<>();
+		
+		for (int i=0; m.find(); i++) {
+			semicolons.add(m.start());
+		}
+		LOGGER.info("Found semicolons: " + semicolons.size());
 
-    Matcher m = SQL_DELIMITER_SPLIT.matcher(sqlStr);
+    m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
     while (m.find()) {
-      int start = m.start(1);
-      int end = m.end(1);
-
-      String statementSql = m.group(1).trim();
-      StringBuilder statementBuilder = new StringBuilder();
-
-      CommentMap commentMap = new CommentMap(statementSql);
-
-      boolean foundSquareBracketQuotes =
-          SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
-      LOGGER.log(
-          Level.FINE, "MSQL Server Square Bracket Quations is {0}.", foundSquareBracketQuotes);
-
-      try {
-        Statement statement =
-            CCJSqlParserUtil.parse(
-                statementSql,
-                parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
-
-        if (statement instanceof Select) {
-          Select select = (Select) statement;
-          appendSelect(select, statementBuilder, indent, true);
-
-        } else if (statement instanceof Update) {
-          Update update = (Update) statement;
-          appendUpdate(statementBuilder, update, indent);
-
-        } else if (statement instanceof Insert) {
-          Insert insert = (Insert) statement;
-          appendInsert(statementBuilder, insert, indent);
-
-        } else if (statement instanceof Merge) {
-          Merge merge = (Merge) statement;
-          appendMerge(statementBuilder, merge, indent);
-
-        } else if (statement instanceof Delete) {
-          Delete delete = (Delete) statement;
-          appendDelete(statementBuilder, delete, indent);
-
-        } else if (statement instanceof Truncate) {
-          Truncate truncate = (Truncate) statement;
-          appendTruncate(statementBuilder, truncate, indent);
-
-        } else if (statement instanceof CreateTable) {
-          CreateTable createTable = (CreateTable) statement;
-          appendCreateTable(statementBuilder, createTable, indent);
-
-        } else if (statement instanceof CreateIndex) {
-          CreateIndex createIndex = (CreateIndex) statement;
-          appendCreateIndex(statementBuilder, createIndex, indent);
-
-        } else if (statement instanceof CreateView) {
-          CreateView createView = (CreateView) statement;
-          appendCreateView(statementBuilder, createView, indent);
-
-        } else if (statement instanceof Alter) {
-          Alter alter = (Alter) statement;
-          appendAlter(statementBuilder, alter, indent);
-
-        } else if (statement != null) {
-          try {
-            statementBuilder.append("\n").append(statement.toString());
-          } catch (Exception ex) {
-            throw new UnsupportedOperationException(
-                "The " + statement.getClass().getName() + " Statement is not supported yet.");
-          }
-        }
-				appendNormalizedLineBreak(statementBuilder).append(";\n");
-        builder
-            .append(
-                commentMap.isEmpty()
-                    ? statementBuilder
-                    : commentMap.insertComments(statementBuilder, outputFormat));
+      int start = m.start();
+      int end = m.end();
+			
+			for (int i=semicolons.size()-1; i>=0; i--) {
+        if (start <= semicolons.get(i) && semicolons.get(i) < end) {
+					semicolons.remove(i);
+				}
+			}
+		}
+		LOGGER.info("Reduced semicolons: " + semicolons.size());
+		
+		int pos = 0;
+		int length = sqlStr.length();
+		for (int i=0; i<semicolons.size(); i++) if (semicolons.get(i)>pos) {
+        String statementSql = sqlStr.substring(pos, Integer.min(semicolons.get(i)+1, length));
+				pos = semicolons.get(i)+1;
 				
-				appendNormalizedLineBreak(builder);
-      } catch (Exception ex1) {
-				
+        StringBuilder statementBuilder = new StringBuilder();
+
+        CommentMap commentMap = new CommentMap(statementSql);
+
+        boolean foundSquareBracketQuotes =
+            SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
         LOGGER.log(
-            Level.WARNING,
-            "Failed for format statement between " + start + " and " + end + "\n" + statementSql,
-            ex1);
+            Level.FINE, "MSQL Server Square Bracket Quations is {0}.", foundSquareBracketQuotes);
 
-        exceptions.add(
-            new Exception(
-                "Failed for format statement between "
-                    + start
-                    + " and "
-                    + end
-                    + "\n"
-                    + statementSql));
-        builder
-            .append("-- failed to format start\n")
-            .append(statementSql)
-            .append("\n-- failed to format end\n")
-            .append("\n");
-      }
-    }
+        try {
+          Statement statement =
+              CCJSqlParserUtil.parse(
+                  statementSql,
+                  parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
+
+          if (statement instanceof Select) {
+            Select select = (Select) statement;
+            appendSelect(select, statementBuilder, indent, true);
+
+          } else if (statement instanceof Update) {
+            Update update = (Update) statement;
+            appendUpdate(statementBuilder, update, indent);
+
+          } else if (statement instanceof Insert) {
+            Insert insert = (Insert) statement;
+            appendInsert(statementBuilder, insert, indent);
+
+          } else if (statement instanceof Merge) {
+            Merge merge = (Merge) statement;
+            appendMerge(statementBuilder, merge, indent);
+
+          } else if (statement instanceof Delete) {
+            Delete delete = (Delete) statement;
+            appendDelete(statementBuilder, delete, indent);
+
+          } else if (statement instanceof Truncate) {
+            Truncate truncate = (Truncate) statement;
+            appendTruncate(statementBuilder, truncate, indent);
+
+          } else if (statement instanceof CreateTable) {
+            CreateTable createTable = (CreateTable) statement;
+            appendCreateTable(statementBuilder, createTable, indent);
+
+          } else if (statement instanceof CreateIndex) {
+            CreateIndex createIndex = (CreateIndex) statement;
+            appendCreateIndex(statementBuilder, createIndex, indent);
+
+          } else if (statement instanceof CreateView) {
+            CreateView createView = (CreateView) statement;
+            appendCreateView(statementBuilder, createView, indent);
+
+          } else if (statement instanceof Alter) {
+            Alter alter = (Alter) statement;
+            appendAlter(statementBuilder, alter, indent);
+
+          } else if (statement != null) {
+            try {
+              statementBuilder.append("\n").append(statement.toString());
+            } catch (Exception ex) {
+              throw new UnsupportedOperationException(
+                  "The " + statement.getClass().getName() + " Statement is not supported yet.");
+            }
+          }
+          appendNormalizedLineBreak(statementBuilder).append(";");
+          builder.append(
+              commentMap.isEmpty()
+                  ? statementBuilder
+                  : commentMap.insertComments(statementBuilder, outputFormat));
+
+          appendNormalizedLineBreak(builder);
+        } catch (Exception ex1) {
+
+          LOGGER.log(
+              Level.WARNING,
+              "Failed for format statement between \n" + statementSql,
+              ex1);
+
+          exceptions.add(
+              new Exception(
+                  "Failed for format statement between "
+                      + " and "
+                      + "\n"
+                      + statementSql));
+          builder
+              .append("-- failed to format start\n")
+              .append(statementSql)
+              .append("\n-- failed to format end\n")
+              .append("\n");
+        }
+    } else break;
 
     return builder.toString().trim();
   }
@@ -619,7 +636,7 @@ public class JSQLFormatter {
 
     appendFromItem(table, alias, builder, indent, 0);
 
-		appendNormalizedLineBreak(builder);
+    appendNormalizedLineBreak(builder);
     for (int j = 0; j < indent + 1; j++) builder.append(indentString);
     appendKeyWord(builder, outputFormat, "USING", "", " ");
 
@@ -647,8 +664,8 @@ public class JSQLFormatter {
       int subIndent = getSubIndent(builder, indentWidth, false);
 
       appendExpression(onExpression, null, builder, subIndent, 0, false, BreakLine.AFTER_FIRST);
-			
-			appendNormalizingTrailingWhiteSpace(builder, " )");
+
+      appendNormalizingTrailingWhiteSpace(builder, " )");
     }
 
     MergeInsert insert = merge.getMergeInsert();
@@ -674,7 +691,7 @@ public class JSQLFormatter {
           appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
           i++;
         }
-				appendNormalizingTrailingWhiteSpace(builder, " )\n");
+        appendNormalizingTrailingWhiteSpace(builder, " )\n");
       }
 
       i = 0;
@@ -703,8 +720,8 @@ public class JSQLFormatter {
 
     MergeUpdate update = merge.getMergeUpdate();
     if (update != null) {
-			appendNormalizedLineBreak(builder);
-			
+      appendNormalizedLineBreak(builder);
+
       i = 0;
       for (int j = 0; j < indent; j++) builder.append(indentString);
       appendKeyWord(builder, outputFormat, "WHEN", "", " ");
@@ -779,18 +796,18 @@ public class JSQLFormatter {
     }
 
     if (insert.isUseValues()) {
-			appendNormalizedLineBreak(builder);
+      appendNormalizedLineBreak(builder);
       for (int j = 0; j < indent; j++) builder.append(indentString);
       appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
 
       ItemsList itemsList = insert.getItemsList();
-			
-			int subIndent = getSubIndent(builder, indentWidth, true);
+
+      int subIndent = getSubIndent(builder, indentWidth, true);
       appendItemsList(itemsList, builder, alias, subIndent, BreakLine.AFTER_FIRST);
       appendNormalizingTrailingWhiteSpace(builder, " ) ");
 
     } else {
-			appendNormalizedLineBreak(builder);
+      appendNormalizedLineBreak(builder);
       Select select = insert.getSelect();
 
       appendSelect(select, builder, indent, false);
@@ -824,7 +841,7 @@ public class JSQLFormatter {
           appendExpression(column, null, builder, subIndent, i, true, BreakLine.AFTER_FIRST);
           i++;
         }
-			appendNormalizingTrailingWhiteSpace(builder, " ) = ");
+      appendNormalizingTrailingWhiteSpace(builder, " ) = ");
 
       Select select = update.getSelect();
       builder.append("( ");
@@ -1691,7 +1708,7 @@ public class JSQLFormatter {
     List<WithItem> withItems = subSelect.getWithItemsList();
     if (withItems != null && withItems.size() > 0) {
       int j = 0;
-			appendNormalizedLineBreak(builder);
+      appendNormalizedLineBreak(builder);
       builder.append("WITH ");
 
       for (WithItem withItem : withItems) {
@@ -1710,9 +1727,9 @@ public class JSQLFormatter {
     }
 
     if (alias1 != null) {
-			appendNormalizingTrailingWhiteSpace(builder, " ");
-			appendAlias(builder, outputFormat, alias1.toString(), "", "");
-		}
+      appendNormalizingTrailingWhiteSpace(builder, " ");
+      appendAlias(builder, outputFormat, alias1.toString(), "", "");
+    }
   }
 
   private static void appendFromItem(
@@ -1720,7 +1737,7 @@ public class JSQLFormatter {
 
     builder.append(table.getFullyQualifiedName());
     if (alias != null) {
-			appendNormalizingTrailingWhiteSpace(builder, " ");
+      appendNormalizingTrailingWhiteSpace(builder, " ");
       if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
 
       appendAlias(builder, outputFormat, alias.getName(), "", " ");
@@ -2018,7 +2035,7 @@ public class JSQLFormatter {
           i++;
         }
       }
-			appendNormalizedLineBreak(builder).append(")");
+      appendNormalizedLineBreak(builder).append(")");
     }
     List<String> tableOptionsStrings = createTable.getTableOptionsStrings();
     String options = PlainSelect.getStringList(tableOptionsStrings, false, false);

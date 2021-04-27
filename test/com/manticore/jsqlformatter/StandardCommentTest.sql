@@ -5,7 +5,7 @@
 -- UPDATE CALENDAR
 UPDATE cfe.calendar
 SET year_offset = ?            /* year offset */
-    , settlement_shift = ?     /* settlement shit */
+    , settlement_shift = ?     /* settlement shift */
     , friday_is_holiday = ?    /* friday is a holiday */
     , saturday_is_holiday = ?  /* saturday is a holiday */
     , sunday_is_holiday = ?    /* sunday is a holiday */
