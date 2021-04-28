@@ -500,32 +500,36 @@ public class JSQLFormatter {
 
     int indent = 0;
 
-		Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
-		Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
-		LinkedList<Integer> semicolons = new LinkedList<>();
-		
-		for (int i=0; m.find(); i++) {
-			semicolons.add(m.start());
-		}
+    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
+    Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
+    LinkedList<Integer> semicolons = new LinkedList<>();
+
+    for (int i = 0; m.find(); i++) {
+      semicolons.add(m.start());
+    }
 
     m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
     while (m.find()) {
       int start = m.start();
       int end = m.end();
-			
-			for (int i=semicolons.size()-1; i>=0; i--) {
+
+      for (int i = semicolons.size() - 1; i >= 0; i--) {
         if (start <= semicolons.get(i) && semicolons.get(i) < end) {
-					semicolons.remove(i);
-				}
-			}
-		}
-		
-		int pos = 0;
-		int length = sqlStr.length();
-		for (int i=0; i<semicolons.size(); i++) if (semicolons.get(i)>pos) {
-        String statementSql = sqlStr.substring(pos, Integer.min(semicolons.get(i)+1, length));
-				pos = semicolons.get(i)+1;
-				
+          semicolons.remove(i);
+        }
+      }
+    }
+
+    int pos = 0;
+    int length = sqlStr.length();
+    for (int i = 0; i < semicolons.size(); i++)
+      if (semicolons.get(i) > pos) {
+        String statementSql = sqlStr.substring(pos, Integer.min(semicolons.get(i) + 1, length));
+        pos = semicolons.get(i) + 1;
+
+        // we are at the end and find only remaining whitespace
+        if (statementSql.trim().length() == 0) break;
+
         StringBuilder statementBuilder = new StringBuilder();
 
         CommentMap commentMap = new CommentMap(statementSql);
@@ -598,24 +602,18 @@ public class JSQLFormatter {
           appendNormalizedLineBreak(builder);
         } catch (Exception ex1) {
 
-          LOGGER.log(
-              Level.WARNING,
-              "Failed for format statement between \n" + statementSql,
-              ex1);
+          LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
 
           exceptions.add(
               new Exception(
-                  "Failed for format statement between "
-                      + " and "
-                      + "\n"
-                      + statementSql));
+                  "Failed for format statement between " + " and " + "\n" + statementSql));
           builder
               .append("-- failed to format start\n")
               .append(statementSql)
               .append("\n-- failed to format end\n")
               .append("\n");
         }
-    } else break;
+      } else break;
 
     return builder.toString().trim();
   }
@@ -908,7 +906,7 @@ public class JSQLFormatter {
         for (int j = 0; j < indent; j++) builder.append(indentString);
       }
       appendKeyWord(builder, outputFormat, "SELECT", "", " ");
-			
+
       OracleHint oracleHint = plainSelect.getOracleHint();
       if (oracleHint != null) appendHint(builder, outputFormat, oracleHint.toString(), "", " ");
 
@@ -930,7 +928,7 @@ public class JSQLFormatter {
       int subIndent =
           (oracleHint != null || distinct != null)
               ? indent + 1
-              : getSubIndent(builder, indent, true);
+              : getSubIndent(builder, indent, plainSelect.getSelectItems().size()>1);
       BreakLine bl =
           (oracleHint != null || distinct != null) ? BreakLine.ALWAYS : BreakLine.AFTER_FIRST;
 
@@ -1015,7 +1013,7 @@ public class JSQLFormatter {
       for (int j = 0; j < indent; j++) builder.append(indentString);
       appendKeyWord(builder, outputFormat, "ORDER BY", "", " ");
 
-      int subIndent = getSubIndent(builder, indent, true);
+      int subIndent = getSubIndent(builder, indent, orderByElements.size()>1);
 
       for (OrderByElement orderByElement : orderByElements) {
         Expression expression = orderByElement.getExpression();
@@ -1471,58 +1469,6 @@ public class JSQLFormatter {
       JdbcParameter jdbcParameter = (JdbcParameter) expression;
       appendValue(builder, outputFormat, jdbcParameter.toString(), "", "");
 
-    } else if (expression instanceof Function) {
-      Function function = (Function) expression;
-
-      String name = function.getName();
-      ExpressionList parameters = function.getParameters();
-      NamedExpressionList namedParameters = function.getNamedParameters();
-      boolean distinct = function.isDistinct();
-      boolean allColumns = function.isAllColumns();
-      boolean escaped = function.isEscaped();
-      KeepExpression keep = function.getKeep();
-      Expression attribute = function.getAttribute();
-      String attributeName = function.getAttributeName();
-
-      if (escaped) appendFunction(builder, outputFormat, "fn", " {", " ");
-
-      appendFunction(builder, outputFormat, name, "", "( ");
-
-      if (parameters != null || namedParameters != null) {
-        if (parameters != null) {
-          if (distinct) {
-            builder.append("(DISTINCT ");
-          } else if (allColumns) {
-            builder.append("(ALL ");
-          }
-          int j = 0;
-          for (Expression parameter : parameters.getExpressions()) {
-            appendExpression(parameter, null, builder, indent + 1, j, true, BreakLine.NEVER);
-            j++;
-          }
-          appendNormalizingTrailingWhiteSpace(builder, " )");
-        } else {
-          // @todo: implement this properly and add a test case
-          builder.append(namedParameters.toString());
-        }
-      } else if (allColumns) {
-        builder.append(" ( * )");
-      } else {
-        builder.append(" ()");
-      }
-
-      if (attribute != null) {
-        builder.append("." + attribute.toString());
-      } else if (attributeName != null) {
-        builder.append("." + attributeName);
-      }
-
-      if (keep != null) {
-        builder.append(" " + keep.toString());
-      }
-
-      if (escaped) builder.append("} ");
-
     } else if (expression instanceof IsNullExpression) {
       IsNullExpression isNullExpression = (IsNullExpression) expression;
       appendExpression(
@@ -1575,6 +1521,54 @@ public class JSQLFormatter {
             commaSeparated,
             BreakLine.AFTER_FIRST);
       }
+    } else if (expression instanceof Function) {
+      Function function = (Function) expression;
+
+      String name = function.getName();
+      ExpressionList parameters = function.getParameters();
+      NamedExpressionList namedParameters = function.getNamedParameters();
+      boolean distinct = function.isDistinct();
+      boolean allColumns = function.isAllColumns();
+      boolean escaped = function.isEscaped();
+      KeepExpression keep = function.getKeep();
+      Expression attribute = function.getAttribute();
+      String attributeName = function.getAttributeName();
+
+      if (escaped) appendFunction(builder, outputFormat, "fn", " {", " ");
+
+      appendFunction(builder, outputFormat, name, "", "( ");
+
+      if (parameters != null || namedParameters != null) {
+        if (parameters != null) {
+          if (distinct) {
+            builder.append("(DISTINCT ");
+          } else if (allColumns) {
+            builder.append("(ALL ");
+          }
+					
+          appendExpressionsList(parameters, BreakLine.AS_NEEDED, builder, indent);
+          appendNormalizingTrailingWhiteSpace(builder, " )");
+        } else {
+          // @todo: implement this properly and add a test case
+          builder.append(namedParameters.toString());
+        }
+      } else if (allColumns) {
+        builder.append(" ( * )");
+      } else {
+        builder.append(" ()");
+      }
+
+      if (attribute != null) {
+        builder.append(".").append(attribute.toString());
+      } else if (attributeName != null) {
+        builder.append(".").append(attributeName);
+      }
+
+      if (keep != null) {
+        builder.append(" ").append(keep.toString());
+      }
+
+      if (escaped) builder.append("} ");
 
     } else if (expression instanceof SignedExpression) {
       SignedExpression signedExpression = (SignedExpression) expression;
@@ -1628,28 +1622,7 @@ public class JSQLFormatter {
     // ExpressionList, MultiExpressionList, NamedExpressionList, SubSelect
     if (itemsList instanceof ExpressionList) {
       ExpressionList expressionList = (ExpressionList) itemsList;
-      int i = 0;
-      // @todo: pretty print the Expression List Items
-      for (Expression expression : expressionList.getExpressions()) {
-
-        switch (breakLine) {
-          case AS_NEEDED:
-            BreakLine bl = i % 3 == 0 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
-            appendExpression(expression, null, builder, indent, i, true, bl);
-            break;
-
-          default:
-            appendExpression(expression, null, builder, indent, i, true, breakLine);
-        }
-
-        //        BreakLine bl =
-        //            BreakLine.AS_NEEDED.equals(breakLine) && i % 3 == 0
-        //                ? BreakLine.AFTER_FIRST
-        //                : BreakLine.NEVER;
-        //
-        //        appendExpression(expression, null, builder, indent, i, true, bl);
-        i++;
-      }
+			appendExpressionsList(expressionList, breakLine, builder, indent);
     } else if (itemsList instanceof MultiExpressionList) {
       MultiExpressionList multiExpressionList = (MultiExpressionList) itemsList;
       builder.append(multiExpressionList.toString());
@@ -1662,6 +1635,28 @@ public class JSQLFormatter {
       appendSubSelect(subSelect, builder, false);
     }
   }
+
+	private static void appendExpressionsList(ExpressionList expressionList, BreakLine breakLine,
+																						StringBuilder builder, int indent) {
+		
+		int subIndent = breakLine.equals(BreakLine.NEVER)
+			? indent
+			: getSubIndent(builder, indent, expressionList.getExpressions().size()>3);
+		
+		int i = 0;
+		for (Expression expression : expressionList.getExpressions()) {
+			switch (breakLine) {
+				case AS_NEEDED:
+					BreakLine bl = i % 3 == 0 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+					appendExpression(expression, null, builder, subIndent, i, true, bl);
+					break;
+					
+				default:
+					appendExpression(expression, null, builder, subIndent, i, true, breakLine);
+			}
+			i++;
+		}
+	}
 
   //  private static void appendColumn(Column column, StringBuilder builder, int indent) {
   //    for (int i = 0; i < indent; i++) builder.append(indentString);

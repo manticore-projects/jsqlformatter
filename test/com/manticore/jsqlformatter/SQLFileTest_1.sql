@@ -57,3 +57,10 @@ WHERE  p.value_date >= Nvl(ri.min_ri_date, ri.min_ri_date_1)
        AND p.value_date <= Nvl(ri.max_ri_date, ri.max_ri_date_1)
 GROUP  BY ri.id_risk_indicator
 order by 1; 
+
+
+INSERT INTO cfe.ext_eab
+SELECT /*+ parallel driving_site(a) */ a.*
+FROM TBAADM.EOD_ACCT_BAL_TABLE@finnacle a
+WHERE END_EOD_DATE >= add_months(   To_date(    :VALUE_DATE, 'mm/dd/yy' ), - 4 )
+;
