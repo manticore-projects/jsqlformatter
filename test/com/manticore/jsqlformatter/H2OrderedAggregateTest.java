@@ -37,9 +37,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 /** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
-public class StandardSelectTest {
+public class H2OrderedAggregateTest {
 
-  public static Iterable<Object[]> getSqlMap(Class<? extends StandardSelectTest> clasz) {
+  public static Iterable<Object[]> getSqlMap(Class<? extends H2OrderedAggregateTest> clasz) {
     String resourceName = clasz.getCanonicalName().replace(".", "/").concat(".sql");
 
     LinkedHashMap<String, String> sqlMap = new LinkedHashMap<>();
@@ -83,13 +83,13 @@ public class StandardSelectTest {
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<Object[]> getSqlMap() {
-    return getSqlMap(StandardSelectTest.class);
+    return getSqlMap(H2OrderedAggregateTest.class);
   }
 
   protected String input;
   protected String expected;
 
-  public StandardSelectTest(String input, String expected) {
+  public H2OrderedAggregateTest(String input, String expected) {
     this.input = input;
     this.expected = expected;
   }
@@ -118,9 +118,6 @@ public class StandardSelectTest {
   @Test
   public void testFormat() throws Exception {
     String formatted = JSQLFormatter.format(expected);
-		
-		System.out.println("\n-- " + input);
-    System.out.println(formatted);
 
     // Check if the formatted statement still can be parsed and gives the same content
     String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
@@ -135,6 +132,9 @@ public class StandardSelectTest {
 
     // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
     //      Check if the formatted statement looks like the expected content
+    
+    System.out.println("\n-- " + input);
+    System.out.println(formatted);
 
     assertEquals(expected.trim(), formatted.trim());
   }

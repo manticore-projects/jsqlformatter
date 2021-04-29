@@ -7,6 +7,48 @@ WHERE (value_date, posting_date) = (    SELECT  value_date
                                             AND value_date = :VALUE_DATE )
 ;
 
+-- DELETE WITH MANY ITEMS
+DELETE FROM cfe.LEDGER_BRANCH_BALANCE
+WHERE (value_date, posting_date, something_else ) = (    SELECT  value_date
+                                                , posting_date
+                                                , something_else
+                                        FROM cfe.execution
+                                        WHERE id_status = 'R'
+                                            AND value_date = :VALUE_DATE )
+;
+
+-- DELETE WITH MORE ITEMS
+DELETE FROM cfe.LEDGER_BRANCH_BALANCE
+WHERE (value_date, posting_date, something_else, value_date ) = (    SELECT  value_date
+                                                , posting_date
+                                                , something_else
+                                                , value_date
+                                        FROM cfe.execution
+                                        WHERE id_status = 'R'
+                                            AND value_date = :VALUE_DATE )
+;
+
+-- DELETE WITH EVEN MORE ITEMS
+DELETE FROM cfe.LEDGER_BRANCH_BALANCE
+WHERE (value_date, posting_date, something_else, value_date, posting_date, something_else ) = (    SELECT  value_date
+                                                , posting_date
+                                                , something_else
+                                                , value_date, posting_date, something_else
+                                        FROM cfe.execution
+                                        WHERE id_status = 'R'
+                                            AND value_date = :VALUE_DATE )
+;
+
+-- DELETE INSTRUMENT HST AFTER VALUE_DATE_P
+delete /*+PARALLEL index_ffs(a, instrument_hst_idx1)*/ from cfe.instrument_hst a
+where (value_date, posting_date) in (
+    select value_date, posting_date
+    from cfe.execution
+    where posting_date > (select max(posting_date) from cfe.execution where id_status='R' and value_date <= :value_date_p)
+        or (select max(posting_date) from cfe.execution where id_status='R' and value_date <= :value_date_p) is null
+);
+
+
 -- DELETE REDUNDANT INSTRUMENT COLLATERAL HST 2
 DELETE FROM cfe.instrument_collateral_hst t1
 WHERE EXISTS (  SELECT  1
