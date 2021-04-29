@@ -1,8 +1,8 @@
 -- INSERT NEW LEDGER ACCOUNTS
 SELECT /*+ PARALLEL */
     cfe.id_account_seq.nextval
-    , a.code
-    , a.id_currency
+    , "a"."code"
+    , a."id_currency"
     , a.id_fee_type
     , current_date
     , NULL

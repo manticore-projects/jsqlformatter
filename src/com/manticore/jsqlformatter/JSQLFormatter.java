@@ -103,6 +103,19 @@ public class JSQLFormatter {
     RTF
   };
 
+  public enum Spelling {
+    UPPER,
+    LOWER,
+    CAMEL,
+    KEEP
+  }
+
+  private static Spelling keywordSpelling = Spelling.UPPER;
+
+  private static Spelling functionSpelling = Spelling.CAMEL;
+
+  private static Spelling objectSpelling = Spelling.LOWER;
+
   private static OutputFormat outputFormat = OutputFormat.PLAIN;
 
   private static int indentWidth = 4;
@@ -130,17 +143,48 @@ public class JSQLFormatter {
   private static final AnsiFormat ANSI_FORMAT_TYPE =
       new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
 
+  static String toCamelCase(String s) {
+    StringBuilder camelCaseString = new StringBuilder();
+
+    String[] nameParts = s.split("_");
+    int i = 0;
+    for (String part : nameParts) {
+      if (i > 0) camelCaseString.append("_");
+      camelCaseString
+          .append(part.substring(0, 1).toUpperCase())
+          .append(part.substring(1).toLowerCase());
+      i++;
+    }
+    return camelCaseString.toString();
+  }
+
   private static StringBuilder appendKeyWord(
       StringBuilder builder, OutputFormat format, String keyword, String before, String after) {
-    switch (format) {
-      case PLAIN:
-        builder.append(before).append(keyword).append(after);
+
+    String s;
+    switch (keywordSpelling) {
+      case UPPER:
+        s = keyword.toUpperCase();
         break;
-      case ANSI:
-        builder.append(before).append(ANSI_FORMAT_KEYWORD.format(keyword)).append(after);
+      case LOWER:
+        s = keyword.toLowerCase();
+        break;
+      case CAMEL:
+        s = toCamelCase(keyword);
         break;
       default:
-        builder.append(before).append(keyword).append(after);
+        s = keyword;
+    }
+
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(s).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_KEYWORD.format(s)).append(after);
+        break;
+      default:
+        builder.append(before).append(s).append(after);
         break;
     }
     return builder;
@@ -173,15 +217,31 @@ public class JSQLFormatter {
 
   private static StringBuilder appendHint(
       StringBuilder builder, OutputFormat format, String hint, String before, String after) {
-    switch (format) {
-      case PLAIN:
-        builder.append(before).append(hint).append(after);
+
+    String s;
+    switch (keywordSpelling) {
+      case UPPER:
+        s = hint.toUpperCase();
         break;
-      case ANSI:
-        builder.append(before).append(ANSI_FORMAT_HINT.format(hint)).append(after);
+      case LOWER:
+        s = hint.toLowerCase();
+        break;
+      case CAMEL:
+        s = toCamelCase(hint);
         break;
       default:
-        builder.append(before).append(hint).append(after);
+        s = hint;
+    }
+
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(s).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_HINT.format(s)).append(after);
+        break;
+      default:
+        builder.append(before).append(s).append(after);
         break;
     }
     return builder;
@@ -221,15 +281,76 @@ public class JSQLFormatter {
 
   private static StringBuilder appendAlias(
       StringBuilder builder, OutputFormat format, String alias, String before, String after) {
+
+    String s;
+    if (alias.startsWith("\"")) {
+      s = alias;
+    } else {
+      switch (keywordSpelling) {
+        case UPPER:
+          s = alias.toUpperCase();
+          break;
+        case LOWER:
+          s = alias.toLowerCase();
+          break;
+        case CAMEL:
+          s = toCamelCase(alias);
+          break;
+        default:
+          s = alias;
+      }
+    }
+
     switch (format) {
       case PLAIN:
-        builder.append(before).append(alias).append(after);
+        builder.append(before).append(s).append(after);
         break;
       case ANSI:
-        builder.append(before).append(ANSI_FORMAT_ALIAS.format(alias)).append(after);
+        builder.append(before).append(ANSI_FORMAT_ALIAS.format(s)).append(after);
         break;
       default:
-        builder.append(before).append(alias).append(after);
+        builder.append(before).append(s).append(after);
+        break;
+    }
+    return builder;
+  }
+
+  private static StringBuilder appendObjectName(
+      StringBuilder builder, OutputFormat format, String objectName, String before, String after) {
+
+    StringBuilder nameBuilder = new StringBuilder();
+
+    int j = 0;
+    String[] parts = objectName.contains(".") ? objectName.split("\\.") : new String[] {objectName};
+    for (String w : parts) {
+      if (j > 0) nameBuilder.append(".");
+      if (w.startsWith("\"")) {
+        nameBuilder.append(w);
+      } else {
+        switch (objectSpelling) {
+          case UPPER:
+            nameBuilder.append(w.toUpperCase());
+            break;
+          case LOWER:
+            nameBuilder.append(w.toLowerCase());
+            break;
+          case CAMEL:
+            nameBuilder.append(toCamelCase(w));
+            break;
+        }
+      }
+      j++;
+    }
+
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(nameBuilder).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(nameBuilder).append(after);
+        break;
+      default:
+        builder.append(before).append(nameBuilder).append(after);
         break;
     }
     return builder;
@@ -237,15 +358,31 @@ public class JSQLFormatter {
 
   private static StringBuilder appendFunction(
       StringBuilder builder, OutputFormat format, String function, String before, String after) {
-    switch (format) {
-      case PLAIN:
-        builder.append(before).append(function).append(after);
+
+    String s;
+    switch (functionSpelling) {
+      case UPPER:
+        s = function.toUpperCase();
         break;
-      case ANSI:
-        builder.append(before).append(ANSI_FORMAT_FUNCTION.format(function)).append(after);
+      case LOWER:
+        s = function.toLowerCase();
+        break;
+      case CAMEL:
+        s = toCamelCase(function);
         break;
       default:
-        builder.append(before).append(function).append(after);
+        s = function;
+    }
+
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(s).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_FUNCTION.format(s)).append(after);
+        break;
+      default:
+        builder.append(before).append(s).append(after);
         break;
     }
     return builder;
@@ -253,15 +390,31 @@ public class JSQLFormatter {
 
   private static StringBuilder appendType(
       StringBuilder builder, OutputFormat format, String type, String before, String after) {
-    switch (format) {
-      case PLAIN:
-        builder.append(before).append(type).append(after);
+
+    String s;
+    switch (keywordSpelling) {
+      case UPPER:
+        s = type.toUpperCase();
         break;
-      case ANSI:
-        builder.append(before).append(ANSI_FORMAT_TYPE.format(type)).append(after);
+      case LOWER:
+        s = type.toLowerCase();
+        break;
+      case CAMEL:
+        s = toCamelCase(type);
         break;
       default:
-        builder.append(before).append(type).append(after);
+        s = type;
+    }
+
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(s).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_TYPE.format(s)).append(after);
+        break;
+      default:
+        builder.append(before).append(s).append(after);
         break;
     }
     return builder;
@@ -375,6 +528,15 @@ public class JSQLFormatter {
 
     options.addOption(
         Option.builder(null).longOpt("indent").hasArg().desc("The indent width [2 4* 8]").build());
+		
+		options.addOption(
+        Option.builder(null).longOpt("keywordSpelling").hasArg().desc("[UPPER*, LOWER, CAMEL, KEEP]").build());
+		
+		options.addOption(
+        Option.builder(null).longOpt("functionSpelling").hasArg().desc("[UPPER, LOWER, CAMEL*, KEEP]").build());
+		
+		options.addOption(
+        Option.builder(null).longOpt("objectSpelling").hasArg().desc("[UPPER, LOWER*, CAMEL, KEEP]").build());
 
     options.addOption("2", false, "Indent with 2 characters.");
     options.addOption("8", false, "Indent with 8 characters.");
@@ -392,6 +554,7 @@ public class JSQLFormatter {
 
       if (line.hasOption("2")) formatterOptions.add("indentWidth=2");
       if (line.hasOption("8")) formatterOptions.add("indentWidth=8");
+			
       if (line.hasOption("indent"))
         formatterOptions.add("indentWidth=" + line.getOptionValue("indent"));
 
@@ -484,29 +647,7 @@ public class JSQLFormatter {
   public static String format(String sqlStr, String... options) throws Exception {
     ArrayList<Exception> exceptions = new ArrayList<>();
 
-    // set the formatting options
-    for (String s : options) {
-      String[] o = s.split("=");
-      if (o.length == 2) {
-        LOGGER.log(Level.FINE, "Found Formatting Option {0} = {1}", o);
-
-        if (o[0].equalsIgnoreCase("outputFormat")) {
-          outputFormat = OutputFormat.valueOf(o[1]);
-        } else if (o[0].equalsIgnoreCase("indentWidth")) {
-          indentWidth = Integer.valueOf(o[1]);
-
-          char[] chars = new char[indentWidth];
-          Arrays.fill(chars, ' ');
-
-          indentString = new String(chars);
-        } else {
-          LOGGER.log(Level.WARNING, "Unknown Formatting Option {0} = {1} ", o);
-        }
-
-      } else {
-        LOGGER.log(Level.WARNING, "Invalid Formatting Option {0}", s);
-      }
-    }
+    applyFormattingOptions(options);
 
     StringBuilder builder = new StringBuilder();
 
@@ -552,12 +693,21 @@ public class JSQLFormatter {
 
         StringBuilder statementBuilder = new StringBuilder();
 
-        CommentMap commentMap = new CommentMap(statementSql);
-
         boolean foundSquareBracketQuotes =
             SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
         LOGGER.log(
             Level.FINE, "MSQL Server Square Bracket Quations is {0}.", foundSquareBracketQuotes);
+
+        CommentMap commentMap = new CommentMap(statementSql);
+
+        Pattern DIRECTIVE_PATTERN = Pattern.compile("@JSQLFormatter\\s?\\((.*)\\)");
+        for (Comment comment : commentMap.values()) {
+          Matcher m1 = DIRECTIVE_PATTERN.matcher(comment.text);
+          if (m1.find()) {
+            String[] keyValuePairs = m1.group(1).split(",");
+            applyFormattingOptions(keyValuePairs);
+          }
+        }
 
         try {
           Statement statement =
@@ -636,6 +786,65 @@ public class JSQLFormatter {
       } else break;
 
     return builder.toString().trim();
+  }
+
+  public static void applyFormattingOptions(String[] options) {
+    // set the formatting options
+    for (String s : options) {
+      String[] o = s.split("=");
+      if (o.length == 2) {
+        LOGGER.log(Level.FINE, "Found Formatting Option {0} = {1}", o);
+
+        String key = o[0].trim();
+        String value = o[1].trim();
+
+        if (key.equalsIgnoreCase("outputFormat")) {
+					try {
+						outputFormat = OutputFormat.valueOf(value.toUpperCase());
+					} catch (Exception ex) {
+						LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+					}
+
+        } else if (key.equalsIgnoreCase("keywordSpelling")) {
+          try {
+						keywordSpelling = Spelling.valueOf(value.toUpperCase());
+					} catch (Exception ex) {
+						LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+					}
+
+        } else if (key.equalsIgnoreCase("functionSpelling")) {
+          try {
+						functionSpelling = Spelling.valueOf(value.toUpperCase());
+					} catch (Exception ex) {
+						LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+					}
+
+        } else if (key.equalsIgnoreCase("objectSpelling")) {
+          try {
+						objectSpelling = Spelling.valueOf(value.toUpperCase());
+					} catch (Exception ex) {
+						LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+					}
+
+        } else if (key.equalsIgnoreCase("indentWidth")) {
+					try {
+          indentWidth = Integer.valueOf(value);
+
+          char[] chars = new char[indentWidth];
+          Arrays.fill(chars, ' ');
+
+          indentString = new String(chars);
+					} catch (Exception ex) {
+						LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+					}
+        } else {
+          LOGGER.log(Level.WARNING, "Unknown Formatting Option {0} = {1} ", o);
+        }
+
+      } else {
+        LOGGER.log(Level.WARNING, "Invalid Formatting Option {0}", s);
+      }
+    }
   }
 
   private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
@@ -1243,7 +1452,7 @@ public class JSQLFormatter {
       if (commaSeparated && i > 0) builder.append(", ");
     }
 
-    builder.append(s);
+    appendObjectName(builder, outputFormat, s, "", "");
   }
 
   private static void appendExpression(
@@ -1265,7 +1474,7 @@ public class JSQLFormatter {
 
     if (expression instanceof Column) {
       Column column = (Column) expression;
-      builder.append(column.getFullyQualifiedName());
+      appendObjectName(builder, outputFormat, column.getFullyQualifiedName(), "", "");
 
     } else if (expression instanceof AndExpression) {
       AndExpression andExpression = (AndExpression) expression;
@@ -1339,9 +1548,11 @@ public class JSQLFormatter {
 
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
+
       builder.append(equalsTo.getLeftExpression());
+
       appendOperator(builder, outputFormat, "=", " ", " ");
-      // builder.append(equalsTo.getRightExpression());
+
       appendExpression(
           equalsTo.getRightExpression(),
           alias,
@@ -1443,7 +1654,7 @@ public class JSQLFormatter {
         if (j > 0) {
           builder.append(".");
         }
-        builder.append(name);
+        appendObjectName(builder, outputFormat, name, "", "");
         j++;
       }
 
@@ -1769,7 +1980,7 @@ public class JSQLFormatter {
   private static void appendFromItem(
       Table table, Alias alias, StringBuilder builder, int indent, int i) {
 
-    builder.append(table.getFullyQualifiedName());
+    appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
     if (alias != null) {
       appendNormalizingTrailingWhiteSpace(builder, " ");
       if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
@@ -1893,7 +2104,7 @@ public class JSQLFormatter {
         ColDataType colDataType = columnDefinition.getColDataType();
         List<String> columnSpecs = columnDefinition.getColumnSpecs();
 
-        builder.append(columnName);
+        appendObjectName(builder, outputFormat, columnName, "", "");
 
         int lastLineLength = getLastLineLength(builder);
 
@@ -1966,7 +2177,7 @@ public class JSQLFormatter {
             appendNormalizedLineBreak(builder);
             for (int j = 0; j <= indent + 1; j++) builder.append(indentString);
             appendKeyWord(builder, outputFormat, "REFERENCES", "", " ");
-            builder.append(foreignTable).append(" ");
+            appendObjectName(builder, outputFormat, foreignTable.getFullyQualifiedName(), "", " ");
 
             builder.append("( ");
             subIndent = getSubIndent(builder, indent, referencedColumnNames.size() > 2);
@@ -2133,7 +2344,7 @@ public class JSQLFormatter {
     appendNormalizedLineBreak(builder);
     for (int j = 0; j <= indent; j++) builder.append(indentString);
     appendKeyWord(builder, outputFormat, "ON", "", " ");
-    builder.append(table.getFullyQualifiedName());
+    appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
 
     if (index.getUsing() != null) {
       appendKeyWord(builder, outputFormat, "USING", "  ", " ");
@@ -2185,7 +2396,6 @@ public class JSQLFormatter {
         break;
       case NO_FORCE:
         appendKeyWord(builder, outputFormat, "NO FORCE", "", " ");
-        builder.append("NO FORCE ");
         break;
     }
 
@@ -2232,7 +2442,7 @@ public class JSQLFormatter {
     if (useOnly) {
       appendKeyWord(builder, outputFormat, "ONLY", "", " ");
     }
-    builder.append(table.getFullyQualifiedName()).append(" ");
+    appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
     int i = 0;
 
     if (alterExpressions != null) {
@@ -2291,10 +2501,10 @@ public class JSQLFormatter {
         } else if (columnName != null) {
           if (alterExpression.hasColumn()) appendKeyWord(builder, outputFormat, "COLUMN", "", " ");
           if (operation == AlterOperation.RENAME) {
-            builder.append(columnOldName);
+            appendObjectName(builder, outputFormat, columnOldName, "", "");
             appendKeyWord(builder, outputFormat, "TO", " ", " ");
           }
-          builder.append(columnName);
+          appendObjectName(builder, outputFormat, columnName, "", "");
         } else if (colDataTypeList != null) {
 
           int colWidth = 0;
@@ -2308,7 +2518,7 @@ public class JSQLFormatter {
             if (optionalSpecifier != null) {
               builder.append(optionalSpecifier).append(" ");
             }
-            builder.append(columnOldName).append(" ");
+            appendObjectName(builder, outputFormat, columnOldName, "", " ");
           } else if (colDataTypeList.size() > 1) {
 
             for (ColumnDefinition columnDefinition : colDataTypeList) {
@@ -2345,7 +2555,7 @@ public class JSQLFormatter {
             ColDataType colDataType = columnDefinition.getColDataType();
             List<String> columnSpecs = columnDefinition.getColumnSpecs();
 
-            builder.append(columnName1).append(" ");
+            appendObjectName(builder, outputFormat, columnName1, "", " ");
 
             int lastLineLength = getLastLineLength(builder);
 
@@ -2378,7 +2588,7 @@ public class JSQLFormatter {
             if (optionalSpecifier != null) {
               builder.append(optionalSpecifier).append(" ");
             }
-            builder.append(columnOldName).append(" ");
+            appendObjectName(builder, outputFormat, columnOldName, "", " ");
           } else if (columnDropNotNullList.size() > 1) {
             builder.append("(");
           } else {
@@ -2395,7 +2605,7 @@ public class JSQLFormatter {
           if (constraintIfExists) {
             appendKeyWord(builder, outputFormat, "IF EXISTS", "", " ");
           }
-          builder.append(constraintName);
+          appendObjectName(builder, outputFormat, constraintName, "", "");
         } else if (pkColumns != null) {
           appendKeyWord(builder, outputFormat, "PRIMARY KEY", "", " (");
 
@@ -2408,7 +2618,7 @@ public class JSQLFormatter {
             } else {
               appendKeyWord(builder, outputFormat, "INDEX", " ", " ");
             }
-            builder.append(ukName);
+            appendObjectName(builder, outputFormat, ukName, "", "");
           }
           builder.append(" (").append(PlainSelect.getStringList(ukColumns)).append(")");
         } else if (fkColumns != null) {
@@ -2433,30 +2643,18 @@ public class JSQLFormatter {
           builder.append(index);
         }
         if (constraints != null && !constraints.isEmpty()) {
-          builder.append(' ').append(PlainSelect.getStringList(constraints, false, false));
+          builder.append(" ").append(PlainSelect.getStringList(constraints, false, false));
         }
         if (useEqual) {
-          builder.append('=');
+          builder.append("=");
         }
         if (parameters != null && !parameters.isEmpty()) {
-          builder.append(' ').append(PlainSelect.getStringList(parameters, false, false));
+          builder.append(" ").append(PlainSelect.getStringList(parameters, false, false));
         }
 
         i++;
       }
     }
-
-    Iterator<AlterExpression> altIter = alterExpressions.iterator();
-
-    //        while (altIter.hasNext()) {
-    //            builder.append(altIter.next().toString());
-    //
-    //            // Need to append whitespace after each ADD or DROP statement
-    //            // but not the last one
-    //            if (altIter.hasNext()) {
-    //                builder.append(", ");
-    //            }
-    //        }
   }
 
   private enum BreakLine {
