@@ -1,3 +1,4 @@
+
 -- MERGE 1
 MERGE INTO cfe.impairment imp
     USING   (   WITH x AS (
@@ -23,9 +24,9 @@ MERGE INTO cfe.impairment imp
                                     AND ( c.attribute_value LIKE t.product_code
                                             OR ( c.attribute_value IS NULL
                                                     AND t.product_code = '%' ) ) )
-                SELECT /*+ parallel */ *
+                SELECT /*+ PARALLEL */ *
                 FROM x x1
-                WHERE x1.valid_date = ( SELECT  Max
+                WHERE x1.valid_date = ( SELECT max
                                         FROM x
                                         WHERE id_instrument = x1.id_instrument ) ) s
         ON ( imp.id_instrument = s.id_instrument )
@@ -58,9 +59,9 @@ MERGE INTO cfe.instrument_import_measure imp
                                     AND ( c.attribute_value LIKE t.product_code
                                             OR ( c.attribute_value IS NULL
                                                     AND t.product_code = '%' ) ) )
-                SELECT /*+ parallel */ *
+                SELECT /*+ PARALLEL */ *
                 FROM x x1
-                WHERE x1.valid_date = ( SELECT  Max
+                WHERE x1.valid_date = ( SELECT max
                                         FROM x
                                         WHERE id_instrument = x1.id_instrument
                                             AND valid_date <= to_date ) ) s
@@ -106,9 +107,9 @@ MERGE INTO cfe.instrument_import_measure imp
                                     AND ( c.attribute_value LIKE t.product_code
                                             OR ( c.attribute_value IS NULL
                                                     AND t.product_code = '%' ) ) )
-                SELECT /*+ parallel */ *
+                SELECT /*+ PARALLEL */ *
                 FROM x x1
-                WHERE x1.valid_date = ( SELECT  Max
+                WHERE x1.valid_date = ( SELECT max
                                         FROM x
                                         WHERE id_instrument = x1.id_instrument
                                             AND valid_date <= to_date ) ) s
@@ -123,7 +124,7 @@ MERGE INTO empl_current tar
     USING   (   SELECT  empno
                         , ename
                         , CASE
-                                WHEN leavedate <= SYSDATE
+                                WHEN leavedate <= sysdate
                                     THEN 'Y'
                                 ELSE 'N'
                             END AS delete_flag

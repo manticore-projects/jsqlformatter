@@ -1,3 +1,4 @@
+
 -- INSERT NEW LEDGER ACCOUNTS
 SELECT /*+ PARALLEL */
     cfe.id_account_seq.nextval
@@ -7,8 +8,8 @@ SELECT /*+ PARALLEL */
     , current_date
     , NULL
     , id_accounting_scope_code
-FROM  ( SELECT  *
-        FROM  ( SELECT DISTINCT
+FROM (  SELECT *
+        FROM (  SELECT DISTINCT
                     c.code code
                     , d.id_currency
                     , NULL id_fee_type
@@ -17,19 +18,19 @@ FROM  ( SELECT  *
                     INNER JOIN cfe.accounting_scope c1
                         ON c1.id_accounting_scope = c.id_accounting_scope
                             AND c1.id_status = 'C'
-                    , COMMON.LEDGER_CURRENCY d
+                    , common.ledger_currency d
                 MINUS 
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
                     , NULL id_fee_type
                     , c.id_accounting_scope_code
-                FROM cfe.LEDGER_ACCOUNT c
-                    INNER JOIN COMMON.LEDGER_CURRENCY d
+                FROM cfe.ledger_account c
+                    INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency )
         UNION 
-        SELECT  *
-        FROM  ( SELECT DISTINCT
+        SELECT *
+        FROM (  SELECT DISTINCT
                     c.code
                     , d.id_currency
                     , NULL id_fee_type
@@ -38,19 +39,19 @@ FROM  ( SELECT  *
                     INNER JOIN cfe.accounting_scope c1
                         ON c1.id_accounting_scope = c.id_accounting_scope
                             AND c1.id_status = 'C'
-                    , COMMON.LEDGER_CURRENCY d
+                    , common.ledger_currency d
                 MINUS 
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
                     , NULL id_fee_type
                     , c.id_accounting_scope_code
-                FROM cfe.LEDGER_ACCOUNT c
-                    INNER JOIN COMMON.LEDGER_CURRENCY d
+                FROM cfe.ledger_account c
+                    INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency )
         UNION 
-        SELECT  *
-        FROM  ( SELECT DISTINCT
+        SELECT *
+        FROM (  SELECT DISTINCT
                     c.code code
                     , d.id_currency
                     , e.id_fee_type
@@ -59,16 +60,16 @@ FROM  ( SELECT  *
                     INNER JOIN cfe.accounting_scope c1
                         ON c1.id_accounting_scope = c.id_accounting_scope
                             AND c1.id_status = 'C'
-                    , COMMON.LEDGER_CURRENCY d
-                    , cfe.FEE_TYPE e
+                    , common.ledger_currency d
+                    , cfe.fee_type e
                 MINUS 
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
                     , e.id_fee_type
                     , c.id_accounting_scope_code
-                FROM cfe.LEDGER_ACCOUNT c
-                    INNER JOIN COMMON.LEDGER_CURRENCY d
+                FROM cfe.ledger_account c
+                    INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency
                     INNER JOIN cfe.fee_type e
                         ON c.id_fee_type = e.id_fee_type ) )  a
@@ -76,15 +77,15 @@ FROM  ( SELECT  *
 
 -- INSERT INTO LEDGER BRANCH BALANCE
 WITH scope AS (
-        SELECT  *
+        SELECT *
         FROM cfe.accounting_scope
         WHERE id_status = 'C'
             AND id_accounting_scope_code = :SCOPE )
     , ex AS (
-        SELECT  *
+        SELECT *
         FROM cfe.execution
         WHERE id_status = 'R'
-            AND value_date = (  SELECT  Max( value_date )
+            AND value_date = (  SELECT Max( value_date )
                                 FROM cfe.execution
                                 WHERE id_status = 'R'
                                     AND ( :VALUE_DATE IS NULL
@@ -95,7 +96,7 @@ WITH scope AS (
         FROM common.fxrate_hst f
             INNER JOIN ex
                 ON f.value_date <= ex.value_date
-        WHERE f.value_date = (  SELECT  Max( value_date )
+        WHERE f.value_date = (  SELECT Max( value_date )
                                 FROM common.fxrate_hst
                                 WHERE id_currency_from = f.id_currency_from
                                     AND id_currency_into = f.id_currency_into
@@ -105,11 +106,11 @@ WITH scope AS (
         SELECT  :BOOK_CURRENCY
                 , 1
         FROM dual )
-SELECT /*+ parallel */
+SELECT /*+ PARALLEL */
     scope.id_accounting_scope
     , ex.value_date
     , ex.posting_date
-    , a.GL_LEVEL
+    , a.gl_level
     , a.code
     , b.description
     , c.balance_bc
@@ -121,7 +122,7 @@ FROM ex
     INNER JOIN cfe.ledger_branch b
         ON b.id_accounting_scope = scope.id_accounting_scope
             AND b.code = a.code
-    INNER JOIN  (   SELECT  b.code
+    INNER JOIN (    SELECT  b.code
                             , Round( d.amount * fxr.fxrate, 2 ) balance_bc
                     FROM scope
                         INNER JOIN cfe.ledger_branch_branch b
@@ -129,9 +130,9 @@ FROM ex
                         INNER JOIN cfe.ledger_account c
                             ON b.code_inferior = c.code
                                 AND c.id_accounting_scope_code = scope.id_accounting_scope_code
-                        INNER JOIN  (   SELECT  id_account
-                                                , SUM( amount ) balance
-                                        FROM  ( SELECT  id_account_credit id_account
+                        INNER JOIN (    SELECT  id_account
+                                                , Sum( amount ) balance
+                                        FROM (  SELECT  id_account_credit id_account
                                                         , amount
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
@@ -152,15 +153,15 @@ FROM ex
 
 -- INSERT INTO LEDGER BRANCH BALANCE NEW
 WITH scope AS (
-        SELECT  *
+        SELECT *
         FROM cfe.accounting_scope
         WHERE id_status = 'C'
             AND id_accounting_scope_code = :SCOPE )
     , ex AS (
-        SELECT  *
+        SELECT *
         FROM cfe.execution
         WHERE id_status = 'R'
-            AND value_date = (  SELECT  Max( value_date )
+            AND value_date = (  SELECT Max( value_date )
                                 FROM cfe.execution
                                 WHERE id_status = 'R'
                                     AND ( :VALUE_DATE IS NULL
@@ -171,7 +172,7 @@ WITH scope AS (
         FROM common.fxrate_hst f
             INNER JOIN ex
                 ON f.value_date <= ex.value_date
-        WHERE f.value_date = (  SELECT  Max( value_date )
+        WHERE f.value_date = (  SELECT Max( value_date )
                                 FROM common.fxrate_hst
                                 WHERE id_currency_from = f.id_currency_from
                                     AND id_currency_into = f.id_currency_into
@@ -181,11 +182,11 @@ WITH scope AS (
         SELECT  :BOOK_CURRENCY
                 , 1
         FROM dual )
-SELECT /*+ parallel */
+SELECT /*+ PARALLEL */
     scope.id_accounting_scope
     , ex.value_date
     , ex.posting_date
-    , a.GL_LEVEL
+    , a.gl_level
     , a.code
     , b.description
     , c.balance_bc
@@ -197,7 +198,7 @@ FROM ex
     INNER JOIN cfe.ledger_branch b
         ON b.id_accounting_scope = scope.id_accounting_scope
             AND b.code = a.code
-    INNER JOIN  (   SELECT  b.code
+    INNER JOIN (    SELECT  b.code
                             , Round( d.amount * fxr.fxrate, 2 )
                     FROM scope
                         INNER JOIN cfe.ledger_branch_branch b
@@ -205,9 +206,9 @@ FROM ex
                         INNER JOIN cfe.ledger_account c
                             ON b.code_inferior = c.code
                                 AND c.id_accounting_scope_code = scope.id_accounting_scope_code
-                        INNER JOIN  (   SELECT  id_account
+                        INNER JOIN (    SELECT  id_account
                                                 , Sum( amount )
-                                        FROM  ( SELECT  id_account_credit
+                                        FROM (  SELECT  id_account_credit
                                                         , amount
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
@@ -225,11 +226,10 @@ FROM ex
 ;
 
 -- APPEND COLLATERAL REF
-
 SELECT /*+ PARALLEL */
     cfe.id_collateral_ref.nextval
     , id_collateral
-FROM  ( SELECT DISTINCT
+FROM (  SELECT DISTINCT
             a.id_collateral
         FROM cfe.collateral a
             LEFT JOIN cfe.collateral_ref b
@@ -238,11 +238,10 @@ FROM  ( SELECT DISTINCT
 ;
 
 -- APPEND COUNTER PARTY REF
-
 SELECT /*+ PARALLEL */
     cfe.id_counter_party_ref.nextval
     , id_counter_party
-FROM  ( SELECT DISTINCT
+FROM (  SELECT DISTINCT
             a.id_counter_party
         FROM cfe.collateral a
             LEFT JOIN cfe.counter_party_ref b
@@ -255,7 +254,7 @@ FROM  ( SELECT DISTINCT
 SELECT /*+ PARALLEL */
     b.id_collateral_ref
     , c.id_counter_party_ref
-    , Coalesce valid_date
+    , coalesce valid_date
     , a.description
     , d.id_collateral_type_ref
     , a.fair_value
@@ -267,12 +266,12 @@ FROM cfe.collateral a
         ON a.id_collateral = b.id_collateral
     LEFT JOIN cfe.counter_party_ref c
         ON a.id_counter_party = c.id_counter_party
-    INNER JOIN  (   SELECT  *
+    INNER JOIN (    SELECT *
                     FROM common.collateral_type d1
-                    WHERE id_status IN  ( 'C', 'H' )
-                        AND id_collateral_type_ref = (  SELECT  Max( id_collateral_type_ref )
+                    WHERE id_status IN ( 'C', 'H' )
+                        AND id_collateral_type_ref = (  SELECT Max( id_collateral_type_ref )
                                                         FROM common.collateral_type
-                                                        WHERE id_status IN  ( 'C', 'H' )
+                                                        WHERE id_status IN ( 'C', 'H' )
                                                             AND id_collateral_type = d1.id_collateral_type ) )  d
         ON a.id_collateral_type = d.id_collateral_type
 ;
@@ -282,21 +281,21 @@ WITH ex AS (
         SELECT  value_date
                 , posting_date
         FROM cfe.execution x
-        WHERE id_status IN  ( 'R', 'H' )
-            AND value_date = (  SELECT  Max( value_date )
+        WHERE id_status IN ( 'R', 'H' )
+            AND value_date = (  SELECT Max( value_date )
                                 FROM cfe.execution
-                                WHERE id_status IN  ( 'R', 'H' ) )
-            AND posting_date = (    SELECT  Max( posting_date )
+                                WHERE id_status IN ( 'R', 'H' ) )
+            AND posting_date = (    SELECT Max( posting_date )
                                     FROM cfe.execution
-                                    WHERE id_status IN  ( 'R', 'H' )
+                                    WHERE id_status IN ( 'R', 'H' )
                                         AND value_date = x.value_date ) )
     , fxr AS (
         SELECT  id_currency_from
                 , fxrate
         FROM common.fxrate_hst f
-        WHERE f.value_date <= ( SELECT  value_date
+        WHERE f.value_date <= ( SELECT value_date
                                 FROM ex )
-            AND f.value_date = (    SELECT  Max( value_date )
+            AND f.value_date = (    SELECT Max( value_date )
                                     FROM common.fxrate_hst
                                     WHERE id_currency_from = f.id_currency_from
                                         AND id_currency_into = f.id_currency_into )
@@ -306,12 +305,12 @@ WITH ex AS (
                 , 1
         FROM dual )
     , scope AS (
-        SELECT  *
+        SELECT *
         FROM cfe.accounting_scope
         WHERE id_status = 'C'
             AND id_accounting_scope_code = 'INTERN' )
     , scope1 AS (
-        SELECT  *
+        SELECT *
         FROM cfe.accounting_scope
         WHERE id_status = 'C'
             AND id_accounting_scope_code = 'NGAAP' )
@@ -324,7 +323,7 @@ WITH ex AS (
             INNER JOIN cfe.ledger_account c
                 ON b.code_inferior = c.code
                     AND c.id_accounting_scope_code = scope.id_accounting_scope_code
-            INNER JOIN  (   SELECT  id_account_credit id_account
+            INNER JOIN (    SELECT  id_account_credit id_account
                                     , amount
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
@@ -348,7 +347,7 @@ WITH ex AS (
             INNER JOIN cfe.ledger_account c
                 ON b.code_inferior = c.code
                     AND c.id_accounting_scope_code = scope1.id_accounting_scope_code
-            INNER JOIN  (   SELECT  id_account_credit id_account
+            INNER JOIN (    SELECT  id_account_credit id_account
                                     , amount
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
@@ -363,9 +362,9 @@ WITH ex AS (
             INNER JOIN fxr
                 ON c.id_currency = fxr.id_currency_from
         GROUP BY b.code )
-SELECT /*+ parallel */
+SELECT /*+ PARALLEL */
     a.code code
-    , Lpad( ' ', 4 * ( a.GL_LEVEL - 1 ), ' ' )
+    , Lpad( ' ', 4 * ( a.gl_level - 1 ), ' ' )
              || a.code format_code
     , b.description
     , c.balance_bc
@@ -384,37 +383,37 @@ FROM scope
 WHERE gl_level <= 3
     AND NOT ( c.balance_bc IS NULL
                 AND c1.balance_bc IS NULL )
-ORDER BY    (   SELECT  code
+ORDER BY    (   SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 1 ) NULLS FIRST
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 2 ) ASC NULLS FIRST
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 3 ) DESC NULLS FIRST
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 4 ) DESC
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 5 ) ASC
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
                     AND gl_level = 6 ) NULLS FIRST
-            , ( SELECT  code
+            , ( SELECT code
                 FROM cfe.ledger_branch_branch
                 WHERE id_accounting_scope = a.id_accounting_scope
                     AND code_inferior = a.code
@@ -422,8 +421,7 @@ ORDER BY    (   SELECT  code
             , code
 ;
 
-
 -- ALL COLUMNS FROM TABLE
-SELECT  a.*
+SELECT a.*
 FROM cfe.instrument a
 ;

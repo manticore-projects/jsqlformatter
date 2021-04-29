@@ -311,9 +311,9 @@ WHERE  ( amortised_cost_dirty < 0
           OR impairment_contingent_d != 0 )
        AND NOT ( id_instrument_type IN ( 'own_acc', 'sec_hft', 'sec_hft_set' )
                   OR ( f2.attribute_value IS NOT NULL
-                       AND f2.attribute_value IN ( 'GOVBONDS', 'TBILL'/*CBN Issues*/
+                       AND f2.attribute_value IN ( 'GOVBONDS', 'TBILL' /*CBN Issues*/
                                                   ) )
                   OR ( g2.attribute_value IS NOT NULL
-                       AND g2.attribute_value IN ( '271', '7614' ) )/*CBN*/
+                       AND g2.attribute_value IN ( '271', '7614' ) ) /*CBN*/
                 )
 ;

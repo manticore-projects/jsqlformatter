@@ -1,41 +1,42 @@
+
 -- BRACKETS 1
-SELECT  columnName
-FROM [server-name\\server-instance]..schemaName.tableName
+SELECT columnname
+FROM [server-name\\server-instance]..schemaname.tablename
 ;
 
 -- BRACKETS 2
-SELECT  columnName
+SELECT columnname
 FROM [server-name\\server-instance]..[schemaName].[table Name]
 ;
 
 -- BRACKETS 3
-SELECT  columnName
+SELECT columnname
 FROM [server-name\\server-instance]..[schemaName].[table-Name]
 ;
 
 -- BRACKETS 4
-SELECT  columnName
+SELECT columnname
 FROM [schemaName].[tableName]
 ;
 
 -- BRACKETS 5
-SELECT  columnName
-FROM schemaName.[tableName]
+SELECT columnname
+FROM schemaname.[tableName]
 ;
 
 -- BRACKETS 6
-SELECT  columnName
-FROM [schemaName].tableName
+SELECT columnname
+FROM [schemaName].tablename
 ;
 
 -- READ INSTRUMENT TRANSACTIONS WITH COLLATERAL ONLY
-SELECT  a.*
+SELECT a.*
 FROM [cfe].[TRANSACTION] a
     INNER JOIN cfe.instrument b
         ON a.id_instrument = b.id_instrument
 WHERE a.id_instrument >= ?
     AND a.id_instrument <= ?
-    AND EXISTS (    SELECT  1
+    AND EXISTS (    SELECT 1
                     FROM cfe.instrument_ref b
                         INNER JOIN cfe.instrument_collateral_hst c
                             ON b.id_instrument_ref = c.id_instrument_ref

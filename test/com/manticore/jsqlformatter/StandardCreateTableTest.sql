@@ -1,3 +1,4 @@
+
 -- CREATE TABLE CFE.INTEREST_PERIOD
 CREATE TABLE cfe.interest_period (
     id_instrument                VARCHAR (40)    NOT NULL
@@ -19,37 +20,37 @@ CREATE TABLE cfe.interest_period (
 
 -- SIMPLE
 CREATE TABLE employees (
-    employee_number      int         NOT NULL
-    , employee_name      char (50)   NOT NULL
-    , department_id      int
-    , salary             int
+    employee_number      INT         NOT NULL
+    , employee_name      CHAR (50)   NOT NULL
+    , department_id      INT
+    , salary             INT
     , PRIMARY KEY ( employee_number )
     , UNIQUE ( employee_name )
     , FOREIGN KEY ( department_id )
         REFERENCES departments ( department_id )
-) parallel compress nologging
+) PARALLEL COMPRESS NOLOGGING
 ;
 
 -- COMPLEX
 CREATE TABLE employees (
-    employee_number      int         NOT NULL
-    , employee_name      char (50)   NOT NULL
-    , department_id      int
-    , salary             int
+    employee_number      INT         NOT NULL
+    , employee_name      CHAR (50)   NOT NULL
+    , department_id      INT
+    , salary             INT
     , CONSTRAINT employees_pk
         PRIMARY KEY ( employee_number )
     , CONSTRAINT fk_departments
         FOREIGN KEY ( department_id )
         REFERENCES departments ( department_id )
-) parallel compress nologging
+) PARALLEL COMPRESS NOLOGGING
 ;
 
 -- COMPLEX WITH MANY REFERENCES
 CREATE TABLE employees (
-    employee_number      int         NOT NULL
-    , employee_name      char (50)   NOT NULL
-    , department_id      int
-    , salary             int
+    employee_number      INT         NOT NULL
+    , employee_name      CHAR (50)   NOT NULL
+    , department_id      INT
+    , salary             INT
     , CONSTRAINT employees_pk
         PRIMARY KEY (   employee_number
                         , employee_name
@@ -61,22 +62,22 @@ CREATE TABLE employees (
         REFERENCES departments (    employee_number
                                     , employee_name
                                     , department_id )
-) parallel compress nologging
+) PARALLEL COMPRESS NOLOGGING
 ;
 
 -- CREATE TABLE CFE.RECONCILIATION_NOMINAL_HST 2
-CREATE TABLE cfe.RECONCILIATION_NOMINAL_hst parallel compress nologging
-    AS ( SELECT /*+ parallel */
-            (   SELECT  id_execution_ref
+CREATE TABLE cfe.reconciliation_nominal_hst PARALLEL COMPRESS NOLOGGING
+    AS ( SELECT /*+ PARALLEL */
+            (   SELECT id_execution_ref
                 FROM cfe.execution_ref c
                     INNER JOIN cfe.execution_v d
                         ON c.value_date = d.value_date
                             AND c.posting_date = d.posting_date
                             AND d.flag = 'L' ) id_execution_ref
-            , b.ID_INSTRUMENT_REF
-            , a.VALUE_DATE
-            , a.NOMINAL_BALANCE
-        FROM cfe.RECONCILIATION_NOMINAL a
+            , b.id_instrument_ref
+            , a.value_date
+            , a.nominal_balance
+        FROM cfe.reconciliation_nominal a
             INNER JOIN cfe.instrument_ref b
                 ON a.id_instrument = b.id_instrument )
 ;

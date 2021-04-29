@@ -12,8 +12,8 @@ SELECT  osuser
         , time_remaining
 FROM v$session_longops sl
     INNER JOIN v$session s
-        ON sl.SID = s.SID
-            AND sl.SERIAL# = s.SERIAL#
+        ON sl.sid = s.sid
+            AND sl.serial# = s.serial#
 WHERE time_remaining > 0
 /* Also not this query:
 select * from end_comment;

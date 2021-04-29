@@ -1,3 +1,4 @@
+
 -- ALTER TABLE ADD FOREIGN KEY
 ALTER TABLE cfe.ledger_acc_entry_manual
     ADD FOREIGN KEY (id_manual_posting_batch)
@@ -31,14 +32,14 @@ ALTER TABLE risk.collateral
 
 -- ORACLE ADD MULTIPLE COLUMNS
 ALTER TABLE customers
-    ADD (   customer_name    varchar2 (45)
-            , city           varchar2 (40)   DEFAULT 'Seattle')
+    ADD (   customer_name    VARCHAR2 (45)
+            , city           VARCHAR2 (40)   DEFAULT 'SEATTLE')
 ;
 
 -- ORACLE MODIFY MULTIPLE COLUMNS
 ALTER TABLE customers
-    MODIFY (    customer_name    varchar2 (100)  NOT NULL
-                , city           varchar2 (75)   DEFAULT 'Seattle' NOT NULL)
+    MODIFY (    customer_name    VARCHAR2 (100)  NOT NULL
+                , city           VARCHAR2 (75)   DEFAULT 'SEATTLE' NOT NULL)
 ;
 
 -- RENAME

@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 /** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
+@Ignore
 public class H2OrderedAggregateTest {
 
   public static Iterable<Object[]> getSqlMap(Class<? extends H2OrderedAggregateTest> clasz) {

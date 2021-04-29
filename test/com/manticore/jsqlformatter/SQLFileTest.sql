@@ -7,10 +7,11 @@ SELECT  osuser
         , time_remaining
 FROM v$session_longops sl
     INNER JOIN v$session s
-        ON sl.SID = s.SID
-            AND sl.SERIAL# = s.SERIAL#
+        ON sl.sid = s.sid
+            AND sl.serial# = s.serial#
 WHERE time_remaining > 0
 ;
+
 CREATE VIEW sys.running_sql
     AS SELECT   s.username
                 , sl.sid
@@ -27,16 +28,19 @@ CREATE VIEW sys.running_sql
             INNER JOIN v$sql sq
                 ON sq.sql_id = sl.sql_id
             INNER JOIN v$session s
-                ON sl.SID = s.SID
+                ON sl.sid = s.sid
                     AND sl.serial# = s.serial#
         WHERE time_remaining > 0
 ;
 
+
 SET pagesize 55
 ;
 
+
 SET linesize 170
 ;
+
 
 /*
 something crazy;
@@ -47,28 +51,32 @@ something crazy;
 
 
 -- something crazy;
-SELECT  SUBSTR( V$SESSION.USERNAME, 1, 8 ) USERNAME
-        , V$SESSION.OSUSER OSUSER
-        , DECODE( V$SESSION.SERVER, 'DEDICATED', 'D', 'SHARED', 'S', 'O' ) SERVER
-        , V$SQLAREA.DISK_READS DISK_READS
-        , V$SQLAREA.BUFFER_GETS BUFFER_GETS
-        , SUBSTR( V$SESSION.LOCKWAIT, 1, 10 ) LOCKWAIT
-        , V$SESSION.PROCESS PID
-        , V$SESSION_WAIT.EVENT EVENT
-        , V$SQLAREA.SQL_TEXT SQL
-FROM V$SESSION_WAIT
-    , V$SQLAREA
-    , V$SESSION
-WHERE V$SESSION.SQL_ADDRESS = V$SQLAREA.ADDRESS
-    AND V$SESSION.SQL_HASH_VALUE = V$SQLAREA.HASH_VALUE
-    AND V$SESSION.SID = V$SESSION_WAIT.SID
-    AND V$SESSION.STATUS = 'ACTIVE'
-    AND V$SESSION_WAIT.EVENT != 'client message'
-ORDER BY    V$SESSION.LOCKWAIT ASC
-            , V$SESSION.USERNAME
+SELECT  Substr( v$session.username, 1, 8 ) username
+        , v$session.osuser osuser
+        , Decode( v$session.server
+                    , 'DEDICATED', 'D'
+                    , 'SHARED', 'S'
+                    , 'O' ) server
+        , v$sqlarea.disk_reads disk_reads
+        , v$sqlarea.buffer_gets buffer_gets
+        , Substr( v$session.lockwait, 1, 10 ) lockwait
+        , v$session.process pid
+        , v$session_wait.event event
+        , v$sqlarea.sql_text sql
+FROM v$session_wait
+    , v$sqlarea
+    , v$session
+WHERE v$session.sql_address = v$sqlarea.address
+    AND v$session.sql_hash_value = v$sqlarea.hash_value
+    AND v$session.sid = v$session_wait.sid
+    AND v$session.status = 'ACTIVE'
+    AND v$session_wait.event != 'client message'
+ORDER BY    v$session.lockwait ASC
+            , v$session.username
 ;
 
-SELECT  'exec DBMS_SHARED_POOL.PURGE (''' || ADDRESS || ',' || HASH_VALUE || ''', ''C'');'
-FROM V$SQLAREA
-WHERE SQL_ID LIKE '9z1ufprvt2pk2'
+
+SELECT 'exec DBMS_SHARED_POOL.PURGE (''' || address || ',' || hash_value || ''', ''C'');'
+FROM v$sqlarea
+WHERE sql_id LIKE '9z1ufprvt2pk2'
 ;

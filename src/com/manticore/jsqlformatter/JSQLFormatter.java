@@ -274,10 +274,10 @@ public class JSQLFormatter {
       StringBuilder builder, OutputFormat format, String alias, String before, String after) {
 
     String s;
-    if (alias.startsWith("\"")) {
+    if (alias.trim().startsWith("\"") || alias.trim().startsWith("[")) {
       s = alias;
     } else {
-      switch (keywordSpelling) {
+      switch (objectSpelling) {
         case UPPER:
           s = alias.toUpperCase();
           break;
@@ -315,7 +315,7 @@ public class JSQLFormatter {
     String[] parts = objectName.contains(".") ? objectName.split("\\.") : new String[] {objectName};
     for (String w : parts) {
       if (j > 0) nameBuilder.append(".");
-      if (w.startsWith("\"")) {
+      if (w.trim().startsWith("\"") || w.trim().startsWith("[")) {
         nameBuilder.append(w);
       } else {
         switch (objectSpelling) {
@@ -442,7 +442,7 @@ public class JSQLFormatter {
     if (tables != null && tables.size() > 0) {
       int j = 0;
       for (Table table : tables) {
-        appendKeyWord(builder, outputFormat, table.getFullyQualifiedName(), j > 1 ? "," : "", " ");
+        appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), j > 1 ? "," : "", " ");
         j++;
       }
     }
@@ -1000,7 +1000,7 @@ public class JSQLFormatter {
           appendExpression(column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
           builder.append(" = ");
           appendExpression(
-              expressions.get(i), null, builder, subIndent, i, columns.size(), false, BreakLine.AFTER_FIRST);
+              expressions.get(i), null, builder, subIndent, 0, columns.size(), false, BreakLine.AFTER_FIRST);
           i++;
         }
 
@@ -1122,7 +1122,7 @@ public class JSQLFormatter {
           appendExpression(column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
           builder.append(" = ");
           appendExpression(
-              expressions.get(i), null, builder, subIndent, i, columns.size(), false, BreakLine.AFTER_FIRST);
+              expressions.get(i), null, builder, subIndent, 0, columns.size(), false, BreakLine.AFTER_FIRST);
           i++;
         }
     }

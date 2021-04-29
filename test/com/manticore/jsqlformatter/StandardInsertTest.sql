@@ -1,25 +1,18 @@
+
 -- INSERT COUNTERPARTY COUNTERPARTY RELATIONSHIP
 INSERT INTO risk.counterparty_counterparty
-VALUES (    :id_counterparty_ref
-            , :id_counterparty_beneficiary
-            , :id_instrument_guarantee
-            , :priority
-            , :type
-            , :description
-            , :limit_amout
-            , :id_currency
-            , :end_date )
+VALUES (    :id_counterparty_ref, :id_counterparty_beneficiary, :id_instrument_guarantee
+            , :priority, :type, :description
+            , :limit_amout, :id_currency, :end_date )
 ;
 
 -- INSERT RATIO COLLECTION RATIOS
 INSERT INTO risk.counterparty_ratio
-VALUES (    ?
-            , ?
-            , ? )
+VALUES ( ?, ?, ? )
 ;
 
 -- INSERT TMP_CCF
-INSERT INTO RISK.TMP_CCF (
+INSERT INTO risk.tmp_ccf (
     "ID_INSTRUMENT"
     , "TENOR"
     , "STATUS"
@@ -40,13 +33,13 @@ FROM dual
 ;
 
 -- APPEND ATTRIBUTE VALUE REF
-INSERT INTO cfe.ATTRIBUTE_VALUE_REF
+INSERT INTO cfe.attribute_value_ref
 SELECT  cfe.id_attribute_value_ref.nextval
-        , ATTRIBUTE_VALUE
-FROM  ( SELECT DISTINCT
-            a.ATTRIBUTE_VALUE
+        , attribute_value
+FROM (  SELECT DISTINCT
+            a.attribute_value
         FROM cfe.instrument_attribute a
-            LEFT JOIN cfe.ATTRIBUTE_VALUE_REF b
+            LEFT JOIN cfe.attribute_value_ref b
                 ON a.attribute_value = b.attribute_value
         WHERE b.attribute_value IS NULL )  a
 ;
