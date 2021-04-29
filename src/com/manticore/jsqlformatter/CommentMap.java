@@ -29,7 +29,7 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
           Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
   public static final Pattern LINE_END_COMMENT_PATTERN =
-      Pattern.compile("(\\/\\*.*\\\\*\\/\\s?\\)?\\n)");
+      Pattern.compile("(\\/\\*.*\\\\*\\/\\s?[\\,\\)]?\\n)");
 
   private static final Pattern STRING_PATTERN =
       Pattern.compile(

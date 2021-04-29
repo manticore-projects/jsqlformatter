@@ -117,7 +117,7 @@ public class StandardSelectTest {
    */
   @Test
   public void testFormat() throws Exception {
-    String formatted = JSQLFormatter.format(expected);
+    String formatted = JSQLFormatter.format(expected /*,"indentWidth=4", "keywordSpelling=UPPER", "functionSpelling=CAMEL", "objectSpelling=LOWER", "separation=BEFORE"*/);
 		
 		System.out.println("\n-- " + input);
     System.out.println(formatted);

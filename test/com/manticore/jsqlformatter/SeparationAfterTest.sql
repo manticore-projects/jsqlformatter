@@ -174,14 +174,14 @@ insert into RISK.TMP_CCF (
     "LIMIT",
     "DR_BALANCE",
     "OPEN_LIMIT" )
-select  '1000042339' /* ID_INSTRUMENT */,
-        0 /* TENOR */,
-        'DEFAULT' /* STATUS */,
-        {d '2020-02-27'} /* OBSERVATION_DATE */,
-        - 142574953.65 /* BALANCE */,
-        300000000 /* LIMIT */,
-        - 142574953.65 /* DR_BALANCE */,
-        157425046.35   /* OPEN_LIMIT */
+select  '1000042339'       /* ID_INSTRUMENT */,
+        0                  /* TENOR */,
+        'DEFAULT'          /* STATUS */,
+        {d '2020-02-27'}   /* OBSERVATION_DATE */,
+        - 142574953.65     /* BALANCE */,
+        300000000          /* LIMIT */,
+        - 142574953.65     /* DR_BALANCE */,
+        157425046.35       /* OPEN_LIMIT */
 from DUAL
 ;
 
