@@ -50,13 +50,13 @@ Static Binaries
      - File
      - Size
    * - Linux x64
-     - :downloads:`JSQLFormatter <0.1.4/JSQLFormatter>`
+     - :downloads:`JSQLFormatter <0.1.5/JSQLFormatter>`
      - (2.8 MB) 
    * - Windows x64
-     - :downloads:`JSQLFormatter.exe <0.1.4/JSQLFormatter.exe>`
+     - :downloads:`JSQLFormatter.exe <0.1.5/JSQLFormatter.exe>`
      - (2.8 MB) 
    * - Java
-     - :downloads:`JSQLFormatter.jar <0.1.4/JSQLFormatter.jar>`
+     - :downloads:`JSQLFormatter.jar <0.1.5/JSQLFormatter.jar>`
      - (700 kB) 
    * - MacOS
      - Comming soon.

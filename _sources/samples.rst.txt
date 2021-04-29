@@ -78,3 +78,10 @@ MS Sql Server
   :language: SQL
   :force:
   :linenos:
+
+Formatting Options
+-------------------
+.. literalinclude:: ../../../test/com/manticore/jsqlformatter/FormattingOptionsTest.sql
+  :language: SQL
+  :force:
+  :linenos:
