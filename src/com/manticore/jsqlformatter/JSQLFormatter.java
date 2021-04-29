@@ -442,7 +442,18 @@ public class JSQLFormatter {
     if (tables != null && tables.size() > 0) {
       int j = 0;
       for (Table table : tables) {
-        appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), j > 1 ? "," : "", " ");
+        switch (separation) {
+					case AFTER:
+						appendObjectName(
+              builder, outputFormat, table.getFullyQualifiedName(), "", j<tables.size()-1 ? ", " : "");
+						break;
+					case BEFORE:	
+					default:
+						appendObjectName(
+              builder, outputFormat, table.getFullyQualifiedName(), j > 1 ? ", " : "", "");
+						break;
+				}
+          
         j++;
       }
     }
@@ -1363,11 +1374,21 @@ public class JSQLFormatter {
   private static void appendJoins(List<Join> joins, StringBuilder builder, int indent) {
     if (joins != null)
       for (Join join : joins) {
+				
+				if (join.isSimple()) {
+					switch (separation) {
+						case AFTER:  builder.append(",");
+					}
+        } 
         appendNormalizedLineBreak(builder);
 
         if (join.isSimple()) {
           for (int j = 0; j <= indent; j++) builder.append(indentString);
-          builder.append(", ");
+					
+					switch (separation) {
+						case BEFORE:  builder.append(", ");
+					}
+         
         } else {
           for (int j = 0; j <= indent; j++) builder.append(indentString);
 
@@ -1416,26 +1437,39 @@ public class JSQLFormatter {
     if (i > 0) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j <= indent; j++) builder.append(indentString);
-      builder.append(", ");
     }
-
-    appendAlias(builder, outputFormat, withItem.getName(), "", " ");
+		
+		switch (separation) {
+			case BEFORE:
+						appendAlias(builder, outputFormat, withItem.getName(), i > 1 ? ", " : " ", " ");
+						break;
+			default:
+				appendAlias(builder, outputFormat, withItem.getName(), "", " ");
+				}
 
     List<SelectItem> selectItems = withItem.getWithItemList();
     if (selectItems != null && selectItems.size() > 0) {
-      builder.append(" (");
-
+      builder.append("( ");
       int k = 0;
       for (SelectItem selectItem : selectItems) {
         // @todo: write code for selectItems
         k++;
       }
-      builder.append(")");
+      builder.append(" ) ");
     }
 
     appendKeyWord(builder, outputFormat, "AS", "", " (");
     appendSelectBody(withItem.getSelectBody(), null, builder, indent + 2, true);
-    appendNormalizingTrailingWhiteSpace(builder, " )");
+		
+		switch (separation) {
+					case AFTER:
+						appendNormalizingTrailingWhiteSpace(builder, i < n-1 ? " )," : " )");
+						break;
+					case BEFORE:	
+						appendNormalizingTrailingWhiteSpace(builder, " )");
+						break;
+				}
+    
   }
 
   private static void appendAllColumns(
@@ -1443,9 +1477,17 @@ public class JSQLFormatter {
     if (i > 0) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j <= indent; j++) builder.append(indentString);
-      builder.append(", ");
+      
     }
-    builder.append(allColumns.toString());
+		switch (separation) {
+			case AFTER:
+				builder.append(allColumns.toString());
+				appendNormalizingTrailingWhiteSpace(builder, i > n - 1 ? ", " : "");
+				break;
+			case BEFORE:
+				builder.append(i >0 ? ", " : "");
+				builder.append(allColumns.toString());
+		}
   }
 
   private static void appendStringList(
@@ -1476,10 +1518,18 @@ public class JSQLFormatter {
         appendNormalizedLineBreak(builder);
         for (int j = 0; j < indent; j++) builder.append(indentString);
       }
-      if (commaSeparated && i > 0) builder.append(", ");
     }
-
-    appendObjectName(builder, outputFormat, s, "", "");
+		
+		switch (separation) {
+			case AFTER:
+				appendObjectName(builder, outputFormat, s, "", "");
+				appendNormalizingTrailingWhiteSpace(builder, commaSeparated && i > n - 1 ? ", " : "");
+				break;
+			case BEFORE:
+				builder.append(commaSeparated && i >0 ? ", " : "");
+				appendObjectName(builder, outputFormat, s, "", "");
+		}
+    
   }
 
   private static void appendExpression(
@@ -1496,8 +1546,12 @@ public class JSQLFormatter {
         appendNormalizedLineBreak(builder);
         for (int j = 0; j < indent; j++) builder.append(indentString);
       }
-      if (commaSeparated && i > 0) builder.append(", ");
     }
+		
+		switch (separation) {
+			case BEFORE:
+				builder.append(commaSeparated && i >0 ? ", " : "");
+		}
 
     if (expression instanceof Column) {
       Column column = (Column) expression;
@@ -1897,6 +1951,12 @@ public class JSQLFormatter {
       if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
       appendAlias(builder, outputFormat, alias.getName(), "", " ");
     }
+		
+		switch (separation) {
+			case AFTER:
+				appendNormalizingTrailingWhiteSpace(builder, commaSeparated && i < n-1 ? ", " : "");
+				break;
+		}
   }
 
   private static void appendItemsList(
@@ -1951,8 +2011,12 @@ public class JSQLFormatter {
     if (i > 0) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j <= indent; j++) builder.append(indentString);
-      builder.append(", ");
     }
+		
+		switch (separation) {
+			case BEFORE:
+				builder.append( i >0 ? ", " : "");
+		}
 
     Alias alias = fromItem.getAlias();
 
@@ -1968,6 +2032,12 @@ public class JSQLFormatter {
     } else {
       System.out.println(fromItem.getClass().getName());
     }
+		
+		switch (separation) {
+			case AFTER:
+				appendNormalizingTrailingWhiteSpace(builder, i < n-1 ? ", " : "");
+				break;
+		}
   }
 
   private static void appendSubSelect(
@@ -2125,12 +2195,16 @@ public class JSQLFormatter {
             appendNormalizedLineBreak(builder);
             for (int j = 0; j <= indent; j++) builder.append(indentString);
           }
-          if (commaSeparated && i > 0) builder.append(", ");
         }
 
         String columnName = columnDefinition.getColumnName();
         ColDataType colDataType = columnDefinition.getColDataType();
         List<String> columnSpecs = columnDefinition.getColumnSpecs();
+
+        switch (separation) {
+          case BEFORE:
+            builder.append(i > 0 ? ", " : " ");
+        }
 
         appendObjectName(builder, outputFormat, columnName, "", "");
 
@@ -2147,6 +2221,13 @@ public class JSQLFormatter {
           appendType(
               builder, outputFormat, PlainSelect.getStringList(columnSpecs, false, false), "", "");
         }
+				
+				switch (separation) {
+          case AFTER:
+            appendNormalizingTrailingWhiteSpace(builder, i > columnDefinitions.size() - 1 ? ", " : "");
+            break;
+        }
+				
         i++;
       }
 
@@ -2164,8 +2245,12 @@ public class JSQLFormatter {
               appendNormalizedLineBreak(builder);
               for (int j = 0; j <= indent; j++) builder.append(indentString);
             }
-            if (commaSeparated && i > 0) builder.append(", ");
           }
+					
+					switch (separation) {
+          case BEFORE:
+            builder.append(i > 0 ? ", " : "");
+        }
 
           if (index instanceof ForeignKeyIndex) {
             ForeignKeyIndex foreignKeyIndex = (ForeignKeyIndex) index;
@@ -2305,6 +2390,13 @@ public class JSQLFormatter {
                 .append(PlainSelect.getStringList(columnParams, true, true))
                 .append(!"".equals(idxSpecText) ? " " + idxSpecText : "");
           }
+					
+					switch (separation) {
+          case AFTER:
+            appendNormalizingTrailingWhiteSpace(builder, i > indexes.size() - 1 ? ", " : "");
+            break;
+        }
+					
           i++;
         }
       }
@@ -2456,9 +2548,17 @@ public class JSQLFormatter {
     if (i > 0) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j <= indent; j++) builder.append(indentString);
-      builder.append(", ");
     }
-    builder.append(allColumns.toString());
+		
+		switch (separation) {
+          case AFTER:
+						builder.append(allColumns.toString());
+            appendNormalizingTrailingWhiteSpace(builder, i > n - 1 ? ", " : "");
+            break;
+          case BEFORE:
+            builder.append(i > 0 ? ", " : "");
+						builder.append(allColumns.toString());
+        }
   }
 
   private static void appendAlter(StringBuilder builder, Alter alter, int indent) {
@@ -2478,7 +2578,11 @@ public class JSQLFormatter {
         if (i > 0) {
           appendNormalizedLineBreak(builder);
           for (int j = 0; j <= indent; j++) builder.append(indentString);
-          builder.append(", ");
+        }
+				
+				switch (separation) {
+          case BEFORE:
+            builder.append(i > 0 ? ", " : "");
         }
 
         AlterOperation operation = alterExpression.getOperation();
@@ -2678,6 +2782,12 @@ public class JSQLFormatter {
         }
         if (parameters != null && !parameters.isEmpty()) {
           builder.append(" ").append(PlainSelect.getStringList(parameters, false, false));
+        }
+				
+				switch (separation) {
+          case AFTER:
+						appendNormalizingTrailingWhiteSpace(builder, i < alterExpressions.size()-1 ? ", " : "");
+            break;
         }
 
         i++;

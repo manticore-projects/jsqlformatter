@@ -44,7 +44,7 @@ public class StandardSelectTest {
 
     LinkedHashMap<String, String> sqlMap = new LinkedHashMap<>();
     boolean start = false;
-    boolean end;
+    boolean end = false;
 
     StringBuilder stringBuilder = new StringBuilder();
     InputStream inputStream;
@@ -57,8 +57,8 @@ public class StandardSelectTest {
     String k = "";
     try {
       while ((line = bufferedReader.readLine()) != null) {
-        if (!start && line.startsWith("--")) k = line.substring(3).trim().toUpperCase();
-        start = start || (!start && !line.startsWith("--") && line.trim().length() > 0);
+        if (!start && line.startsWith("--") && !line.startsWith("-- @")) k = line.substring(3).trim().toUpperCase();
+        start = start || (!start && (!line.startsWith("--") || line.startsWith("-- @")) && line.trim().length() > 0);
         end = start && line.trim().endsWith(";");
         if (start) stringBuilder.append(line).append("\n");
         if (end) {
