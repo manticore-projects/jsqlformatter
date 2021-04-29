@@ -7,21 +7,34 @@ Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
 * supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE, ALTER statements
 * ANSI syntax highlighting
+* Formatting Options for Indent Width, Comma Before or After, Upper/Lower/Camel Case spelling
 ![image](https://user-images.githubusercontent.com/18080123/115190509-53106a00-a112-11eb-88f0-6ee693d6e4d3.png)
 
-* Command Line Option (CLI)
+* Command Line Option (CLI) and SQL Inline Options
 ```
-are@ryzen ~/d/s/jsqlformatter (main) [1]> ./JSQLFormatter
-usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
-       [--indent <arg>] [-2] [-8]
- -i,--input-file <arg>    The input SQL file or folder.
- -o,--output-file <arg>   The out SQL file for the formatted statements.
- -f,--format <arg>        The output-format [PLAIN* ANSI HTML RTF]
-    --ansi                Output ANSI annotated text.
-    --html                Output HTML annotated text.
-    --indent <arg>        The indent width [2 4* 8]
- -2                       Indent with 2 characters.
- -8                       Indent with 8 characters.
+java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
+       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+       <arg>]
+ -i,--input-file <arg>         The input SQL file or folder.
+ -o,--output-file <arg>        The out SQL file for the formatted
+                               statements.
+ -f,--format <arg>             The output-format.
+                               [PLAIN* ANSI HTML RTF]
+    --ansi                     Output ANSI annotated text.
+    --html                     Output HTML annotated text.
+ -t,--indent <arg>             The indent width.
+                               [2 4* 8]
+ -2                            Indent with 2 characters.
+ -8                            Indent with 8 characters.
+    --keywordSpelling <arg>    Keyword spelling.
+                               [UPPER*, LOWER, CAMEL, KEEP]
+    --functionSpelling <arg>   Function name spelling.
+                               [UPPER, LOWER, CAMEL*, KEEP]
+    --objectSpelling <arg>     Object name spelling.
+                               [UPPER, LOWER*, CAMEL, KEEP]
+    --separation <arg>         Position of the field separator.
+                               [BEFORE*, AFTER]
 ```
 
 * simple usage of the Java library
@@ -46,11 +59,11 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 	
 
 * Multi Platform Binaries:
-	- JVM: [jsqlformatter-0.1.4.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar)
-(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.4/jsqlformatter-0.1.4.jar.sha1))
-	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
-	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.4/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
+	- JVM: [jsqlformatter-0.1.5.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar.sha1))
+	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.5/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
+	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.5/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
 	- MacOS is planned
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
@@ -59,233 +72,69 @@ usage: ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html]
 ## Todo/Planned
 * add support for SELECT INTO statements
 * detect and quote reserved keyword names
-* add formatting options as per SQL dialect (e. g. Comma first/last, Greedy Spaces, Upper-/Lower-/Camel-Case Names)
 * beautify complex Functions()
 * export or copy to Java, XML/HTML, RTF
-* implement OS native standalone package and a Netbeans Plugin
+* implement Plugins for Netbeans, Eclipse, JEdit, DBeaver, Squirrel SQL
 
 ## Samples
 
-### MERGE statements
+### Inline Formatting Options
 ```sql
--- MERGE DELETE WHERE
-MERGE INTO empl_current tar
-    USING ( SELECT empno
-                , ename
-                , CASE 
-                    WHEN leavedate <= SYSDATE
-                        THEN 'Y'
-                    ELSE 'N'
-                 END AS delete_flag
-            FROM empl ) src
-        ON ( tar.empno = src.empno ) 
-WHEN NOT MATCHED THEN 
-    INSERT ( empno
-                , ename ) 
-    VALUES ( src.empno
-                , src.ename )
-WHEN MATCHED THEN 
-    UPDATE SET tar.ename = src.ename
-    WHERE delete_flag = 'N'
-    DELETE WHERE delete_flag = 'Y'
+-- UPDATE CALENDAR
+-- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
+UPDATE cfe.calendar
+SET     year_offset = ?                    /* year offset */
+        , settlement_shift = To_Char( ? )  /* settlement shift */
+        , friday_is_holiday = ?            /* friday is a holiday */
+        , saturday_is_holiday = ?          /* saturday is a holiday */
+        , sunday_is_holiday = ?            /* sunday is a holiday */
+WHERE id_calendar = ?
+;
+
+-- UPDATE CALENDAR
+-- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
+update CFE.CALENDAR
+set YEAR_OFFSET = ?                    /* year offset */,
+    SETTLEMENT_SHIFT = to_char( ? )    /* settlement shift */,
+    FRIDAY_IS_HOLIDAY = ?              /* friday is a holiday */,
+    SATURDAY_IS_HOLIDAY = ?            /* saturday is a holiday */,
+    SUNDAY_IS_HOLIDAY = ?              /* sunday is a holiday */
+where ID_CALENDAR = ?
 ;
 ```
 
-### UPDATE statements
+### Complex Comments
 ```sql
--- UPDATE COUNTERPARTY_INSTRUMENT
-UPDATE risk.counterparty_instrument a1
-SET ( PRIORITY
-            , TYPE
-            , DESCRIPTION
-            , LIMIT_AMOUT
-            , ID_CURRENCY
-            , END_DATE ) = ( SELECT a.PRIORITY
-                                , a.TYPE
-                                , a.DESCRIPTION
-                                , a.LIMIT_AMOUT
-                                , a.ID_CURRENCY
-                                , a.END_DATE
-                            FROM risk.imp_counterparty_instrument a
-                                    INNER JOIN risk.counterparty b
-                                        ON a.id_counterparty = b.id_counterparty
-                                            AND b.id_status = 'C'
-                                    INNER JOIN risk.instrument c
-                                        ON a.ID_instrument_BENEFICIARY = c.id_instrument
-                                            AND c.id_status = 'C'
-                                    INNER JOIN risk.counterparty_instrument e
-                                        ON b.id_counterparty_ref = e.id_counterparty_ref
-                                            AND e.ID_instrument_BENEFICIARY = a.ID_instrument_BENEFICIARY
-                                            AND e.ID_INSTRUMENT_GUARANTEE = a.ID_INSTRUMENT_GUARANTEE
-                            WHERE e.id_counterparty_ref = a1.id_counterparty_ref
-                                AND e.ID_instrument_BENEFICIARY = a1.ID_instrument_BENEFICIARY
-                                AND e.ID_INSTRUMENT_GUARANTEE = a1.ID_INSTRUMENT_GUARANTEE ) 
-WHERE EXISTS ( SELECT a.PRIORITY
-                    , a.TYPE
-                    , a.DESCRIPTION
-                    , a.LIMIT_AMOUT
-                    , a.ID_CURRENCY
-                    , a.END_DATE
-                FROM risk.imp_counterparty_instrument a
-                        INNER JOIN risk.counterparty b
-                            ON a.id_counterparty = b.id_counterparty
-                                AND b.id_status = 'C'
-                        INNER JOIN risk.instrument c
-                            ON a.ID_instrument_BENEFICIARY = c.id_instrument
-                                AND c.id_status = 'C'
-                        INNER JOIN risk.counterparty_instrument e
-                            ON b.id_counterparty_ref = e.id_counterparty_ref
-                                AND e.ID_instrument_BENEFICIARY = a.ID_instrument_BENEFICIARY
-                                AND e.ID_INSTRUMENT_GUARANTEE = a.ID_INSTRUMENT_GUARANTEE
-                WHERE e.id_counterparty_ref = a1.id_counterparty_ref
-                    AND e.ID_instrument_BENEFICIARY = a1.ID_instrument_BENEFICIARY
-                    AND e.ID_INSTRUMENT_GUARANTEE = a1.ID_INSTRUMENT_GUARANTEE ) 
-;
-```
+------------------------------------------------------------------------------------------------------------------------
+-- CONFIGURATION
+------------------------------------------------------------------------------------------------------------------------
 
-### SELECT statements
-```sql
--- SELECT WITH COMPLEX ORDER
-WITH ex AS ( 
-        SELECT value_date
-            , posting_date
-        FROM cfe.execution x
-        WHERE id_status IN  ( 'R', 'H' ) 
-            AND value_date = ( SELECT Max(value_date)
-                                FROM cfe.execution
-                                WHERE id_status IN  ( 'R', 'H' )  ) 
-            AND posting_date = ( SELECT Max(posting_date)
-                                FROM cfe.execution
-                                WHERE id_status IN  ( 'R', 'H' ) 
-                                    AND value_date = x.value_date )  )
-, fxr AS ( 
-        SELECT id_currency_from
-            , fxrate
-        FROM common.fxrate_hst f
-        WHERE f.value_date <= ( SELECT value_date
-                                FROM ex ) 
-            AND f.value_date = ( SELECT Max(value_date)
-                                FROM common.fxrate_hst
-                                WHERE id_currency_from = f.id_currency_from
-                                    AND id_currency_into = f.id_currency_into ) 
-            AND id_currency_into = 'NGN'
-        UNION ALL 
-        SELECT 'NGN'
-            , 1
-        FROM dual )
-, scope AS ( 
-        SELECT *
-        FROM cfe.accounting_scope
-        WHERE id_status = 'C'
-            AND id_accounting_scope_code = 'INTERN' )
-, scope1 AS ( 
-        SELECT *
-        FROM cfe.accounting_scope
-        WHERE id_status = 'C'
-            AND id_accounting_scope_code = 'NGAAP' )
-, c AS ( 
-        SELECT b.code
-            , Round(Sum(d.amount * fxr.fxrate), 2) balance_bc
-        FROM scope
-                INNER JOIN cfe.ledger_branch_branch b
-                    ON b.id_accounting_scope = scope.id_accounting_scope
-                INNER JOIN cfe.ledger_account c
-                    ON b.code_inferior = c.code
-                        AND c.id_accounting_scope_code = scope.id_accounting_scope_code
-                INNER JOIN  ( SELECT id_account_credit id_account
-                                        , amount
-                                    FROM cfe.ledger_account_entry
-                                            INNER JOIN ex
-                                                ON ledger_account_entry.posting_date <= ex.posting_date
-                                    UNION ALL 
-                                    SELECT id_account_debit
-                                        , -amount
-                                    FROM cfe.ledger_account_entry
-                                            INNER JOIN ex
-                                                ON ledger_account_entry.posting_date <= ex.posting_date )  d
-                    ON c.id_account = d.id_account
-                INNER JOIN fxr
-                    ON c.id_currency = fxr.id_currency_from
-        GROUP BY b.code )
-, c1 AS ( 
-        SELECT b.code
-            , Round(Sum(d.amount * fxr.fxrate), 2) balance_bc
-        FROM scope1
-                INNER JOIN cfe.ledger_branch_branch b
-                    ON b.id_accounting_scope = scope1.id_accounting_scope
-                INNER JOIN cfe.ledger_account c
-                    ON b.code_inferior = c.code
-                        AND c.id_accounting_scope_code = scope1.id_accounting_scope_code
-                INNER JOIN  ( SELECT id_account_credit id_account
-                                        , amount
-                                    FROM cfe.ledger_account_entry
-                                            INNER JOIN ex
-                                                ON ledger_account_entry.posting_date <= ex.posting_date
-                                    UNION ALL 
-                                    SELECT id_account_debit
-                                        , -amount
-                                    FROM cfe.ledger_account_entry
-                                            INNER JOIN ex
-                                                ON ledger_account_entry.posting_date <= ex.posting_date )  d
-                    ON c.id_account = d.id_account
-                INNER JOIN fxr
-                    ON c.id_currency = fxr.id_currency_from
-        GROUP BY b.code )
-SELECT /*+ parallel */ a.code code
-    , Lpad(' ', 4 * (a.GL_LEVEL - 1), ' ') ||  a.code format_code
-    , b.description
-    , c.balance_bc
-    , c1.balance_bc
-FROM scope
-        INNER JOIN cfe.ledger_branch_branch a
-            ON a.code = a.code_inferior
-                AND a.id_accounting_scope = scope.id_accounting_scope
-        INNER JOIN cfe.ledger_branch b
-            ON a.id_accounting_scope = b.id_accounting_scope
-                AND a.code = b.code
-        LEFT JOIN c
-            ON a.code = c.code
-        LEFT OUTER JOIN c1
-            ON a.code = c1.code
-WHERE gl_level <= 3
-    AND NOT ( c.balance_bc IS NULL
-                AND c1.balance_bc IS NULL )
-ORDER BY ( SELECT code
-            FROM cfe.ledger_branch_branch
-            WHERE id_accounting_scope = a.id_accounting_scope
-                AND code_inferior = a.code
-                AND gl_level = 1 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 2 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 3 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 4 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 5 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 6 ) NULLS FIRST 
-    , ( SELECT code
-        FROM cfe.ledger_branch_branch
-        WHERE id_accounting_scope = a.id_accounting_scope
-            AND code_inferior = a.code
-            AND gl_level = 7 ) NULLS FIRST 
-    , code
+-- UPDATE CALENDAR
+UPDATE cfe.calendar
+SET year_offset = ?            /* year offset */
+    , settlement_shift = ?     /* settlement shift */
+    , friday_is_holiday = ?    /* friday is a holiday */
+    , saturday_is_holiday = ?  /* saturday is a holiday */
+    , sunday_is_holiday = ?    /* sunday is a holiday */
+WHERE id_calendar = ?
+;
+
+
+-- BOTH CLAUSES PRESENT 'with a string' AND "a field"
+MERGE /*+ PARALLEL */ INTO test1 /*the target table*/ a
+    USING all_objects      /*the source table*/
+        ON ( /*joins in()!*/ a.object_id = b.object_id )
+-- INSERT CLAUSE 
+WHEN /*comments between keywords!*/ NOT MATCHED THEN
+    INSERT ( object_id     /*ID Column*/
+                , status   /*Status Column*/ )
+    VALUES ( b.object_id
+                , b.status )
+/* UPDATE CLAUSE
+WITH A WHERE CONDITION */ 
+WHEN MATCHED THEN          /* Lets rock */
+    UPDATE SET  a.status = '/*this is no comment!*/ and -- this ain''t either'
+    WHERE   b."--status" != 'VALID'
 ;
 ```
 

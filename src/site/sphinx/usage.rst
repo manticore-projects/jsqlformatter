@@ -11,24 +11,28 @@ Static Binaries
 
       .. code:: Bash
       
-        java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg>]
-            [--ansi] [--html] [--indent <arg>] [-2] [-8]
+         java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
+         --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+         --functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+         <arg>]
 
    .. tab:: Linux Shell
 
       .. code:: Bash
 
-		./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg>] [--ansi] [--html] 
-		    [--indent <arg>] [-2] [-8]
+         ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> |
+         --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+         [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+         <arg>]
 		    
    .. tab:: Windows Power Shell
 
       .. code:: Bash
 
-		java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
-       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
-       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-       <arg>]
+         JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> |
+         --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+         [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+         <arg>]
 
 ..........................
 Command Line Options (CLI)
@@ -38,7 +42,7 @@ Command Line Options (CLI)
 --format, -f <arg>          The output-format [PLAIN* ANSI HTML RTF]
 --ansi                      Output ANSI annotated text.
 --html                      Output HTML annotated text.
---indent <arg>              The indent width [2 4* 8]
+--indent, -t <arg>          The indent width [2 4* 8]
  -2                         Indent with 2 characters.
  -8                         Indent with 8 characters.
 --keywordSpelling <arg>     Spelling of keywords. [UPPER* LOWER CAMLE KEEP]
@@ -48,32 +52,30 @@ Command Line Options (CLI)
  
 .. note::
 
-   You can provide the SQL Statement as an argument to the program, e. g.
+  You can provide the SQL Statement as an argument to the program, e. g.
    
-    .. code:: 
-        :language: Bash
+  .. code:: Bash
         
-       java -jar JSQLFormatter.jar "select * from dual;"
+    java -jar JSQLFormatter.jar "select * from dual;"
 
 .. note::
 
-   You can provide the formatting options as comment in front of the sql statement
+  You can provide the formatting options as comment in front of the sql statement
    
-    .. code:: 
-        :language: SQL
+  .. code:: SQL
         
-       java -jar JSQLFormatter.jar "select * from dual;"
+    -- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
+    SELECT 'something' FROM DUAL;
        
      
 .. warning::
 
-   On Windows 10, you will need to active ANSI output first
+  On Windows 10, you will need to active ANSI output first
         
-    .. code:: 
-        :language: Bash
-        
-       -- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
-       SELECT 'something' FROM DUAL;
+  .. code:: PowerShell
+   
+    Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1     
+      
         
 
 -----------------
