@@ -1,4 +1,4 @@
--- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER)
+-- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
 -- UPDATE CALENDAR
 UPDATE cfe.calendar
 SET     year_offset = ?                    /* year offset */
@@ -10,7 +10,7 @@ WHERE id_calendar = ?
 ;
 
 
--- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER)
+-- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 -- UPDATE CALENDAR
 update CFE.CALENDAR
 set YEAR_OFFSET = ?                    /* year offset */
