@@ -4,6 +4,7 @@ upx --lzma dist/JSQLFormatter
 
 /usr/lib/jvm/java-11-graalvm/bin/native-image --no-server --no-fallback -cp dist/JSQLFormatter.jar:dist/lib/jsqlparser-4.1-SNAPSHOT.jar --shared -H:Name=dist/libSQLFormatter --native-compiler-options='-Os' --native-compiler-options='-fno-inline' --native-compiler-options='-fno-exceptions' --native-compiler-options='-flto' --native-compiler-options='-Wl,--gc-sections'  --native-image-info
 
+C:\Users\andre\Documents\graalvm-ce-java11-21.0.0.2\bin\native-image.cmd  --no-server --no-fallback -cp dist/JSQLFormatter.jar;dist/lib/jsqlparser-4.1-SNAPSHOT.jar -H:+StaticExecutableWithDynamicLibC -H:Name=dist\JSQLFormatter com.manticore.jsqlformatter.JSQLFormatter
 C:\Users\andre\Documents\upx.exe --lzma dist\JSQLFormatter.exe      
 
 export LD_LIBRARY_PATH=.
