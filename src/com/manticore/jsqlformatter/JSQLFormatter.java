@@ -1982,15 +1982,17 @@ public class JSQLFormatter {
 
       if (escaped) appendFunction(builder, outputFormat, "fn", " {", " ");
 
-      appendFunction(builder, outputFormat, name, "", "( ");
+      appendFunction(builder, outputFormat, name, "", "");
 
       if (parameters != null || namedParameters != null) {
         if (parameters != null) {
           if (distinct) {
-            builder.append("(DISTINCT ");
+            builder.append("( DISTINCT ");
           } else if (allColumns) {
-            builder.append("(ALL ");
-          }
+            builder.append("( ALL ");
+          } else {
+						builder.append("( ");
+					}
 
           if (name.equalsIgnoreCase("Decode")) {
             appendDecodeExpressionsList(parameters, BreakLine.AS_NEEDED, builder, indent);
@@ -2004,9 +2006,9 @@ public class JSQLFormatter {
           builder.append(namedParameters.toString());
         }
       } else if (allColumns) {
-        builder.append(" ( * )");
+        builder.append("( * )");
       } else {
-        builder.append(" ()");
+        builder.append("()");
       }
 
       if (attribute != null) {
