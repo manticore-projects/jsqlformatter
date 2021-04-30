@@ -45,9 +45,9 @@ Command Line Options (CLI)
 --indent, -t <arg>          The indent width [2 4* 8]
  -2                         Indent with 2 characters.
  -8                         Indent with 8 characters.
---keywordSpelling <arg>     Spelling of keywords. [UPPER* LOWER CAMLE KEEP]
---objectSpelling <arg>      Spelling of object names. [UPPER* LOWER CAMLE KEEP]
---functionSpelling <arg>    Spelling of function names. [UPPER* LOWER CAMLE KEEP]
+--keywordSpelling <arg>     Spelling of keywords. [UPPER* LOWER CAMEL KEEP]
+--objectSpelling <arg>      Spelling of object names. [UPPER* LOWER CAMEL KEEP]
+--functionSpelling <arg>    Spelling of function names. [UPPER* LOWER CAMEL KEEP]
 --separation <arg>          Position of the field separator. [BEFORE* AFTER]
  
 .. note::

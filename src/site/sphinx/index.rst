@@ -20,7 +20,7 @@ Features:
 
     * Intend With
     * Comma Before or After
-    * Upper/Lower/Camel-case Spelling of Keywords, Functions and Object Names
+    * Upper/Lower/Camel-Case Spelling of Keywords, Functions and Object Names
 
 .........
 Platform:
