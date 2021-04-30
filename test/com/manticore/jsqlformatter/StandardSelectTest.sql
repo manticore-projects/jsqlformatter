@@ -72,7 +72,7 @@ FROM (  SELECT *
                     INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency
                     INNER JOIN cfe.fee_type e
-                        ON c.id_fee_type = e.id_fee_type ) )  a
+                        ON c.id_fee_type = e.id_fee_type ) ) a
 ;
 
 -- INSERT INTO LEDGER BRANCH BALANCE
@@ -143,11 +143,11 @@ FROM ex
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
                                                         ON ledger_account_entry.posting_date <= ex.posting_date )
-                                        GROUP BY id_account )  d
+                                        GROUP BY id_account ) d
                             ON c.id_account = d.id_account
                         INNER JOIN fxr
                             ON c.id_currency = fxr.id_currency_from
-                    GROUP BY b.code )  c
+                    GROUP BY b.code ) c
         ON c.code = a.code
 ;
 
@@ -218,10 +218,10 @@ FROM ex
                                                         , - amount
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
-                                                        ON ledger_account_entry.posting_date <= ex.posting_date ) )  d
+                                                        ON ledger_account_entry.posting_date <= ex.posting_date ) ) d
                             ON c.id_account = d.id_account
                         INNER JOIN fxr
-                            ON c.id_currency = fxr.id_currency_from )  c
+                            ON c.id_currency = fxr.id_currency_from ) c
         ON c.code = a.code
 ;
 
@@ -272,7 +272,7 @@ FROM cfe.collateral a
                         AND id_collateral_type_ref = (  SELECT Max( id_collateral_type_ref )
                                                         FROM common.collateral_type
                                                         WHERE id_status IN ( 'C', 'H' )
-                                                            AND id_collateral_type = d1.id_collateral_type ) )  d
+                                                            AND id_collateral_type = d1.id_collateral_type ) ) d
         ON a.id_collateral_type = d.id_collateral_type
 ;
 
@@ -333,7 +333,7 @@ WITH ex AS (
                                     , - amount
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
-                                    ON ledger_account_entry.posting_date <= ex.posting_date )  d
+                                    ON ledger_account_entry.posting_date <= ex.posting_date ) d
                 ON c.id_account = d.id_account
             INNER JOIN fxr
                 ON c.id_currency = fxr.id_currency_from
@@ -357,7 +357,7 @@ WITH ex AS (
                                     , - amount
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
-                                    ON ledger_account_entry.posting_date <= ex.posting_date )  d
+                                    ON ledger_account_entry.posting_date <= ex.posting_date ) d
                 ON c.id_account = d.id_account
             INNER JOIN fxr
                 ON c.id_currency = fxr.id_currency_from

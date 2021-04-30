@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW cfe.interest_period_on_value_day
                     AND posting_date = (    SELECT Max( posting_date )
                                             FROM cfe.execution
                                             WHERE id_status = 'R'
-                                                AND value_date = e.value_date ) )  a
+                                                AND value_date = e.value_date ) ) a
             INNER JOIN cfe.instrument_hst b
                 ON a.value_date = b.value_date
                     AND a.posting_date = b.posting_date

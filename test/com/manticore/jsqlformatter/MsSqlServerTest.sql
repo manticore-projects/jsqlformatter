@@ -11,7 +11,7 @@ DELETE a FROM cfe.instrument_attribute_hst2 a
                         OR (    SELECT Max( posting_date )
                                 FROM cfe.execution
                                 WHERE id_status = 'R'
-                                    AND value_date <= :value_date_p ) IS NULL )  b
+                                    AND value_date <= :value_date_p ) IS NULL ) b
         ON a.value_date = b.value_date
             AND b.posting_date = b.posting_date
 ;

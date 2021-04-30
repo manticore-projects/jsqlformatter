@@ -41,5 +41,5 @@ FROM (  SELECT DISTINCT
         FROM cfe.instrument_attribute a
             LEFT JOIN cfe.attribute_value_ref b
                 ON a.attribute_value = b.attribute_value
-        WHERE b.attribute_value IS NULL )  a
+        WHERE b.attribute_value IS NULL ) a
 ;

@@ -169,3 +169,48 @@ WHEN MATCHED THEN
     UPDATE SET  a.status = b.status
     WHERE   b.status != 'VALID'
 ;
+
+-- INSERT WITHOUT COLUMNS
+MERGE /*+ PARALLEL */ INTO cfe.tmp_eab a
+    USING   (   SELECT /*+ PARALLEL DRIVING_SITE(C) */ c.*
+                FROM tbaadm.eab@finnacle c
+                    INNER JOIN (    SELECT  acid
+                                            , eod_date
+                                    FROM cfe.tmp_eab e
+                                    WHERE end_eod_date = (  SELECT Max( eod_date )
+                                                            FROM cfe.tmp_eab
+                                                            WHERE acid = e.acid )
+                                        AND end_eod_date < '31-Dec-2099' ) d
+                        ON c.acid = d.acid
+                            AND c.eod_date >= d.eod_date ) b
+        ON ( a.acid = b.acid
+                    AND a.eod_date = b.eod_date )
+WHEN MATCHED THEN
+    UPDATE SET  a.tran_date_bal = b.tran_date_bal
+                , a.tran_date_tot_tran = b.tran_date_tot_tran
+                , a.value_date_bal = b.value_date_bal
+                , a.value_date_tot_tran = b.value_date_tot_tran
+                , a.end_eod_date = b.end_eod_date
+                , a.lchg_user_id = b.lchg_user_id
+                , a.lchg_time = b.lchg_time
+                , a.rcre_user_id = b.rcre_user_id
+                , a.rcre_time = b.rcre_time
+                , a.ts_cnt = b.ts_cnt
+                , a.eab_crncy_code = b.eab_crncy_code
+                , a.bank_id = b.bank_id
+WHEN NOT MATCHED THEN
+    INSERT VALUES ( b.acid
+                    , b.eod_date
+                    , b.tran_date_bal
+                    , b.tran_date_tot_tran
+                    , b.value_date_bal
+                    , b.value_date_tot_tran
+                    , b.end_eod_date
+                    , b.lchg_user_id
+                    , b.lchg_time
+                    , b.rcre_user_id
+                    , b.rcre_time
+                    , b.ts_cnt
+                    , b.eab_crncy_code
+                    , b.bank_id )
+;

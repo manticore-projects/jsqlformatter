@@ -73,7 +73,7 @@ from (  select *
                     inner join COMMON.LEDGER_CURRENCY D
                         on C.ID_CURRENCY = D.ID_CURRENCY
                     inner join CFE.FEE_TYPE E
-                        on C.ID_FEE_TYPE = E.ID_FEE_TYPE ) )  A
+                        on C.ID_FEE_TYPE = E.ID_FEE_TYPE ) ) A
 ;
 
 -- INSERT INTO LEDGER BRANCH BALANCE
@@ -144,11 +144,11 @@ from EX,
                                                 from CFE.LEDGER_ACCOUNT_ENTRY
                                                     inner join EX
                                                         on LEDGER_ACCOUNT_ENTRY.POSTING_DATE <= EX.POSTING_DATE )
-                                        group by ID_ACCOUNT )  D
+                                        group by ID_ACCOUNT ) D
                             on C.ID_ACCOUNT = D.ID_ACCOUNT
                         inner join FXR
                             on C.ID_CURRENCY = FXR.ID_CURRENCY_FROM
-                    group by B.CODE )  C
+                    group by B.CODE ) C
         on C.CODE = A.CODE
 ;
 
@@ -194,5 +194,5 @@ from (  select distinct
         from CFE.INSTRUMENT_ATTRIBUTE A
             left join CFE.ATTRIBUTE_VALUE_REF B
                 on A.ATTRIBUTE_VALUE = B.ATTRIBUTE_VALUE
-        where B.ATTRIBUTE_VALUE IS NULL )  A
+        where B.ATTRIBUTE_VALUE IS NULL ) A
 ;

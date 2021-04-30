@@ -934,153 +934,167 @@ public class JSQLFormatter {
     }
 
     MergeInsert insert = merge.getMergeInsert();
-    if (insert != null) {
-      appendNormalizedLineBreak(builder);
-      for (int j = 0; j < indent; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "WHEN", "", " ");
-      appendKeyWord(builder, outputFormat, "NOT", "", " ");
-      appendKeyWord(builder, outputFormat, "MATCHED", "", " ");
-      appendKeyWord(builder, outputFormat, "THEN", "", "\n");
-
-      for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "INSERT", "", " ");
-
-      List<Column> columns = insert.getColumns();
-      List<Expression> expressions = insert.getValues();
-
-      if (columns != null) {
-        builder.append("( ");
-        int subIndent = getSubIndent(builder, indentWidth, false);
-
-        for (Column column : columns) {
-          appendExpression(
-              column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
-          i++;
-        }
-        appendNormalizingTrailingWhiteSpace(builder, " )\n");
-      }
-
-      i = 0;
-      for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
-
-      int subIndent = getSubIndent(builder, indentWidth, false);
-      if (expressions != null)
-        for (Expression expression : expressions) {
-          appendExpression(
-              expression,
-              null,
-              builder,
-              subIndent,
-              i,
-              expressions.size(),
-              true,
-              BreakLine.AFTER_FIRST);
-          i++;
-        }
-      appendNormalizingTrailingWhiteSpace(builder, " )");
-
-      Expression whereCondition = insert.getWhereCondition();
-      if (whereCondition != null) {
-        appendNormalizedLineBreak(builder);
-        for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-        appendKeyWord(builder, outputFormat, "WHERE", "", " ");
-
-        subIndent = getSubIndent(builder, indentWidth, true);
-
-        appendExpression(
-            whereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
-      }
-    }
-
     MergeUpdate update = merge.getMergeUpdate();
-    if (update != null) {
-      appendNormalizedLineBreak(builder);
-
-      i = 0;
-      for (int j = 0; j < indent; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "WHEN", "", " ");
-      appendKeyWord(builder, outputFormat, "MATCHED", "", " ");
-      appendKeyWord(builder, outputFormat, "THEN", "", "\n");
-
-      for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "UPDATE", "", " ");
-      appendKeyWord(builder, outputFormat, "SET", "", " ");
-
-      int subIndent = getSubIndent(builder, indentWidth, true);
-
-      List<Column> columns = update.getColumns();
-      List<Expression> expressions = update.getValues();
-
-      if (columns != null)
-        for (Column column : columns) {
-          switch (separation) {
-            case AFTER:
-              appendExpression(
-                  column,
-                  null,
-                  builder,
-                  subIndent,
-                  i,
-                  columns.size(),
-                  false,
-                  BreakLine.AFTER_FIRST);
-              builder.append(" = ");
-              appendExpression(
-                  expressions.get(i),
-                  null,
-                  builder,
-                  subIndent,
-                  i,
-                  columns.size(),
-                  true,
-                  BreakLine.NEVER);
-              break;
-            case BEFORE:
-              appendExpression(
-                  column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
-              builder.append(" = ");
-              appendExpression(
-                  expressions.get(i),
-                  null,
-                  builder,
-                  subIndent,
-                  0,
-                  columns.size(),
-                  false,
-                  BreakLine.AFTER_FIRST);
-              break;
-          }
-
-          i++;
-        }
-
-      Expression whereCondition = update.getWhereCondition();
-      if (whereCondition != null) {
-        appendNormalizedLineBreak(builder);
-        for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-        appendKeyWord(builder, outputFormat, "WHERE", "", " ");
-
-        subIndent = getSubIndent(builder, indentWidth, true);
-
-        appendExpression(
-            whereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
-      }
-
-      Expression deleteWhereCondition = update.getDeleteWhereCondition();
-      if (deleteWhereCondition != null) {
-        appendNormalizedLineBreak(builder);
-        for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-        appendKeyWord(builder, outputFormat, "DELETE", "", " ");
-        appendKeyWord(builder, outputFormat, "WHERE", "", " ");
-
-        subIndent = getSubIndent(builder, indentWidth, true);
-
-        appendExpression(
-            deleteWhereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
-      }
-    }
+		if (merge.isInsertFirst()) {
+			appendMergeInsert(insert, builder, indent, i);
+			appendMergeUpdate(update, builder, indent, i);
+		} else {
+			appendMergeUpdate(update, builder, indent, i);
+			appendMergeInsert(insert, builder, indent, i);
+		}
+			
   }
+
+	public static void appendMergeUpdate(MergeUpdate update, StringBuilder builder, int indent, int i) {
+		if (update != null) {
+			appendNormalizedLineBreak(builder);
+			
+			i = 0;
+			for (int j = 0; j < indent; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "WHEN", "", " ");
+			appendKeyWord(builder, outputFormat, "MATCHED", "", " ");
+			appendKeyWord(builder, outputFormat, "THEN", "", "\n");
+			
+			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "UPDATE", "", " ");
+			appendKeyWord(builder, outputFormat, "SET", "", " ");
+			
+			int subIndent = getSubIndent(builder, indentWidth, true);
+			
+			List<Column> columns = update.getColumns();
+			List<Expression> expressions = update.getValues();
+			
+			if (columns != null)
+				for (Column column : columns) {
+					switch (separation) {
+						case AFTER:
+							appendExpression(
+									column,
+									null,
+									builder,
+									subIndent,
+									i,
+									columns.size(),
+									false,
+									BreakLine.AFTER_FIRST);
+							builder.append(" = ");
+							appendExpression(
+									expressions.get(i),
+									null,
+									builder,
+									subIndent,
+									i,
+									columns.size(),
+									true,
+									BreakLine.NEVER);
+							break;
+						case BEFORE:
+							appendExpression(
+									column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
+							builder.append(" = ");
+							appendExpression(
+									expressions.get(i),
+									null,
+									builder,
+									subIndent,
+									0,
+									columns.size(),
+									false,
+									BreakLine.AFTER_FIRST);
+							break;
+					}
+					
+					i++;
+				}
+			
+			Expression whereCondition = update.getWhereCondition();
+			if (whereCondition != null) {
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+				appendKeyWord(builder, outputFormat, "WHERE", "", " ");
+				
+				subIndent = getSubIndent(builder, indentWidth, true);
+				
+				appendExpression(
+						whereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
+			}
+			
+			Expression deleteWhereCondition = update.getDeleteWhereCondition();
+			if (deleteWhereCondition != null) {
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+				appendKeyWord(builder, outputFormat, "DELETE", "", " ");
+				appendKeyWord(builder, outputFormat, "WHERE", "", " ");
+				
+				subIndent = getSubIndent(builder, indentWidth, true);
+				
+				appendExpression(
+						deleteWhereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
+			}
+		}
+	}
+
+	public static void appendMergeInsert(MergeInsert insert, StringBuilder builder, int indent, int i) {
+		if (insert != null) {
+			appendNormalizedLineBreak(builder);
+			for (int j = 0; j < indent; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "WHEN", "", " ");
+			appendKeyWord(builder, outputFormat, "NOT", "", " ");
+			appendKeyWord(builder, outputFormat, "MATCHED", "", " ");
+			appendKeyWord(builder, outputFormat, "THEN", "", "\n");
+			
+			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "INSERT", "", " ");
+			
+			List<Column> columns = insert.getColumns();
+			List<Expression> expressions = insert.getValues();
+			
+			if (columns != null && columns.size()>0) {
+				builder.append("( ");
+				int subIndent = getSubIndent(builder, indentWidth, false);
+				
+				for (Column column : columns) {
+					appendExpression(
+							column, null, builder, subIndent, i, columns.size(), true, BreakLine.AFTER_FIRST);
+					i++;
+				}
+				appendNormalizingTrailingWhiteSpace(builder, " )\n");
+			}
+			
+			i = 0;
+			if (columns != null && columns.size()>0)
+				for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
+			
+			int subIndent = getSubIndent(builder, indentWidth, false);
+			if (expressions != null)
+				for (Expression expression : expressions) {
+					appendExpression(
+							expression,
+							null,
+							builder,
+							subIndent,
+							i,
+							expressions.size(),
+							true,
+							BreakLine.AFTER_FIRST);
+					i++;
+				}
+			appendNormalizingTrailingWhiteSpace(builder, " )");
+			
+			Expression whereCondition = insert.getWhereCondition();
+			if (whereCondition != null) {
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+				appendKeyWord(builder, outputFormat, "WHERE", "", " ");
+				
+				subIndent = getSubIndent(builder, indentWidth, true);
+				
+				appendExpression(
+						whereCondition, null, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
+			}
+		}
+	}
 
   private static void appendInsert(StringBuilder builder, Insert insert, int indent) {
     int i = 0;
@@ -2197,7 +2211,8 @@ public class JSQLFormatter {
 
     if (alias1 != null) {
       appendNormalizingTrailingWhiteSpace(builder, " ");
-      appendAlias(builder, outputFormat, alias1.toString(), "", "");
+      if (alias1.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
+      appendAlias(builder, outputFormat, alias1.getName(), "", " ");
     }
   }
 
