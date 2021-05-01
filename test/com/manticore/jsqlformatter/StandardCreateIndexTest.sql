@@ -30,3 +30,15 @@ CREATE UNIQUE INDEX cfe.version_info_idx2
                             , minor_version
                             , patch_level ) PARALLEL COMPRESS NOLOGGING
 ;
+
+
+-- Z MANY COLUMNS WITH TAIL OPTIONS
+-- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
+create unique index CFE.VERSION_INFO_IDX2
+  on CFE.VERSION_INFO(  MAJOR_VERSION,
+                        MINOR_VERSION,
+                        PATCH_LEVEL,
+                        MAJOR_VERSION,
+                        MINOR_VERSION,
+                        PATCH_LEVEL ) parallel compress nologging
+;

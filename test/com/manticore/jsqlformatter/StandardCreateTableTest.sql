@@ -81,3 +81,24 @@ CREATE TABLE cfe.reconciliation_nominal_hst PARALLEL COMPRESS NOLOGGING
             INNER JOIN cfe.instrument_ref b
                 ON a.id_instrument = b.id_instrument )
 ;
+
+-- Z COMPLEX WITH MANY REFERENCES
+-- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
+create table EMPLOYEES (
+  EMPLOYEE_NUMBER    int       not null,
+  EMPLOYEE_NAME      char (50) not null,
+  DEPARTMENT_ID      int,
+  SALARY             int,
+  constraint EMPLOYEES_PK
+    primary key ( EMPLOYEE_NUMBER,
+                  EMPLOYEE_NAME,
+                  DEPARTMENT_ID ),
+  constraint FK_DEPARTMENTS
+    foreign key ( EMPLOYEE_NUMBER,
+                  EMPLOYEE_NAME,
+                  DEPARTMENT_ID )
+    references DEPARTMENTS (  EMPLOYEE_NUMBER,
+                              EMPLOYEE_NAME,
+                              DEPARTMENT_ID )
+) parallel compress nologging
+;

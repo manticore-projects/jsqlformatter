@@ -1857,7 +1857,7 @@ public class JSQLFormatter {
     switch (separation) {
       case AFTER:
         appendObjectName(builder, outputFormat, s, "", "");
-        appendNormalizingTrailingWhiteSpace(builder, commaSeparated && i > n - 1 ? ", " : "");
+        appendNormalizingTrailingWhiteSpace(builder, commaSeparated && i < n - 1 ? ", " : "");
         break;
       case BEFORE:
         builder.append(commaSeparated && i > 0 ? ", " : "");
@@ -2524,6 +2524,8 @@ public class JSQLFormatter {
     appendAlias(builder, outputFormat, table.getFullyQualifiedName(), "", "");
 
     List<ColumnDefinition> columnDefinitions = createTable.getColumnDefinitions();
+		List<Index> indexes = createTable.getIndexes();
+		
     if (columnDefinitions != null && !columnDefinitions.isEmpty()) {
       builder.append(" (");
 
@@ -2584,7 +2586,7 @@ public class JSQLFormatter {
         switch (separation) {
           case AFTER:
             appendNormalizingTrailingWhiteSpace(
-                builder, i > columnDefinitions.size() - 1 ? ", " : "");
+                builder, i < columnDefinitions.size() + indexes.size() - 1 ? ", " : "");
             break;
         }
 
@@ -2597,7 +2599,7 @@ public class JSQLFormatter {
       // Direct Known Subclasses:
       // CheckConstraint, ForeignKeyIndex
 
-      List<Index> indexes = createTable.getIndexes();
+      
       if (indexes != null && !indexes.isEmpty()) {
         for (Index index : indexes) {
           if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
@@ -2753,7 +2755,7 @@ public class JSQLFormatter {
 
           switch (separation) {
             case AFTER:
-              appendNormalizingTrailingWhiteSpace(builder, i > indexes.size() - 1 ? ", " : "");
+              appendNormalizingTrailingWhiteSpace(builder, i < columnDefinitions.size() + indexes.size()  - 1 ? ", " : "");
               break;
           }
 

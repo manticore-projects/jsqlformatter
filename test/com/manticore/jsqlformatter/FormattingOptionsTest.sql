@@ -1,4 +1,4 @@
--- UPDATE CALENDAR
+-- 1 UPDATE CALENDAR
 -- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
 UPDATE cfe.calendar
 SET     year_offset = ?                    /* year offset */
@@ -10,7 +10,7 @@ WHERE id_calendar = ?
 ;
 
 
--- UPDATE CALENDAR
+-- 2 UPDATE CALENDAR
 -- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 update CFE.CALENDAR
 set YEAR_OFFSET = ?                    /* year offset */,
@@ -22,7 +22,7 @@ where ID_CALENDAR = ?
 ;
 
 
--- MERGE DELETE WHERE
+-- 3 MERGE DELETE WHERE
 merge into EMPL_CURRENT TAR
   using ( select  EMPNO,
                   ENAME,
