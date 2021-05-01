@@ -130,6 +130,7 @@
         <version>1.1.2</version>
         <extensions>true</extensions>
         <configuration>
+          <isolation>ABSOLUTE</isolation>
           <executor>JAVA</executor>
           <javaOptions>
             <inheritIO>true</inheritIO>

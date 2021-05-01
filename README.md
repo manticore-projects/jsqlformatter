@@ -6,35 +6,38 @@ Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit
 ## Features
 * based on [JSQLParser](https://github.com/JSQLParser/JSqlParser)
 * supports complex SELECT, INSERT INTO, MERGE, UPDATE, DELETE, CREATE, ALTER statements
+* [Netbeans Plugin](https://funfried.github.io/externalcodeformatter_for_netbeans/)
 * ANSI syntax highlighting
 * Formatting Options for Indent Width, Comma Before or After, Upper/Lower/Camel Case spelling
 ![image](https://user-images.githubusercontent.com/18080123/115190509-53106a00-a112-11eb-88f0-6ee693d6e4d3.png)
 
 * Command Line Option (CLI) and SQL Inline Options
-```
+```bash
 java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
        --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
        [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-       <arg>]
- -i,--input-file <arg>         The input SQL file or folder.
- -o,--output-file <arg>        The out SQL file for the formatted
-                               statements.
- -f,--format <arg>             The output-format.
-                               [PLAIN* ANSI HTML RTF]
-    --ansi                     Output ANSI annotated text.
-    --html                     Output HTML annotated text.
- -t,--indent <arg>             The indent width.
-                               [2 4* 8]
- -2                            Indent with 2 characters.
- -8                            Indent with 8 characters.
-    --keywordSpelling <arg>    Keyword spelling.
-                               [UPPER*, LOWER, CAMEL, KEEP]
-    --functionSpelling <arg>   Function name spelling.
-                               [UPPER, LOWER, CAMEL*, KEEP]
-    --objectSpelling <arg>     Object name spelling.
-                               [UPPER, LOWER*, CAMEL, KEEP]
-    --separation <arg>         Position of the field separator.
-                               [BEFORE*, AFTER]
+       <arg>] [--squareBracketQuotation <arg>]
+ -i,--inputFile <arg>               The input SQL file or folder.
+ -o,--outputFile <arg>              The out SQL file for the formatted
+                                    statements.
+ -f,--outputFormat <arg>            The output-format.
+                                    [PLAIN* ANSI HTML RTF]
+    --ansi                          Output ANSI annotated text.
+    --html                          Output HTML annotated text.
+ -t,--indent <arg>                  The indent width.
+                                    [2 4* 8]
+ -2                                 Indent with 2 characters.
+ -8                                 Indent with 8 characters.
+    --keywordSpelling <arg>         Keyword spelling.
+                                    [UPPER*, LOWER, CAMEL, KEEP]
+    --functionSpelling <arg>        Function name spelling.
+                                    [UPPER, LOWER, CAMEL*, KEEP]
+    --objectSpelling <arg>          Object name spelling.
+                                    [UPPER, LOWER*, CAMEL, KEEP]
+    --separation <arg>              Position of the field separator.
+                                    [BEFORE*, AFTER]
+    --squareBracketQuotation <arg>  Position of the field separator.
+                                    [AUTO*, YES, NO]
 ```
 
 * simple usage of the Java library
@@ -56,14 +59,13 @@ java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
     <version>0.1.6</version>
   </dependency>
   ```
-	
 
 * Multi Platform Binaries:
-	- JVM: [jsqlformatter-0.1.5.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar)
-(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.5/jsqlformatter-0.1.5.jar.sha1))
-	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.5/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
-	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.5/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
+	- JVM: [jsqlformatter-0.1.6.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.6/jsqlformatter-0.1.6.jar)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.6/jsqlformatter-0.1.6.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.6/jsqlformatter-0.1.6.jar.sha1))
+	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.6/JSQLFormatter) (2.8 MB, ELF 64-bit LSB pie executable)
+	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.6/JSQLFormatter.exe) (2.8 MB, PE32+ executable)
 	- MacOS is planned
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
@@ -74,7 +76,7 @@ java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
 * detect and quote reserved keyword names
 * beautify complex Functions()
 * export or copy to Java, XML/HTML, RTF
-* implement Plugins for Netbeans, Eclipse, JEdit, DBeaver, Squirrel SQL
+* implement Plugins for Eclipse, JEdit, DBeaver, Squirrel SQL
 
 ## Samples
 
