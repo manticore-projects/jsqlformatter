@@ -27,8 +27,7 @@ Platform:
 .........	
   * Java Library (JAR) 
   * Native Static Binary or Dynamic Libray for Windows, Linux or MacOS
-  * Editor Plugins (Netbeans, Eclipse, JEdit, Squirrel SQL, DBeaver) coming soon
-
+  * Netbeans Plugin (Other platforms such as Eclipse, JEdit, Squirrel SQL, DBeaver coming soon)
 
 .. toctree::
    :caption: Documentation

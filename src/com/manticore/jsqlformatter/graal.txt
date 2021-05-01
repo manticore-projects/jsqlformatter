@@ -1,4 +1,10 @@
 rm dist/lib/polyglot-native-api.jar
+
+/usr/lib/jvm/java-11-graalvm/bin/native-image --no-server --no-fallback -H:+StaticExecutableWithDynamicLibC \
+    -cp dist/JSQLFormatter.jar:dist/lib/'*.jar' \
+    -H:Name=dist/JSQLFormatter \
+    com.manticore.jsqlformatter.JSQLFormatter
+
 /usr/lib/jvm/java-11-graalvm/bin/native-image --no-server --no-fallback -H:+StaticExecutableWithDynamicLibC \
     -cp JSQLFormatterUI.jar \
     -H:Name=dist/JSQLFormatterUI \

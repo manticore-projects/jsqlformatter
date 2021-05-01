@@ -78,5 +78,5 @@ Plugins
      - File
      - Size
    * - Netbeans 12
-     - :downloads:`ExternalCodeFormatter.nbm <0.1.6/ExternalCodeFormatter.nbm>`
+     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.6/externalcodeformatter-sql.nbm>`
      - (45.2 MB) 
