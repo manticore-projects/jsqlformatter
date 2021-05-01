@@ -34,7 +34,10 @@ import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import static net.sf.jsqlparser.parser.CCJSqlParserUtil.newParser;
+import net.sf.jsqlparser.parser.Node;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.ReferentialAction;
@@ -857,6 +860,107 @@ public class JSQLFormatter {
     return builder.toString().trim();
   }
 
+	public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
+		ArrayList<Node> nodes = new ArrayList<>();
+		
+    applyFormattingOptions(options);
+
+    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
+    Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
+    ArrayList<Integer> semicolons = new ArrayList<>();
+
+    for (int i = 0; m.find(); i++) {
+      semicolons.add(m.start());
+    }
+
+    m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
+    while (m.find()) {
+      int start = m.start();
+      int end = m.end();
+
+      int n = semicolons.size();
+      for (int i = n - 1; i >= 0; i--) {
+        int pos = semicolons.get(i);
+        if (start <= pos && pos < end) {
+          semicolons.remove(i);
+        }
+      }
+    }
+
+    int pos = 0;
+    int length = sqlStr.length();
+    int n = semicolons.size();
+    for (int i = 0; i < n; i++) {
+      int semicolonPos = semicolons.get(i);
+
+      if (semicolonPos > pos) {
+        String statementSql = sqlStr.substring(pos, Integer.min(semicolonPos + 1, length));
+        pos = semicolonPos + 1;
+
+        // we are at the end and find only remaining whitespace
+        if (statementSql.trim().length() == 0) break;
+
+        StringBuilder statementBuilder = new StringBuilder();
+
+        boolean useSquareBracketQuotation;
+        switch (squaredBracketQuotation) {
+          case YES:
+            useSquareBracketQuotation = true;
+            LOGGER.log(
+                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
+            break;
+          case NO:
+            useSquareBracketQuotation = false;
+            LOGGER.log(
+                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
+            break;
+          case AUTO:
+          default:
+            useSquareBracketQuotation =
+                SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
+            LOGGER.log(
+                Level.FINE,
+                "Square Bracket Quotation auto-detected as {0}.",
+                useSquareBracketQuotation);
+        }
+
+        CommentMap commentMap = new CommentMap(statementSql);
+
+        Pattern DIRECTIVE_PATTERN = Pattern.compile("@JSQLFormatter\\s?\\((.*)\\)");
+        for (Comment comment : commentMap.values()) {
+          Matcher m1 = DIRECTIVE_PATTERN.matcher(comment.text);
+          if (m1.find()) {
+            String[] keyValuePairs = m1.group(1).split(",");
+            applyFormattingOptions(keyValuePairs);
+          }
+        }
+				
+				/*
+				public static Statement parse(String sql, Consumer<CCJSqlParser> consumer) throws JSQLParserException {
+        CCJSqlParser parser = newParser(sql);
+        if (consumer != null) {
+            consumer.accept(parser);
+        }
+        return parseStatement(parser);
+				}
+				 */
+
+        try {
+					CCJSqlParser parser = newParser(statementSql);
+					Statement statement = parser.Statement();
+					Node root = parser.getASTRoot();
+					
+					nodes.add(root);
+          
+        } catch (Exception ex1) {
+          LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
+        }
+      } else break;
+    }
+
+    return nodes;
+  }
+	
   public static void applyFormattingOptions(String[] options) {
     // set the formatting options
     if (options != null)
