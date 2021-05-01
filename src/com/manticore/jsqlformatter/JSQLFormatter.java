@@ -93,6 +93,75 @@ public class JSQLFormatter {
 
   private static int indentWidth = 4;
 
+	public static SquaredBracketQuotation getSquaredBracketQuotation() {
+		return squaredBracketQuotation;
+	}
+
+	public static void setSquaredBracketQuotation(SquaredBracketQuotation squaredBracketQuotation) {
+		JSQLFormatter.squaredBracketQuotation = squaredBracketQuotation;
+	}
+
+	public static Separation getSeparation() {
+		return separation;
+	}
+
+	public static void setSeparation(Separation separation) {
+		JSQLFormatter.separation = separation;
+	}
+
+	public static Spelling getKeywordSpelling() {
+		return keywordSpelling;
+	}
+
+	public static void setKeywordSpelling(Spelling keywordSpelling) {
+		JSQLFormatter.keywordSpelling = keywordSpelling;
+	}
+
+	public static Spelling getFunctionSpelling() {
+		return functionSpelling;
+	}
+
+	public static void setFunctionSpelling(Spelling functionSpelling) {
+		JSQLFormatter.functionSpelling = functionSpelling;
+	}
+
+	public static Spelling getObjectSpelling() {
+		return objectSpelling;
+	}
+
+	public static void setObjectSpelling(Spelling objectSpelling) {
+		JSQLFormatter.objectSpelling = objectSpelling;
+	}
+
+	public static OutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+
+	public static void setOutputFormat(OutputFormat outputFormat) {
+		JSQLFormatter.outputFormat = outputFormat;
+	}
+
+	public static int getIndentWidth() {
+		return indentWidth;
+	}
+
+	public static void setIndentWidth(int indentWidth) {
+		JSQLFormatter.indentWidth = indentWidth;
+		
+		char[] chars = new char[indentWidth];
+    Arrays.fill(chars, ' ');
+
+    JSQLFormatter.indentString = new String(chars);
+	}
+
+	public static String getIndentString() {
+		return indentString;
+	}
+
+	public static void setIndentString(String indentString) {
+		JSQLFormatter.indentString = indentString;
+	}
+
   private static String indentString = "    ";
 
   private static final Logger LOGGER = Logger.getLogger(JSQLFormatter.class.getName());
