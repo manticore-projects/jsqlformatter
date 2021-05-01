@@ -42,7 +42,7 @@ Download
 Static Binaries
 ---------------------------------------------
 
-.. list-table:: Direct Download Links
+.. list-table:: Static Binaries Direct Download Links
    :widths: 25 25 25
    :header-rows: 1
 
@@ -50,13 +50,13 @@ Static Binaries
      - File
      - Size
    * - Linux x64
-     - :downloads:`JSQLFormatter <0.1.5/JSQLFormatter>`
+     - :downloads:`JSQLFormatter <0.1.6/JSQLFormatter>`
      - (2.8 MB) 
    * - Windows x64
-     - :downloads:`JSQLFormatter.exe <0.1.5/JSQLFormatter.exe>`
+     - :downloads:`JSQLFormatter.exe <0.1.6/JSQLFormatter.exe>`
      - (2.8 MB) 
    * - Java
-     - :downloads:`JSQLFormatter.jar <0.1.5/JSQLFormatter-0.1.5.jar>`
+     - :downloads:`JSQLFormatter.jar <0.1.6/JSQLFormatter-0.1.6.jar>`
      - (700 kB) 
    * - MacOS
      - Comming soon.
@@ -67,3 +67,16 @@ Native Dynamic Libraries
 
     Comming soon.
       
+Plugins
+---------------------------------------------
+
+.. list-table:: Plugins Direct Download Links
+   :widths: 25 25 25
+   :header-rows: 1
+
+   * - Platform
+     - File
+     - Size
+   * - Netbeans 12
+     - :downloads:`ExternalCodeFormatter.nbm <0.1.6/ExternalCodeFormatter.nbm>`
+     - (45.2 MB) 

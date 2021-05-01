@@ -11,29 +11,29 @@ Static Binaries
 
       .. code:: Bash
       
-         java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>]
+         java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
    .. tab:: Linux Shell
 
       .. code:: Bash
 
-         ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>]
+         ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 		    
    .. tab:: Windows Power Shell
 
       .. code:: Bash
 
-         JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>]
+         JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
 ..........................
 Command Line Options (CLI)
 ..........................
---input-file, -i <arg>          The input SQL file or folder.
---output-file, -o <arg>         The out SQL file for the formatted statements.
+--inputFile, -i <arg>           The input SQL file or folder.
+--outputFile, -o <arg>          The out SQL file for the formatted statements.
 --format, -f <arg>              The output-format [PLAIN* ANSI HTML RTF]
 --ansi                          Output ANSI annotated text.
 --html                          Output HTML annotated text.
---indent, -t <arg>              The indent width [2 4* 8]
+--indentWidth, -t <arg>         The Indent Width [2 4* 8]
  -2                             Indent with 2 characters.
  -8                             Indent with 8 characters.
 --keywordSpelling <arg>         Spelling of keywords. [UPPER* LOWER CAMEL KEEP]

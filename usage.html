@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>2. How to use it &mdash; JSQLFormatter 0.1.5 documentation</title>
+  <title>2. How to use it &mdash; JSQLFormatter 0.1.6 documentation</title>
   
 
   
@@ -44,7 +44,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="JSQLFormatter 0.1.5 documentation" href="index.html"/>
+    <link rel="top" title="JSQLFormatter 0.1.6 documentation" href="index.html"/>
         <link rel="next" title="3. Samples" href="samples.html"/>
         <link rel="prev" title="1. Installation" href="install.html"/> 
 
@@ -103,6 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#download">1.3. Download</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install.html#static-binaries">1.3.1. Static Binaries</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install.html#native-dynamic-libraries">1.3.2. Native Dynamic Libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#plugins">1.3.3. Plugins</a></li>
 </ul>
 </li>
 </ul>
@@ -131,6 +132,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#latest-changes">Latest Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-6">Changes 0.1.6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-5">Changes 0.1.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-4">Changes 0.1.4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-3">Changes 0.1.3</a></li>
@@ -199,23 +201,23 @@
 <div class="section" id="static-binaries">
 <h2><span class="section-number">2.1. </span>Static Binaries<a class="headerlink" href="#static-binaries" title="Permalink to this headline">¶</a></h2>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">JVM</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Linux Shell</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Windows Power Shell</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>java -jar JSQLFormatter.jar <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">JVM</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Linux Shell</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Windows Power Shell</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>java -jar JSQLFormatter.jar <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span> --squareBracketQuotation &lt;arg&gt;
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>./JSQLFormatter <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>./JSQLFormatter <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span> --squareBracketQuotation &lt;arg&gt;
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>JSQLFormatter.exe <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>JSQLFormatter.exe <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span> --squareBracketQuotation &lt;arg&gt;
 </pre></div>
 </div>
 </div></div>
 <div class="section" id="command-line-options-cli">
 <h3><span class="section-number">2.1.1. </span>Command Line Options (CLI)<a class="headerlink" href="#command-line-options-cli" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
-<dt><kbd><span class="option">--input-file</span>, <span class="option">-i <var>&lt;arg&gt;</var></span></kbd></dt>
+<dt><kbd><span class="option">--inputFile</span>, <span class="option">-i <var>&lt;arg&gt;</var></span></kbd></dt>
 <dd><p>The input SQL file or folder.</p>
 </dd>
-<dt><kbd><span class="option">--output-file</span>, <span class="option">-o <var>&lt;arg&gt;</var></span></kbd></dt>
+<dt><kbd><span class="option">--outputFile</span>, <span class="option">-o <var>&lt;arg&gt;</var></span></kbd></dt>
 <dd><p>The out SQL file for the formatted statements.</p>
 </dd>
 <dt><kbd><span class="option">--format</span>, <span class="option">-f <var>&lt;arg&gt;</var></span></kbd></dt>
@@ -227,8 +229,8 @@
 <dt><kbd><span class="option">--html</span></kbd></dt>
 <dd><p>Output HTML annotated text.</p>
 </dd>
-<dt><kbd><span class="option">--indent</span>, <span class="option">-t <var>&lt;arg&gt;</var></span></kbd></dt>
-<dd><p>The indent width [2 4* 8]
+<dt><kbd><span class="option">--indentWidth</span>, <span class="option">-t <var>&lt;arg&gt;</var></span></kbd></dt>
+<dd><p>The Indent Width [2 4* 8]
 -2                             Indent with 2 characters.
 -8                             Indent with 8 characters.</p>
 </dd>
@@ -354,7 +356,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.5',
+            VERSION:'0.1.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE: 'true'
