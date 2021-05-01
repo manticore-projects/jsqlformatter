@@ -30,10 +30,10 @@ developerName = root.find("xmlns:developers/xmlns:developer[1]/xmlns:name", name
 
 email_support = "andreas@manticore-projects.com"
 
-rst_epilog = """
-.. |EMAIL| replace:: {0}
-.. |VERSION| replace:: {1}
-""".format(email_support, versionName)
+#rst_epilog = """
+#.. |EMAIL| replace:: {0}
+#.. |VERSION| replace:: {1}
+#""".format(email_support, versionName)
 
 rst_prolog = """
 .. |EMAIL| replace:: {0}
@@ -76,20 +76,20 @@ html_theme_path = [rtcat_sphinx_theme.get_html_theme_path()]
 #html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
-    'analytics_anonymize_ip': False,
+    #'analytics_anonymize_ip': False,
     'logo_only': False,
     'display_version': True,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
-    'style_nav_header_background': '#2980B9',
+    #'prev_next_buttons_location': 'bottom',
+    #'style_external_links': False,
+    #'vcs_pageview_mode': '',
+    #'style_nav_header_background': '#2980B9',
 
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': False,
     'navigation_depth': -1,
-    'includehidden': True,
-    'titles_only': False
+    #'includehidden': True,
+    #'titles_only': False
 }
 
 
