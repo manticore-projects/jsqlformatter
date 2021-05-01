@@ -1,6 +1,6 @@
-*********
+*****************
 How to use it
-*********
+*****************
 
 -----------------
 Static Binaries
@@ -64,7 +64,7 @@ Command Line Options (CLI)
 
   On Windows 10, you will need to active ANSI output first
         
-  .. code:: PowerShell
+  .. code:: Shell
    
     Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1     
       
