@@ -531,7 +531,11 @@ public class JSQLFormatter {
 
     OptionGroup indentOptions = new OptionGroup();
     indentOptions.addOption(
-        Option.builder("t").longOpt(FormattingOption.INDENT_WIDTH.toString()).hasArg().desc("The indent width.\n[2 4* 8]").build());
+        Option.builder("t")
+            .longOpt(FormattingOption.INDENT_WIDTH.toString())
+            .hasArg()
+            .desc("The indent width.\n[2 4* 8]")
+            .build());
     indentOptions.addOption(Option.builder("2").desc("Indent with 2 characters.").build());
     indentOptions.addOption(Option.builder("8").desc("Indent with 8 characters.").build());
     options.addOptionGroup(indentOptions);
@@ -580,23 +584,25 @@ public class JSQLFormatter {
       ArrayList<String> formatterOptions = new ArrayList<>();
 
       if (line.hasOption("ansi"))
-				FormattingOption.OUTPUT_FORMAT.addFormatterOption(OutputFormat.ANSI.toString(), formatterOptions);
-			
-      if (line.hasOption("html")) 
-				FormattingOption.OUTPUT_FORMAT.addFormatterOption(OutputFormat.HTML.toString(), formatterOptions);
+        FormattingOption.OUTPUT_FORMAT.addFormatterOption(
+            OutputFormat.ANSI.toString(), formatterOptions);
+
+      if (line.hasOption("html"))
+        FormattingOption.OUTPUT_FORMAT.addFormatterOption(
+            OutputFormat.HTML.toString(), formatterOptions);
 
       if (line.hasOption("2"))
-				FormattingOption.INDENT_WIDTH.addFormatterOption("2", formatterOptions);
-			
+        FormattingOption.INDENT_WIDTH.addFormatterOption("2", formatterOptions);
+
       if (line.hasOption("8"))
-				FormattingOption.INDENT_WIDTH.addFormatterOption("4", formatterOptions);
+        FormattingOption.INDENT_WIDTH.addFormatterOption("4", formatterOptions);
 
       FormattingOption.INDENT_WIDTH.addFormatterOption(line, formatterOptions);
-			FormattingOption.KEYWORD_SPELLING.addFormatterOption(line, formatterOptions);
-			FormattingOption.FUNCTION_SPELLING.addFormatterOption(line, formatterOptions);
-			FormattingOption.OBJECT_SPELLING.addFormatterOption(line, formatterOptions);
-			FormattingOption.SEPARATION.addFormatterOption(line, formatterOptions);
-			FormattingOption.SQUARE_BRACKET_QUOTATION.addFormatterOption(line, formatterOptions);
+      FormattingOption.KEYWORD_SPELLING.addFormatterOption(line, formatterOptions);
+      FormattingOption.FUNCTION_SPELLING.addFormatterOption(line, formatterOptions);
+      FormattingOption.OBJECT_SPELLING.addFormatterOption(line, formatterOptions);
+      FormattingOption.SEPARATION.addFormatterOption(line, formatterOptions);
+      FormattingOption.SQUARE_BRACKET_QUOTATION.addFormatterOption(line, formatterOptions);
 
       if (line.hasOption("help") || (line.getOptions().length == 0 && line.getArgs().length == 0)) {
         HelpFormatter formatter = new HelpFormatter();
@@ -612,8 +618,8 @@ public class JSQLFormatter {
       }
 
       File inputFile = null;
-      if (line.hasOption("input-file")) {
-        inputFile = getAbsoluteFile(line.getOptionValue("input-file"));
+      if (line.hasOption("inputFile")) {
+        inputFile = getAbsoluteFile(line.getOptionValue("inputFile"));
 
         if (!inputFile.canRead())
           throw new Exception(
@@ -703,7 +709,7 @@ public class JSQLFormatter {
 
     Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
     Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
-    LinkedList<Integer> semicolons = new LinkedList<>();
+    ArrayList<Integer> semicolons = new ArrayList<>();
 
     for (int i = 0; m.find(); i++) {
       semicolons.add(m.start());
@@ -714,8 +720,10 @@ public class JSQLFormatter {
       int start = m.start();
       int end = m.end();
 
-      for (int i = semicolons.size() - 1; i >= 0; i--) {
-        if (start <= semicolons.get(i) && semicolons.get(i) < end) {
+      int n = semicolons.size();
+      for (int i = n - 1; i >= 0; i--) {
+        int pos = semicolons.get(i);
+        if (start <= pos && pos < end) {
           semicolons.remove(i);
         }
       }
@@ -723,10 +731,13 @@ public class JSQLFormatter {
 
     int pos = 0;
     int length = sqlStr.length();
-    for (int i = 0; i < semicolons.size(); i++)
-      if (semicolons.get(i) > pos) {
-        String statementSql = sqlStr.substring(pos, Integer.min(semicolons.get(i) + 1, length));
-        pos = semicolons.get(i) + 1;
+    int n = semicolons.size();
+    for (int i = 0; i < n; i++) {
+      int semicolonPos = semicolons.get(i);
+
+      if (semicolonPos > pos) {
+        String statementSql = sqlStr.substring(pos, Integer.min(semicolonPos + 1, length));
+        pos = semicolonPos + 1;
 
         // we are at the end and find only remaining whitespace
         if (statementSql.trim().length() == 0) break;
@@ -841,81 +852,83 @@ public class JSQLFormatter {
               .append("\n");
         }
       } else break;
+    }
 
     return builder.toString().trim();
   }
 
   public static void applyFormattingOptions(String[] options) {
     // set the formatting options
-    for (String s : options) {
-      String[] o = s.split("=");
-      if (o.length == 2) {
-        LOGGER.log(Level.FINE, "Found Formatting Option {0} = {1}", o);
+    if (options != null)
+      for (String s : options) {
+        String[] o = s.split("=");
+        if (o.length == 2) {
+          LOGGER.log(Level.FINE, "Found Formatting Option {0} = {1}", o);
 
-        String key = o[0].trim();
-        String value = o[1].trim();
+          String key = o[0].trim();
+          String value = o[1].trim();
 
-        if (key.equalsIgnoreCase(FormattingOption.OUTPUT_FORMAT.toString())) {
-          try {
-            outputFormat = OutputFormat.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+          if (key.equalsIgnoreCase(FormattingOption.OUTPUT_FORMAT.toString())) {
+            try {
+              outputFormat = OutputFormat.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.KEYWORD_SPELLING.toString())) {
+            try {
+              keywordSpelling = Spelling.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.FUNCTION_SPELLING.toString())) {
+            try {
+              functionSpelling = Spelling.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.OBJECT_SPELLING.toString())) {
+            try {
+              objectSpelling = Spelling.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.SEPARATION.toString())) {
+            try {
+              separation = Separation.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.SQUARE_BRACKET_QUOTATION.toString())) {
+            try {
+              squaredBracketQuotation = SquaredBracketQuotation.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.INDENT_WIDTH.toString())) {
+            try {
+              indentWidth = Integer.valueOf(value);
+
+              char[] chars = new char[indentWidth];
+              Arrays.fill(chars, ' ');
+
+              indentString = new String(chars);
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+          } else {
+            LOGGER.log(Level.WARNING, "Unknown Formatting Option {0} = {1} ", o);
           }
 
-        } else if (key.equalsIgnoreCase(FormattingOption.KEYWORD_SPELLING.toString())) {
-          try {
-            keywordSpelling = Spelling.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
-
-        } else if (key.equalsIgnoreCase(FormattingOption.FUNCTION_SPELLING.toString())) {
-          try {
-            functionSpelling = Spelling.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
-
-        } else if (key.equalsIgnoreCase(FormattingOption.OBJECT_SPELLING.toString())) {
-          try {
-            objectSpelling = Spelling.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
-
-        } else if (key.equalsIgnoreCase(FormattingOption.SEPARATION.toString())) {
-          try {
-            separation = Separation.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
-
-        } else if (key.equalsIgnoreCase(FormattingOption.SQUARE_BRACKET_QUOTATION.toString())) {
-          try {
-            squaredBracketQuotation = SquaredBracketQuotation.valueOf(value.toUpperCase());
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
-
-        } else if (key.equalsIgnoreCase(FormattingOption.INDENT_WIDTH.toString())) {
-          try {
-            indentWidth = Integer.valueOf(value);
-
-            char[] chars = new char[indentWidth];
-            Arrays.fill(chars, ' ');
-
-            indentString = new String(chars);
-          } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
-          }
         } else {
-          LOGGER.log(Level.WARNING, "Unknown Formatting Option {0} = {1} ", o);
+          LOGGER.log(Level.WARNING, "Invalid Formatting Option {0}", s);
         }
-
-      } else {
-        LOGGER.log(Level.WARNING, "Invalid Formatting Option {0}", s);
       }
-    }
   }
 
   private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
@@ -2545,7 +2558,7 @@ public class JSQLFormatter {
             builder.append(expression);
             builder.append(")");
 
-          } else if (index!=null) {
+          } else if (index != null) {
             String type = index.getType();
             String name = index.getName();
             List<Index.ColumnParams> columnParams = index.getColumns();
@@ -3005,34 +3018,34 @@ public class JSQLFormatter {
     YES,
     NO
   }
-	
-	public static enum FormattingOption {
-		SQUARE_BRACKET_QUOTATION ("squareBracketQuotation"),
-		OUTPUT_FORMAT ("outputFormat"),
-		KEYWORD_SPELLING("keywordSpelling"),
-		FUNCTION_SPELLING("functionSpelling"),
-		OBJECT_SPELLING("objectSpelling"),
-		SEPARATION("separation"),
-		INDENT_WIDTH("indentWidth");
-		
-		private final String optionName;
 
-		private FormattingOption(String optionName) {
-			this.optionName = optionName;
-		}
+  public static enum FormattingOption {
+    SQUARE_BRACKET_QUOTATION("squareBracketQuotation"),
+    OUTPUT_FORMAT("outputFormat"),
+    KEYWORD_SPELLING("keywordSpelling"),
+    FUNCTION_SPELLING("functionSpelling"),
+    OBJECT_SPELLING("objectSpelling"),
+    SEPARATION("separation"),
+    INDENT_WIDTH("indentWidth");
 
-		@Override
-		public String toString() {
-			return optionName;
-		}
-		
-		public void addFormatterOption(CommandLine line, ArrayList<String> formatterOptions) {
-			if (line.hasOption(optionName))
+    private final String optionName;
+
+    private FormattingOption(String optionName) {
+      this.optionName = optionName;
+    }
+
+    @Override
+    public String toString() {
+      return optionName;
+    }
+
+    public void addFormatterOption(CommandLine line, ArrayList<String> formatterOptions) {
+      if (line.hasOption(optionName))
         formatterOptions.add(optionName + "=" + line.getOptionValue(optionName));
-		}
-		
-		public void addFormatterOption(String value, ArrayList<String> formatterOptions) {
-       formatterOptions.add(optionName + "=" + value);
-		}
-	}
+    }
+
+    public void addFormatterOption(String value, ArrayList<String> formatterOptions) {
+      formatterOptions.add(optionName + "=" + value);
+    }
+  }
 }
