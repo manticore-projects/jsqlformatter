@@ -18,7 +18,7 @@ Features:
   * Syntax highlighting (ANSI, HTML, RTF)
   * Command Line Options (CLI) and SQL Inline Formatting Options
 
-    * Intend Width
+    * Indent Width
     * Comma Before or After
     * Upper/Lower/Camel-Case Spelling of Keywords, Functions and Object Names
 
