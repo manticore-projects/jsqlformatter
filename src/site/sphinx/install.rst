@@ -51,16 +51,20 @@ Static Binaries
      - Size
    * - Linux x64
      - :downloads:`JSQLFormatter <0.1.6/JSQLFormatter>`
-     - (2.8 MB) 
+     - (3.1 MB) 
    * - Windows x64
      - :downloads:`JSQLFormatter.exe <0.1.6/JSQLFormatter.exe>`
-     - (2.8 MB) 
+     - (2.9 MB) 
    * - Java
      - :downloads:`JSQLFormatter.jar <0.1.6/JSQLFormatter-0.1.6.jar>`
      - (700 kB) 
    * - MacOS
-     - Comming soon.
-     -
+     - :downloads:`JSQLFormatter.dmg <0.1.6/JSQLFormatter.dmg>`
+     - (2.9 MB) 
+     
+.. note::
+
+  On MacOS, grant an exception for a blocked app by clicking the Open Anyway button in the General pane of Security & Privacy preferences.s
 
 Native Dynamic Libraries
 ---------------------------------------------

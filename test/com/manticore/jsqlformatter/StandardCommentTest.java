@@ -55,7 +55,7 @@ public class StandardCommentTest {
       while ((line = bufferedReader.readLine()) != null) {
         stringBuilder.append(line).append("\n");
       }
-			sqlMap.put("COMMENTED SQL", stringBuilder.toString().trim());
+      sqlMap.put("COMMENTED SQL", stringBuilder.toString().trim());
     } catch (IOException ex) {
       //          ETLConnection.logger.log(Level.SEVERE, null, ex);
     }
@@ -111,17 +111,18 @@ public class StandardCommentTest {
     // Check if the formatted statement still can be parsed and gives the same content
     String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
 
-//    boolean foundSquareBracketQuotes = SQUARED_BRACKET_QUOTATION_PATTERN.matcher(expected).find();
+    //    boolean foundSquareBracketQuotes =
+    // SQUARED_BRACKET_QUOTATION_PATTERN.matcher(expected).find();
 
-//    Statement parsed =
-//        CCJSqlParserUtil.parse(
-//            formatted, parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
-//
-//    String sqlStringFromDeparser = buildSqlString(parsed.toString(), true);
+    //    Statement parsed =
+    //        CCJSqlParserUtil.parse(
+    //            formatted, parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
+    //
+    //    String sqlStringFromDeparser = buildSqlString(parsed.toString(), true);
 
     // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
     //      Check if the formatted statement looks like the expected content
-    
+
     System.out.println(formatted);
 
     assertEquals(expected.trim(), formatted.trim());

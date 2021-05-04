@@ -9,7 +9,7 @@ package com.manticore.jsqlformatter;
 /** @author are */
 public class Comment implements Comparable<Comment> {
   protected boolean newLine;
-	protected boolean extraNewLine;
+  protected boolean extraNewLine;
   protected int absolutePosition;
   protected int relativePosition;
   protected String text;

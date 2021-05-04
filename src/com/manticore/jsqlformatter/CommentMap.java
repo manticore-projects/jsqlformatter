@@ -33,7 +33,8 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
   private static final Pattern STRING_PATTERN =
       Pattern.compile(
-          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")", Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
+          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")",
+          Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
   private static final AnsiFormat ANSI_FORMAT_COMMENT =
       new AnsiFormat(Attribute.CLEAR(), Attribute.BRIGHT_BLACK_TEXT(), Attribute.ITALIC());
@@ -143,8 +144,7 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
             int nextBreak = remaining.indexOf('\n');
             if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().length() == 0) {
               builder.append(remaining.substring(nextBreak + 1));
-            } else
-							builder.append(remaining);
+            } else builder.append(remaining);
           } else builder.append(remaining);
           break;
         }

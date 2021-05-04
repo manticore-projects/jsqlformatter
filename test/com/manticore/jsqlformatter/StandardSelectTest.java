@@ -57,8 +57,13 @@ public class StandardSelectTest {
     String k = "";
     try {
       while ((line = bufferedReader.readLine()) != null) {
-        if (!start && line.startsWith("--") && !line.startsWith("-- @")) k = line.substring(3).trim().toUpperCase();
-        start = start || (!start && (!line.startsWith("--") || line.startsWith("-- @")) && line.trim().length() > 0);
+        if (!start && line.startsWith("--") && !line.startsWith("-- @"))
+          k = line.substring(3).trim().toUpperCase();
+        start =
+            start
+                || (!start
+                    && (!line.startsWith("--") || line.startsWith("-- @"))
+                    && line.trim().length() > 0);
         end = start && line.trim().endsWith(";");
         if (start) stringBuilder.append(line).append("\n");
         if (end) {
@@ -117,9 +122,11 @@ public class StandardSelectTest {
    */
   @Test
   public void testFormat() throws Exception {
-    String formatted = JSQLFormatter.format(expected /*,"indentWidth=4", "keywordSpelling=UPPER", "functionSpelling=CAMEL", "objectSpelling=LOWER", "separation=BEFORE"*/);
-		
-		System.out.println("\n-- " + input);
+    String formatted =
+        JSQLFormatter.format(
+            expected /*,"indentWidth=4", "keywordSpelling=UPPER", "functionSpelling=CAMEL", "objectSpelling=LOWER", "separation=BEFORE"*/);
+
+    System.out.println("\n-- " + input);
     System.out.println(formatted);
 
     // Check if the formatted statement still can be parsed and gives the same content

@@ -134,7 +134,7 @@ public class H2OrderedAggregateTest {
 
     // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
     //      Check if the formatted statement looks like the expected content
-    
+
     System.out.println("\n-- " + input);
     System.out.println(formatted);
 

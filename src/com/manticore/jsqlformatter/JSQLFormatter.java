@@ -93,74 +93,74 @@ public class JSQLFormatter {
 
   private static int indentWidth = 4;
 
-	public static SquaredBracketQuotation getSquaredBracketQuotation() {
-		return squaredBracketQuotation;
-	}
+  public static SquaredBracketQuotation getSquaredBracketQuotation() {
+    return squaredBracketQuotation;
+  }
 
-	public static void setSquaredBracketQuotation(SquaredBracketQuotation squaredBracketQuotation) {
-		JSQLFormatter.squaredBracketQuotation = squaredBracketQuotation;
-	}
+  public static void setSquaredBracketQuotation(SquaredBracketQuotation squaredBracketQuotation) {
+    JSQLFormatter.squaredBracketQuotation = squaredBracketQuotation;
+  }
 
-	public static Separation getSeparation() {
-		return separation;
-	}
+  public static Separation getSeparation() {
+    return separation;
+  }
 
-	public static void setSeparation(Separation separation) {
-		JSQLFormatter.separation = separation;
-	}
+  public static void setSeparation(Separation separation) {
+    JSQLFormatter.separation = separation;
+  }
 
-	public static Spelling getKeywordSpelling() {
-		return keywordSpelling;
-	}
+  public static Spelling getKeywordSpelling() {
+    return keywordSpelling;
+  }
 
-	public static void setKeywordSpelling(Spelling keywordSpelling) {
-		JSQLFormatter.keywordSpelling = keywordSpelling;
-	}
+  public static void setKeywordSpelling(Spelling keywordSpelling) {
+    JSQLFormatter.keywordSpelling = keywordSpelling;
+  }
 
-	public static Spelling getFunctionSpelling() {
-		return functionSpelling;
-	}
+  public static Spelling getFunctionSpelling() {
+    return functionSpelling;
+  }
 
-	public static void setFunctionSpelling(Spelling functionSpelling) {
-		JSQLFormatter.functionSpelling = functionSpelling;
-	}
+  public static void setFunctionSpelling(Spelling functionSpelling) {
+    JSQLFormatter.functionSpelling = functionSpelling;
+  }
 
-	public static Spelling getObjectSpelling() {
-		return objectSpelling;
-	}
+  public static Spelling getObjectSpelling() {
+    return objectSpelling;
+  }
 
-	public static void setObjectSpelling(Spelling objectSpelling) {
-		JSQLFormatter.objectSpelling = objectSpelling;
-	}
+  public static void setObjectSpelling(Spelling objectSpelling) {
+    JSQLFormatter.objectSpelling = objectSpelling;
+  }
 
-	public static OutputFormat getOutputFormat() {
-		return outputFormat;
-	}
+  public static OutputFormat getOutputFormat() {
+    return outputFormat;
+  }
 
-	public static void setOutputFormat(OutputFormat outputFormat) {
-		JSQLFormatter.outputFormat = outputFormat;
-	}
+  public static void setOutputFormat(OutputFormat outputFormat) {
+    JSQLFormatter.outputFormat = outputFormat;
+  }
 
-	public static int getIndentWidth() {
-		return indentWidth;
-	}
+  public static int getIndentWidth() {
+    return indentWidth;
+  }
 
-	public static void setIndentWidth(int indentWidth) {
-		JSQLFormatter.indentWidth = indentWidth;
-		
-		char[] chars = new char[indentWidth];
+  public static void setIndentWidth(int indentWidth) {
+    JSQLFormatter.indentWidth = indentWidth;
+
+    char[] chars = new char[indentWidth];
     Arrays.fill(chars, ' ');
 
     JSQLFormatter.indentString = new String(chars);
-	}
+  }
 
-	public static String getIndentString() {
-		return indentString;
-	}
+  public static String getIndentString() {
+    return indentString;
+  }
 
-	public static void setIndentString(String indentString) {
-		JSQLFormatter.indentString = indentString;
-	}
+  public static void setIndentString(String indentString) {
+    JSQLFormatter.indentString = indentString;
+  }
 
   private static String indentString = "    ";
 
@@ -929,9 +929,9 @@ public class JSQLFormatter {
     return builder.toString().trim();
   }
 
-	public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
-		ArrayList<Node> nodes = new ArrayList<>();
-		
+  public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
+    ArrayList<Node> nodes = new ArrayList<>();
+
     applyFormattingOptions(options);
 
     Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
@@ -1003,24 +1003,24 @@ public class JSQLFormatter {
             applyFormattingOptions(keyValuePairs);
           }
         }
-				
-				/*
-				public static Statement parse(String sql, Consumer<CCJSqlParser> consumer) throws JSQLParserException {
-        CCJSqlParser parser = newParser(sql);
-        if (consumer != null) {
-            consumer.accept(parser);
+
+        /*
+        public static Statement parse(String sql, Consumer<CCJSqlParser> consumer) throws JSQLParserException {
+            CCJSqlParser parser = newParser(sql);
+            if (consumer != null) {
+                consumer.accept(parser);
+            }
+            return parseStatement(parser);
         }
-        return parseStatement(parser);
-				}
-				 */
+         */
 
         try {
-					CCJSqlParser parser = newParser(statementSql);
-					Statement statement = parser.Statement();
-					Node root = parser.getASTRoot();
-					
-					nodes.add(root);
-          
+          CCJSqlParser parser = newParser(statementSql);
+          Statement statement = parser.Statement();
+          Node root = parser.getASTRoot();
+
+          nodes.add(root);
+
         } catch (Exception ex1) {
           LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
         }
@@ -1029,7 +1029,7 @@ public class JSQLFormatter {
 
     return nodes;
   }
-	
+
   public static void applyFormattingOptions(String[] options) {
     // set the formatting options
     if (options != null)
@@ -2524,8 +2524,8 @@ public class JSQLFormatter {
     appendAlias(builder, outputFormat, table.getFullyQualifiedName(), "", "");
 
     List<ColumnDefinition> columnDefinitions = createTable.getColumnDefinitions();
-		List<Index> indexes = createTable.getIndexes();
-		
+    List<Index> indexes = createTable.getIndexes();
+
     if (columnDefinitions != null && !columnDefinitions.isEmpty()) {
       builder.append(" (");
 
@@ -2599,7 +2599,6 @@ public class JSQLFormatter {
       // Direct Known Subclasses:
       // CheckConstraint, ForeignKeyIndex
 
-      
       if (indexes != null && !indexes.isEmpty()) {
         for (Index index : indexes) {
           if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
@@ -2755,7 +2754,8 @@ public class JSQLFormatter {
 
           switch (separation) {
             case AFTER:
-              appendNormalizingTrailingWhiteSpace(builder, i < columnDefinitions.size() + indexes.size()  - 1 ? ", " : "");
+              appendNormalizingTrailingWhiteSpace(
+                  builder, i < columnDefinitions.size() + indexes.size() - 1 ? ", " : "");
               break;
           }
 
