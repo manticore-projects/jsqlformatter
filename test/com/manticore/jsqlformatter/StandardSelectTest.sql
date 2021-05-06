@@ -19,7 +19,7 @@ FROM (  SELECT *
                         ON c1.id_accounting_scope = c.id_accounting_scope
                             AND c1.id_status = 'C'
                     , common.ledger_currency d
-                MINUS 
+                MINUS
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
@@ -28,7 +28,7 @@ FROM (  SELECT *
                 FROM cfe.ledger_account c
                     INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency )
-        UNION 
+        UNION
         SELECT *
         FROM (  SELECT DISTINCT
                     c.code
@@ -40,7 +40,7 @@ FROM (  SELECT *
                         ON c1.id_accounting_scope = c.id_accounting_scope
                             AND c1.id_status = 'C'
                     , common.ledger_currency d
-                MINUS 
+                MINUS
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
@@ -49,7 +49,7 @@ FROM (  SELECT *
                 FROM cfe.ledger_account c
                     INNER JOIN common.ledger_currency d
                         ON c.id_currency = d.id_currency )
-        UNION 
+        UNION
         SELECT *
         FROM (  SELECT DISTINCT
                     c.code code
@@ -62,7 +62,7 @@ FROM (  SELECT *
                             AND c1.id_status = 'C'
                     , common.ledger_currency d
                     , cfe.fee_type e
-                MINUS 
+                MINUS
                 SELECT DISTINCT
                     c.code
                     , d.id_currency
@@ -102,7 +102,7 @@ WITH scope AS (
                                     AND id_currency_into = f.id_currency_into
                                     AND value_date <= ex.value_date )
             AND id_currency_into = :BOOK_CURRENCY
-        UNION ALL 
+        UNION ALL
         SELECT  :BOOK_CURRENCY
                 , 1
         FROM dual )
@@ -137,7 +137,7 @@ FROM ex
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
                                                         ON ledger_account_entry.posting_date <= ex.posting_date
-                                                UNION ALL 
+                                                UNION ALL
                                                 SELECT  id_account_debit
                                                         , - amount
                                                 FROM cfe.ledger_account_entry
@@ -178,7 +178,7 @@ WITH scope AS (
                                     AND id_currency_into = f.id_currency_into
                                     AND value_date <= ex.value_date )
             AND id_currency_into = :BOOK_CURRENCY
-        UNION ALL 
+        UNION ALL
         SELECT  :BOOK_CURRENCY
                 , 1
         FROM dual )
@@ -213,7 +213,7 @@ FROM ex
                                                 FROM cfe.ledger_account_entry
                                                     INNER JOIN ex
                                                         ON ledger_account_entry.posting_date <= ex.posting_date
-                                                UNION ALL 
+                                                UNION ALL
                                                 SELECT  id_account_debit
                                                         , - amount
                                                 FROM cfe.ledger_account_entry
@@ -300,7 +300,7 @@ WITH ex AS (
                                     WHERE id_currency_from = f.id_currency_from
                                         AND id_currency_into = f.id_currency_into )
             AND id_currency_into = 'NGN'
-        UNION ALL 
+        UNION ALL
         SELECT  'NGN'
                 , 1
         FROM dual )
@@ -328,7 +328,7 @@ WITH ex AS (
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
                                     ON ledger_account_entry.posting_date <= ex.posting_date
-                            UNION ALL 
+                            UNION ALL
                             SELECT  id_account_debit
                                     , - amount
                             FROM cfe.ledger_account_entry
@@ -352,7 +352,7 @@ WITH ex AS (
                             FROM cfe.ledger_account_entry
                                 INNER JOIN ex
                                     ON ledger_account_entry.posting_date <= ex.posting_date
-                            UNION ALL 
+                            UNION ALL
                             SELECT  id_account_debit
                                     , - amount
                             FROM cfe.ledger_account_entry
@@ -424,4 +424,16 @@ ORDER BY    (   SELECT code
 -- ALL COLUMNS FROM TABLE
 SELECT a.*
 FROM cfe.instrument a
+;
+
+-- NESTED WITH
+WITH teststmt1 AS (
+        WITH teststmt2 AS (
+                SELECT *
+                FROM my_table2 )
+        SELECT  col1
+                , col2
+        FROM teststmt2 )
+SELECT *
+FROM teststmt
 ;

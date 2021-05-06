@@ -1,34 +1,34 @@
 
 -- MERGE 1
 MERGE INTO cfe.impairment imp
-    USING   (   WITH x AS (
-                        SELECT  a.id_instrument
-                                , a.id_currency
-                                , a.id_instrument_type
-                                , b.id_portfolio
-                                , c.attribute_value product_code
-                                , t.valid_date
-                                , t.ccf
-                        FROM cfe.instrument a
-                            INNER JOIN cfe.impairment b
-                                ON a.id_instrument = b.id_instrument
-                            LEFT JOIN cfe.instrument_attribute c
-                                ON a.id_instrument = c.id_instrument
-                                    AND c.id_attribute = 'product'
-                            INNER JOIN cfe.ext_ccf t
-                                ON ( a.id_currency LIKE t.id_currency )
-                                    AND ( a.id_instrument_type LIKE t.id_instrument_type )
-                                    AND ( b.id_portfolio LIKE t.id_portfolio
-                                            OR ( b.id_portfolio IS NULL
-                                                    AND t.id_portfolio = '%' ) )
-                                    AND ( c.attribute_value LIKE t.product_code
-                                            OR ( c.attribute_value IS NULL
-                                                    AND t.product_code = '%' ) ) )
-                SELECT /*+ PARALLEL */ *
-                FROM x x1
-                WHERE x1.valid_date = ( SELECT max
-                                        FROM x
-                                        WHERE id_instrument = x1.id_instrument ) ) s
+    USING ( WITH x AS (
+                    SELECT  a.id_instrument
+                            , a.id_currency
+                            , a.id_instrument_type
+                            , b.id_portfolio
+                            , c.attribute_value product_code
+                            , t.valid_date
+                            , t.ccf
+                    FROM cfe.instrument a
+                        INNER JOIN cfe.impairment b
+                            ON a.id_instrument = b.id_instrument
+                        LEFT JOIN cfe.instrument_attribute c
+                            ON a.id_instrument = c.id_instrument
+                                AND c.id_attribute = 'product'
+                        INNER JOIN cfe.ext_ccf t
+                            ON ( a.id_currency LIKE t.id_currency )
+                                AND ( a.id_instrument_type LIKE t.id_instrument_type )
+                                AND ( b.id_portfolio LIKE t.id_portfolio
+                                        OR ( b.id_portfolio IS NULL
+                                                AND t.id_portfolio = '%' ) )
+                                AND ( c.attribute_value LIKE t.product_code
+                                        OR ( c.attribute_value IS NULL
+                                                AND t.product_code = '%' ) ) )
+SELECT /*+ PARALLEL */ *
+            FROM x x1
+            WHERE x1.valid_date = ( SELECT max
+                                    FROM x
+                                    WHERE id_instrument = x1.id_instrument ) ) s
         ON ( imp.id_instrument = s.id_instrument )
 WHEN MATCHED THEN
     UPDATE SET  imp.ccf = s.ccf
@@ -36,35 +36,35 @@ WHEN MATCHED THEN
 
 -- MERGE 2
 MERGE INTO cfe.instrument_import_measure imp
-    USING   (   WITH x AS (
-                        SELECT  a.id_instrument
-                                , a.id_currency
-                                , a.id_instrument_type
-                                , b.id_portfolio
-                                , c.attribute_value product_code
-                                , t.valid_date
-                                , t.yield
-                        FROM cfe.instrument a
-                            INNER JOIN cfe.impairment b
-                                ON a.id_instrument = b.id_instrument
-                            LEFT JOIN cfe.instrument_attribute c
-                                ON a.id_instrument = c.id_instrument
-                                    AND c.id_attribute = 'product'
-                            INNER JOIN cfe.ext_yield t
-                                ON ( a.id_currency = t.id_currency )
-                                    AND ( a.id_instrument_type LIKE t.id_instrument_type )
-                                    AND ( b.id_portfolio LIKE t.id_portfolio
-                                            OR ( b.id_portfolio IS NULL
-                                                    AND t.id_portfolio = '%' ) )
-                                    AND ( c.attribute_value LIKE t.product_code
-                                            OR ( c.attribute_value IS NULL
-                                                    AND t.product_code = '%' ) ) )
-                SELECT /*+ PARALLEL */ *
-                FROM x x1
-                WHERE x1.valid_date = ( SELECT max
-                                        FROM x
-                                        WHERE id_instrument = x1.id_instrument
-                                            AND valid_date <= to_date ) ) s
+    USING ( WITH x AS (
+                    SELECT  a.id_instrument
+                            , a.id_currency
+                            , a.id_instrument_type
+                            , b.id_portfolio
+                            , c.attribute_value product_code
+                            , t.valid_date
+                            , t.yield
+                    FROM cfe.instrument a
+                        INNER JOIN cfe.impairment b
+                            ON a.id_instrument = b.id_instrument
+                        LEFT JOIN cfe.instrument_attribute c
+                            ON a.id_instrument = c.id_instrument
+                                AND c.id_attribute = 'product'
+                        INNER JOIN cfe.ext_yield t
+                            ON ( a.id_currency = t.id_currency )
+                                AND ( a.id_instrument_type LIKE t.id_instrument_type )
+                                AND ( b.id_portfolio LIKE t.id_portfolio
+                                        OR ( b.id_portfolio IS NULL
+                                                AND t.id_portfolio = '%' ) )
+                                AND ( c.attribute_value LIKE t.product_code
+                                        OR ( c.attribute_value IS NULL
+                                                AND t.product_code = '%' ) ) )
+SELECT /*+ PARALLEL */ *
+            FROM x x1
+            WHERE x1.valid_date = ( SELECT max
+                                    FROM x
+                                    WHERE id_instrument = x1.id_instrument
+                                        AND valid_date <= to_date ) ) s
         ON ( imp.id_instrument = s.id_instrument
                     AND imp.measure = 'YIELD' )
 WHEN MATCHED THEN
@@ -84,35 +84,35 @@ WHEN MATCHED THEN
 
 -- MERGE 4
 MERGE INTO cfe.instrument_import_measure imp
-    USING   (   WITH x AS (
-                        SELECT  a.id_instrument
-                                , a.id_currency
-                                , a.id_instrument_type
-                                , b.id_portfolio
-                                , c.attribute_value product_code
-                                , t.valid_date
-                                , t.yield
-                        FROM cfe.instrument a
-                            INNER JOIN cfe.impairment b
-                                ON a.id_instrument = b.id_instrument
-                            LEFT JOIN cfe.instrument_attribute c
-                                ON a.id_instrument = c.id_instrument
-                                    AND c.id_attribute = 'product'
-                            INNER JOIN cfe.ext_yield t
-                                ON ( a.id_currency = t.id_currency )
-                                    AND ( a.id_instrument_type LIKE t.id_instrument_type )
-                                    AND ( b.id_portfolio LIKE t.id_portfolio
-                                            OR ( b.id_portfolio IS NULL
-                                                    AND t.id_portfolio = '%' ) )
-                                    AND ( c.attribute_value LIKE t.product_code
-                                            OR ( c.attribute_value IS NULL
-                                                    AND t.product_code = '%' ) ) )
-                SELECT /*+ PARALLEL */ *
-                FROM x x1
-                WHERE x1.valid_date = ( SELECT max
-                                        FROM x
-                                        WHERE id_instrument = x1.id_instrument
-                                            AND valid_date <= to_date ) ) s
+    USING ( WITH x AS (
+                    SELECT  a.id_instrument
+                            , a.id_currency
+                            , a.id_instrument_type
+                            , b.id_portfolio
+                            , c.attribute_value product_code
+                            , t.valid_date
+                            , t.yield
+                    FROM cfe.instrument a
+                        INNER JOIN cfe.impairment b
+                            ON a.id_instrument = b.id_instrument
+                        LEFT JOIN cfe.instrument_attribute c
+                            ON a.id_instrument = c.id_instrument
+                                AND c.id_attribute = 'product'
+                        INNER JOIN cfe.ext_yield t
+                            ON ( a.id_currency = t.id_currency )
+                                AND ( a.id_instrument_type LIKE t.id_instrument_type )
+                                AND ( b.id_portfolio LIKE t.id_portfolio
+                                        OR ( b.id_portfolio IS NULL
+                                                AND t.id_portfolio = '%' ) )
+                                AND ( c.attribute_value LIKE t.product_code
+                                        OR ( c.attribute_value IS NULL
+                                                AND t.product_code = '%' ) ) )
+SELECT /*+ PARALLEL */ *
+            FROM x x1
+            WHERE x1.valid_date = ( SELECT max
+                                    FROM x
+                                    WHERE id_instrument = x1.id_instrument
+                                        AND valid_date <= to_date ) ) s
         ON ( imp.id_instrument = s.id_instrument
                     AND imp.measure = 'YIELD_PP' )
 WHEN MATCHED THEN
@@ -121,14 +121,14 @@ WHEN MATCHED THEN
 
 -- MERGE DELETE WHERE
 MERGE INTO empl_current tar
-    USING   (   SELECT  empno
-                        , ename
-                        , CASE
-                                WHEN leavedate <= sysdate
-                                    THEN 'Y'
-                                ELSE 'N'
-                            END AS delete_flag
-                FROM empl ) src
+    USING ( SELECT  empno
+                    , ename
+                    , CASE
+                            WHEN leavedate <= sysdate
+                                THEN 'Y'
+                            ELSE 'N'
+                        END AS delete_flag
+            FROM empl ) src
         ON ( tar.empno = src.empno )
 WHEN NOT MATCHED THEN
     INSERT ( empno
@@ -172,17 +172,17 @@ WHEN MATCHED THEN
 
 -- INSERT WITHOUT COLUMNS
 MERGE /*+ PARALLEL */ INTO cfe.tmp_eab a
-    USING   (   SELECT /*+ PARALLEL DRIVING_SITE(C) */ c.*
-                FROM tbaadm.eab@finnacle c
-                    INNER JOIN (    SELECT  acid
-                                            , eod_date
-                                    FROM cfe.tmp_eab e
-                                    WHERE end_eod_date = (  SELECT Max( eod_date )
-                                                            FROM cfe.tmp_eab
-                                                            WHERE acid = e.acid )
-                                        AND end_eod_date < '31-Dec-2099' ) d
-                        ON c.acid = d.acid
-                            AND c.eod_date >= d.eod_date ) b
+    USING ( SELECT /*+ PARALLEL DRIVING_SITE(C) */ c.*
+            FROM tbaadm.eab@finnacle c
+                INNER JOIN (    SELECT  acid
+                                        , eod_date
+                                FROM cfe.tmp_eab e
+                                WHERE end_eod_date = (  SELECT Max( eod_date )
+                                                        FROM cfe.tmp_eab
+                                                        WHERE acid = e.acid )
+                                    AND end_eod_date < '31-Dec-2099' ) d
+                    ON c.acid = d.acid
+                        AND c.eod_date >= d.eod_date ) b
         ON ( a.acid = b.acid
                     AND a.eod_date = b.eod_date )
 WHEN MATCHED THEN

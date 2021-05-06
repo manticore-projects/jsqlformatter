@@ -47,7 +47,7 @@ extlinks = {'downloads': ('https://github.com/manticore-projects/jsqlformatter/r
 #""".format(email_support)
 
 project = projectName
-copyright = u'2020, ' + developerName
+copyright = u'2021, ' + developerName
 release = versionName
 
 # General options
@@ -81,10 +81,11 @@ html_theme_options = {
     #'analytics_anonymize_ip': False,
     'logo_only': False,
     'display_version': True,
+    'style_nav_header_background': '#39698a',
     #'prev_next_buttons_location': 'bottom',
     #'style_external_links': False,
     #'vcs_pageview_mode': '',
-    #'style_nav_header_background': '#2980B9',
+    
 
     # Toc options
     'collapse_navigation': False,

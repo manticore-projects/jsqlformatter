@@ -20,7 +20,7 @@ from (  select *
                         on C1.ID_ACCOUNTING_SCOPE = C.ID_ACCOUNTING_SCOPE
                             AND C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D
-                MINUS 
+                MINUS
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -29,7 +29,7 @@ from (  select *
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D
                         on C.ID_CURRENCY = D.ID_CURRENCY )
-        UNION 
+        UNION
         select *
         from (  select distinct
                     C.CODE,
@@ -41,7 +41,7 @@ from (  select *
                         on C1.ID_ACCOUNTING_SCOPE = C.ID_ACCOUNTING_SCOPE
                             AND C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D
-                MINUS 
+                MINUS
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -50,7 +50,7 @@ from (  select *
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D
                         on C.ID_CURRENCY = D.ID_CURRENCY )
-        UNION 
+        UNION
         select *
         from (  select distinct
                     C.CODE CODE,
@@ -63,7 +63,7 @@ from (  select *
                             AND C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D,
                     CFE.FEE_TYPE E
-                MINUS 
+                MINUS
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -103,7 +103,7 @@ with SCOPE as (
                                     AND ID_CURRENCY_INTO = F.ID_CURRENCY_INTO
                                     AND VALUE_DATE <= EX.VALUE_DATE )
             AND ID_CURRENCY_INTO = :BOOK_CURRENCY
-        UNION ALL 
+        UNION ALL
         select  :BOOK_CURRENCY,
                 1
         from DUAL )
@@ -138,7 +138,7 @@ from EX,
                                                 from CFE.LEDGER_ACCOUNT_ENTRY
                                                     inner join EX
                                                         on LEDGER_ACCOUNT_ENTRY.POSTING_DATE <= EX.POSTING_DATE
-                                                UNION ALL 
+                                                UNION ALL
                                                 select  ID_ACCOUNT_DEBIT,
                                                         - AMOUNT
                                                 from CFE.LEDGER_ACCOUNT_ENTRY

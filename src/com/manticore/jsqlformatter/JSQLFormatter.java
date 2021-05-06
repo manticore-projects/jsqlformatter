@@ -762,6 +762,81 @@ public class JSQLFormatter {
     }
   }
 
+  public static ArrayList<Exception> verify(String sqlStr, String... options) throws Exception {
+    ArrayList<Exception> exceptions = new ArrayList<>();
+
+    applyFormattingOptions(options);
+
+    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
+    Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
+    ArrayList<Integer> semicolons = new ArrayList<>();
+
+    for (int i = 0; m.find(); i++) {
+      semicolons.add(m.start());
+    }
+
+    m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
+    while (m.find()) {
+      int start = m.start();
+      int end = m.end();
+
+      int n = semicolons.size();
+      for (int i = n - 1; i >= 0; i--) {
+        int pos = semicolons.get(i);
+        if (start <= pos && pos < end) {
+          semicolons.remove(i);
+        }
+      }
+    }
+
+    int pos = 0;
+    int length = sqlStr.length();
+    int n = semicolons.size();
+    for (int i = 0; i < n; i++) {
+      int semicolonPos = semicolons.get(i);
+
+      if (semicolonPos > pos) {
+        String statementSql = sqlStr.substring(pos, Integer.min(semicolonPos + 1, length));
+        pos = semicolonPos + 1;
+
+        // we are at the end and find only remaining whitespace
+        if (statementSql.trim().length() == 0) break;
+
+        boolean useSquareBracketQuotation;
+        switch (squaredBracketQuotation) {
+          case YES:
+            useSquareBracketQuotation = true;
+            LOGGER.log(
+                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
+            break;
+          case NO:
+            useSquareBracketQuotation = false;
+            LOGGER.log(
+                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
+            break;
+          case AUTO:
+          default:
+            useSquareBracketQuotation =
+                SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
+            LOGGER.log(
+                Level.FINE,
+                "Square Bracket Quotation auto-detected as {0}.",
+                useSquareBracketQuotation);
+        }
+        try {
+          Statement statement =
+              CCJSqlParserUtil.parse(
+                  statementSql,
+                  parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation));
+
+        } catch (Exception ex1) {
+          exceptions.add(new Exception("Cannot parse the Statement:\n" + statementSql, ex1));
+        }
+      } else break;
+    }
+    return exceptions;
+  }
+
   public static String format(String sqlStr, String... options) throws Exception {
     ArrayList<Exception> exceptions = new ArrayList<>();
 
@@ -1124,11 +1199,17 @@ public class JSQLFormatter {
 
     SubSelect select = merge.getUsingSelect();
     if (select != null) {
+      builder.append("( ");
       alias = merge.getUsingAlias();
 
-      int subIndent = getSubIndent(builder, indentWidth, true);
+      appendSubSelect(select, builder, false, BreakLine.NEVER, indent);
+      builder.append(" )");
 
-      appendExpression(select, alias, builder, subIndent, 0, 1, false, BreakLine.AFTER_FIRST);
+      if (alias != null) {
+        appendNormalizingTrailingWhiteSpace(builder, " ");
+        if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
+        appendAlias(builder, outputFormat, alias.getName(), "", " ");
+      }
     }
 
     table = merge.getUsingTable();
@@ -1463,6 +1544,7 @@ public class JSQLFormatter {
     List<WithItem> withItems = select.getWithItemsList();
     if (withItems != null && withItems.size() > 0) {
       int i = 0;
+      for (int j = 0; j < indent; j++) builder.append(indentString);
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
       for (WithItem withItem : withItems) {
@@ -1472,7 +1554,7 @@ public class JSQLFormatter {
     }
 
     SelectBody selectBody = select.getSelectBody();
-    appendSelectBody(selectBody, null, builder, indent, breakLineBefore);
+    appendSelectBody(selectBody, null, builder, indent, breakLineBefore, false);
   }
 
   private static void appendSelectBody(
@@ -1480,7 +1562,8 @@ public class JSQLFormatter {
       Alias alias1,
       StringBuilder builder,
       int indent,
-      boolean breakLineBefore) {
+      boolean breakLineBefore,
+      boolean indentFirstLine) {
 
     // All Known Implementing Classes: PlainSelect, SetOperationList, ValuesStatement, WithItem
     if (selectBody instanceof PlainSelect) {
@@ -1488,9 +1571,10 @@ public class JSQLFormatter {
 
       int i = 0;
       if (breakLineBefore) {
-        builder.append("\n");
-        for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendNormalizedLineBreak(builder);
       }
+      for (int j = 0; indentFirstLine && j < indent; j++) builder.append(indentString);
+
       appendKeyWord(builder, outputFormat, "SELECT", "", " ");
 
       OracleHint oracleHint = plainSelect.getOracleHint();
@@ -1582,7 +1666,13 @@ public class JSQLFormatter {
             SetOperation setOperation = setOperations.get(k - 1);
             appendSetOperation(setOperation, builder, indent);
           }
-          appendSelectBody(selectBody1, alias1, builder, indent, k > 0 || breakLineBefore);
+          appendSelectBody(
+              selectBody1,
+              alias1,
+              builder,
+              indent,
+              k > 0 || breakLineBefore,
+              k > 0 || breakLineBefore || indentFirstLine);
 
           k++;
         }
@@ -1794,7 +1884,9 @@ public class JSQLFormatter {
     }
 
     appendKeyWord(builder, outputFormat, "AS", "", " (");
-    appendSelectBody(withItem.getSelectBody(), null, builder, indent + 2, true);
+
+    for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+    appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
 
     switch (separation) {
       case AFTER:
@@ -2282,7 +2374,8 @@ public class JSQLFormatter {
       SelectBody selectBody = subSelect.getSelectBody();
       Alias alias1 = subSelect.getAlias();
 
-      appendSelectBody(selectBody, alias, builder, subIndent, withItems != null);
+      appendSelectBody(
+          selectBody, alias, builder, subIndent, withItems != null && withItems.size() > 0, false);
       appendNormalizingTrailingWhiteSpace(builder, " )");
 
     } else if (expression instanceof ValueListExpression) {
@@ -2331,7 +2424,7 @@ public class JSQLFormatter {
     } else if (itemsList instanceof SubSelect) {
 
       SubSelect subSelect = (SubSelect) itemsList;
-      appendSubSelect(subSelect, builder, false);
+      appendSubSelect(subSelect, builder, false, BreakLine.NEVER, indent);
     }
   }
 
@@ -2385,7 +2478,7 @@ public class JSQLFormatter {
       appendFromItem(table, alias, builder, indent, i, n);
     } else if (fromItem instanceof SubSelect) {
       SubSelect subSelect = (SubSelect) fromItem;
-      appendSubSelect(subSelect, builder, true);
+      appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
 
     } else {
       System.out.println(fromItem.getClass().getName());
@@ -2399,17 +2492,27 @@ public class JSQLFormatter {
   }
 
   private static void appendSubSelect(
-      SubSelect subSelect, StringBuilder builder, boolean useBrackets) {
+      SubSelect subSelect,
+      StringBuilder builder,
+      boolean useBrackets,
+      BreakLine breakLine,
+      int indent) {
     if (subSelect.isUseBrackets() && useBrackets) {
       builder.append("( ");
     }
 
-    int subIndent = getSubIndent(builder, indentWidth, true);
+    if (breakLine.equals(BreakLine.ALWAYS)) {
+      appendNormalizedLineBreak(builder);
+    }
+
+    int subIndent =
+        breakLine.equals(BreakLine.ALWAYS) ? indent + 2 : getSubIndent(builder, indentWidth, true);
 
     List<WithItem> withItems = subSelect.getWithItemsList();
     if (withItems != null && withItems.size() > 0) {
       int j = 0;
-      appendNormalizedLineBreak(builder);
+      if (breakLine.equals(BreakLine.ALWAYS))
+        for (int k = 0; k < subIndent; k++) builder.append(indentString);
       builder.append("WITH ");
 
       for (WithItem withItem : withItems) {
@@ -2421,7 +2524,13 @@ public class JSQLFormatter {
     SelectBody selectBody = subSelect.getSelectBody();
     Alias alias1 = subSelect.getAlias();
 
-    appendSelectBody(selectBody, null, builder, subIndent, false);
+    appendSelectBody(
+        selectBody,
+        null,
+        builder,
+        subIndent,
+        withItems != null && withItems.size() > 0,
+        breakLine.equals(BreakLine.ALWAYS));
 
     if (subSelect.isUseBrackets() && useBrackets) {
       builder.append(" )");
