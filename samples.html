@@ -138,7 +138,7 @@
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-2">Changes 0.1.2</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Interactive Demo</a></li>
 </ul>
 
             
@@ -1019,7 +1019,19 @@
 <span class="normal">423</span>
 <span class="normal">424</span>
 <span class="normal">425</span>
-<span class="normal">426</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">-- INSERT NEW LEDGER ACCOUNTS</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">-- INSERT NEW LEDGER ACCOUNTS</span>
 <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span>
     <span class="n">cfe</span><span class="p">.</span><span class="n">id_account_seq</span><span class="p">.</span><span class="n">nextval</span>
     <span class="p">,</span> <span class="ss">&quot;a&quot;</span><span class="p">.</span><span class="ss">&quot;code&quot;</span>
@@ -1039,7 +1051,7 @@
                         <span class="k">ON</span> <span class="n">c1</span><span class="p">.</span><span class="n">id_accounting_scope</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_accounting_scope</span>
                             <span class="k">AND</span> <span class="n">c1</span><span class="p">.</span><span class="n">id_status</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
                     <span class="p">,</span> <span class="n">common</span><span class="p">.</span><span class="n">ledger_currency</span> <span class="n">d</span>
-                <span class="n">MINUS</span> 
+                <span class="n">MINUS</span>
                 <span class="k">SELECT</span> <span class="k">DISTINCT</span>
                     <span class="k">c</span><span class="p">.</span><span class="n">code</span>
                     <span class="p">,</span> <span class="n">d</span><span class="p">.</span><span class="n">id_currency</span>
@@ -1048,7 +1060,7 @@
                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account</span> <span class="k">c</span>
                     <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">common</span><span class="p">.</span><span class="n">ledger_currency</span> <span class="n">d</span>
                         <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
-        <span class="k">UNION</span> 
+        <span class="k">UNION</span>
         <span class="k">SELECT</span> <span class="o">*</span>
         <span class="k">FROM</span> <span class="p">(</span>  <span class="k">SELECT</span> <span class="k">DISTINCT</span>
                     <span class="k">c</span><span class="p">.</span><span class="n">code</span>
@@ -1060,7 +1072,7 @@
                         <span class="k">ON</span> <span class="n">c1</span><span class="p">.</span><span class="n">id_accounting_scope</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_accounting_scope</span>
                             <span class="k">AND</span> <span class="n">c1</span><span class="p">.</span><span class="n">id_status</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
                     <span class="p">,</span> <span class="n">common</span><span class="p">.</span><span class="n">ledger_currency</span> <span class="n">d</span>
-                <span class="n">MINUS</span> 
+                <span class="n">MINUS</span>
                 <span class="k">SELECT</span> <span class="k">DISTINCT</span>
                     <span class="k">c</span><span class="p">.</span><span class="n">code</span>
                     <span class="p">,</span> <span class="n">d</span><span class="p">.</span><span class="n">id_currency</span>
@@ -1069,7 +1081,7 @@
                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account</span> <span class="k">c</span>
                     <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">common</span><span class="p">.</span><span class="n">ledger_currency</span> <span class="n">d</span>
                         <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
-        <span class="k">UNION</span> 
+        <span class="k">UNION</span>
         <span class="k">SELECT</span> <span class="o">*</span>
         <span class="k">FROM</span> <span class="p">(</span>  <span class="k">SELECT</span> <span class="k">DISTINCT</span>
                     <span class="k">c</span><span class="p">.</span><span class="n">code</span> <span class="n">code</span>
@@ -1082,7 +1094,7 @@
                             <span class="k">AND</span> <span class="n">c1</span><span class="p">.</span><span class="n">id_status</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
                     <span class="p">,</span> <span class="n">common</span><span class="p">.</span><span class="n">ledger_currency</span> <span class="n">d</span>
                     <span class="p">,</span> <span class="n">cfe</span><span class="p">.</span><span class="n">fee_type</span> <span class="n">e</span>
-                <span class="n">MINUS</span> 
+                <span class="n">MINUS</span>
                 <span class="k">SELECT</span> <span class="k">DISTINCT</span>
                     <span class="k">c</span><span class="p">.</span><span class="n">code</span>
                     <span class="p">,</span> <span class="n">d</span><span class="p">.</span><span class="n">id_currency</span>
@@ -1122,7 +1134,7 @@
                                     <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">id_currency_into</span>
                                     <span class="k">AND</span> <span class="n">value_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">value_date</span> <span class="p">)</span>
             <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="p">:</span><span class="n">BOOK_CURRENCY</span>
-        <span class="k">UNION</span> <span class="k">ALL</span> 
+        <span class="k">UNION</span> <span class="k">ALL</span>
         <span class="k">SELECT</span>  <span class="p">:</span><span class="n">BOOK_CURRENCY</span>
                 <span class="p">,</span> <span class="mi">1</span>
         <span class="k">FROM</span> <span class="n">dual</span> <span class="p">)</span>
@@ -1157,7 +1169,7 @@
                                                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
                                                     <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">ex</span>
                                                         <span class="k">ON</span> <span class="n">ledger_account_entry</span><span class="p">.</span><span class="n">posting_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">posting_date</span>
-                                                <span class="k">UNION</span> <span class="k">ALL</span> 
+                                                <span class="k">UNION</span> <span class="k">ALL</span>
                                                 <span class="k">SELECT</span>  <span class="n">id_account_debit</span>
                                                         <span class="p">,</span> <span class="o">-</span> <span class="n">amount</span>
                                                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
@@ -1198,7 +1210,7 @@
                                     <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">id_currency_into</span>
                                     <span class="k">AND</span> <span class="n">value_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">value_date</span> <span class="p">)</span>
             <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="p">:</span><span class="n">BOOK_CURRENCY</span>
-        <span class="k">UNION</span> <span class="k">ALL</span> 
+        <span class="k">UNION</span> <span class="k">ALL</span>
         <span class="k">SELECT</span>  <span class="p">:</span><span class="n">BOOK_CURRENCY</span>
                 <span class="p">,</span> <span class="mi">1</span>
         <span class="k">FROM</span> <span class="n">dual</span> <span class="p">)</span>
@@ -1233,7 +1245,7 @@
                                                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
                                                     <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">ex</span>
                                                         <span class="k">ON</span> <span class="n">ledger_account_entry</span><span class="p">.</span><span class="n">posting_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">posting_date</span>
-                                                <span class="k">UNION</span> <span class="k">ALL</span> 
+                                                <span class="k">UNION</span> <span class="k">ALL</span>
                                                 <span class="k">SELECT</span>  <span class="n">id_account_debit</span>
                                                         <span class="p">,</span> <span class="o">-</span> <span class="n">amount</span>
                                                 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
@@ -1320,7 +1332,7 @@
                                     <span class="k">WHERE</span> <span class="n">id_currency_from</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">id_currency_from</span>
                                         <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">id_currency_into</span> <span class="p">)</span>
             <span class="k">AND</span> <span class="n">id_currency_into</span> <span class="o">=</span> <span class="s1">&#39;NGN&#39;</span>
-        <span class="k">UNION</span> <span class="k">ALL</span> 
+        <span class="k">UNION</span> <span class="k">ALL</span>
         <span class="k">SELECT</span>  <span class="s1">&#39;NGN&#39;</span>
                 <span class="p">,</span> <span class="mi">1</span>
         <span class="k">FROM</span> <span class="n">dual</span> <span class="p">)</span>
@@ -1348,7 +1360,7 @@
                             <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
                                 <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">ex</span>
                                     <span class="k">ON</span> <span class="n">ledger_account_entry</span><span class="p">.</span><span class="n">posting_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">posting_date</span>
-                            <span class="k">UNION</span> <span class="k">ALL</span> 
+                            <span class="k">UNION</span> <span class="k">ALL</span>
                             <span class="k">SELECT</span>  <span class="n">id_account_debit</span>
                                     <span class="p">,</span> <span class="o">-</span> <span class="n">amount</span>
                             <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
@@ -1372,7 +1384,7 @@
                             <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
                                 <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">ex</span>
                                     <span class="k">ON</span> <span class="n">ledger_account_entry</span><span class="p">.</span><span class="n">posting_date</span> <span class="o">&lt;=</span> <span class="n">ex</span><span class="p">.</span><span class="n">posting_date</span>
-                            <span class="k">UNION</span> <span class="k">ALL</span> 
+                            <span class="k">UNION</span> <span class="k">ALL</span>
                             <span class="k">SELECT</span>  <span class="n">id_account_debit</span>
                                     <span class="p">,</span> <span class="o">-</span> <span class="n">amount</span>
                             <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ledger_account_entry</span>
@@ -1444,6 +1456,18 @@
 <span class="c1">-- ALL COLUMNS FROM TABLE</span>
 <span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="o">*</span>
 <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
+<span class="p">;</span>
+
+<span class="c1">-- NESTED WITH</span>
+<span class="k">WITH</span> <span class="n">teststmt1</span> <span class="k">AS</span> <span class="p">(</span>
+        <span class="k">WITH</span> <span class="n">teststmt2</span> <span class="k">AS</span> <span class="p">(</span>
+                <span class="k">SELECT</span> <span class="o">*</span>
+                <span class="k">FROM</span> <span class="n">my_table2</span> <span class="p">)</span>
+        <span class="k">SELECT</span>  <span class="n">col1</span>
+                <span class="p">,</span> <span class="n">col2</span>
+        <span class="k">FROM</span> <span class="n">teststmt2</span> <span class="p">)</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">teststmt</span>
 <span class="p">;</span>
 </pre></div>
 </td></tr></table></div>
@@ -1666,34 +1690,34 @@
 <span class="normal">214</span>
 <span class="normal">215</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">-- MERGE 1</span>
 <span class="n">MERGE</span> <span class="k">INTO</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">imp</span>
-    <span class="k">USING</span>   <span class="p">(</span>   <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
-                        <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
-                                <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">ccf</span>
-                        <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
-                            <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
-                                    <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_ccf</span> <span class="n">t</span>
-                                <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
-                <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
-                <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
-                <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
-                                        <span class="k">FROM</span> <span class="n">x</span>
-                                        <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
+    <span class="k">USING</span> <span class="p">(</span> <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
+                    <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
+                            <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
+                            <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">ccf</span>
+                    <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
+                        <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
+                                <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_ccf</span> <span class="n">t</span>
+                            <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+<span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
+            <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
+            <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
+                                    <span class="k">FROM</span> <span class="n">x</span>
+                                    <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
         <span class="k">ON</span> <span class="p">(</span> <span class="n">imp</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">id_instrument</span> <span class="p">)</span>
 <span class="k">WHEN</span> <span class="n">MATCHED</span> <span class="k">THEN</span>
     <span class="k">UPDATE</span> <span class="k">SET</span>  <span class="n">imp</span><span class="p">.</span><span class="n">ccf</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">ccf</span>
@@ -1701,35 +1725,35 @@
 
 <span class="c1">-- MERGE 2</span>
 <span class="n">MERGE</span> <span class="k">INTO</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_import_measure</span> <span class="n">imp</span>
-    <span class="k">USING</span>   <span class="p">(</span>   <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
-                        <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
-                                <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">yield</span>
-                        <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
-                            <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
-                                    <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_yield</span> <span class="n">t</span>
-                                <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
-                <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
-                <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
-                <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
-                                        <span class="k">FROM</span> <span class="n">x</span>
-                                        <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span>
-                                            <span class="k">AND</span> <span class="n">valid_date</span> <span class="o">&lt;=</span> <span class="n">to_date</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
+    <span class="k">USING</span> <span class="p">(</span> <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
+                    <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
+                            <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
+                            <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">yield</span>
+                    <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
+                        <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
+                                <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_yield</span> <span class="n">t</span>
+                            <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+<span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
+            <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
+            <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
+                                    <span class="k">FROM</span> <span class="n">x</span>
+                                    <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span>
+                                        <span class="k">AND</span> <span class="n">valid_date</span> <span class="o">&lt;=</span> <span class="n">to_date</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
         <span class="k">ON</span> <span class="p">(</span> <span class="n">imp</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">id_instrument</span>
                     <span class="k">AND</span> <span class="n">imp</span><span class="p">.</span><span class="n">measure</span> <span class="o">=</span> <span class="s1">&#39;YIELD&#39;</span> <span class="p">)</span>
 <span class="k">WHEN</span> <span class="n">MATCHED</span> <span class="k">THEN</span>
@@ -1749,35 +1773,35 @@
 
 <span class="c1">-- MERGE 4</span>
 <span class="n">MERGE</span> <span class="k">INTO</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_import_measure</span> <span class="n">imp</span>
-    <span class="k">USING</span>   <span class="p">(</span>   <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
-                        <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
-                                <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
-                                <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
-                                <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">yield</span>
-                        <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
-                            <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
-                                <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
-                                    <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
-                            <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_yield</span> <span class="n">t</span>
-                                <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
-                                    <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
-                                            <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
-                                                    <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
-                <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
-                <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
-                <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
-                                        <span class="k">FROM</span> <span class="n">x</span>
-                                        <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span>
-                                            <span class="k">AND</span> <span class="n">valid_date</span> <span class="o">&lt;=</span> <span class="n">to_date</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
+    <span class="k">USING</span> <span class="p">(</span> <span class="k">WITH</span> <span class="n">x</span> <span class="k">AS</span> <span class="p">(</span>
+                    <span class="k">SELECT</span>  <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span>
+                            <span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span>
+                            <span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span>
+                            <span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="n">product_code</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">valid_date</span>
+                            <span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">yield</span>
+                    <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument</span> <span class="n">a</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">impairment</span> <span class="n">b</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id_instrument</span>
+                        <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">instrument_attribute</span> <span class="k">c</span>
+                            <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">id_instrument</span>
+                                <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id_attribute</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
+                        <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">cfe</span><span class="p">.</span><span class="n">ext_yield</span> <span class="n">t</span>
+                            <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_currency</span> <span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="n">id_currency</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_instrument_type</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="n">b</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">id_portfolio</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="k">AND</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">LIKE</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span>
+                                        <span class="k">OR</span> <span class="p">(</span> <span class="k">c</span><span class="p">.</span><span class="n">attribute_value</span> <span class="k">IS</span> <span class="k">NULL</span>
+                                                <span class="k">AND</span> <span class="n">t</span><span class="p">.</span><span class="n">product_code</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+<span class="k">SELECT</span> <span class="cm">/*+ PARALLEL */</span> <span class="o">*</span>
+            <span class="k">FROM</span> <span class="n">x</span> <span class="n">x1</span>
+            <span class="k">WHERE</span> <span class="n">x1</span><span class="p">.</span><span class="n">valid_date</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">max</span>
+                                    <span class="k">FROM</span> <span class="n">x</span>
+                                    <span class="k">WHERE</span> <span class="n">id_instrument</span> <span class="o">=</span> <span class="n">x1</span><span class="p">.</span><span class="n">id_instrument</span>
+                                        <span class="k">AND</span> <span class="n">valid_date</span> <span class="o">&lt;=</span> <span class="n">to_date</span> <span class="p">)</span> <span class="p">)</span> <span class="n">s</span>
         <span class="k">ON</span> <span class="p">(</span> <span class="n">imp</span><span class="p">.</span><span class="n">id_instrument</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">id_instrument</span>
                     <span class="k">AND</span> <span class="n">imp</span><span class="p">.</span><span class="n">measure</span> <span class="o">=</span> <span class="s1">&#39;YIELD_PP&#39;</span> <span class="p">)</span>
 <span class="k">WHEN</span> <span class="n">MATCHED</span> <span class="k">THEN</span>
@@ -1786,14 +1810,14 @@
 
 <span class="c1">-- MERGE DELETE WHERE</span>
 <span class="n">MERGE</span> <span class="k">INTO</span> <span class="n">empl_current</span> <span class="n">tar</span>
-    <span class="k">USING</span>   <span class="p">(</span>   <span class="k">SELECT</span>  <span class="n">empno</span>
-                        <span class="p">,</span> <span class="n">ename</span>
-                        <span class="p">,</span> <span class="k">CASE</span>
-                                <span class="k">WHEN</span> <span class="n">leavedate</span> <span class="o">&lt;=</span> <span class="n">sysdate</span>
-                                    <span class="k">THEN</span> <span class="s1">&#39;Y&#39;</span>
-                                <span class="k">ELSE</span> <span class="s1">&#39;N&#39;</span>
-                            <span class="k">END</span> <span class="k">AS</span> <span class="n">delete_flag</span>
-                <span class="k">FROM</span> <span class="n">empl</span> <span class="p">)</span> <span class="n">src</span>
+    <span class="k">USING</span> <span class="p">(</span> <span class="k">SELECT</span>  <span class="n">empno</span>
+                    <span class="p">,</span> <span class="n">ename</span>
+                    <span class="p">,</span> <span class="k">CASE</span>
+                            <span class="k">WHEN</span> <span class="n">leavedate</span> <span class="o">&lt;=</span> <span class="n">sysdate</span>
+                                <span class="k">THEN</span> <span class="s1">&#39;Y&#39;</span>
+                            <span class="k">ELSE</span> <span class="s1">&#39;N&#39;</span>
+                        <span class="k">END</span> <span class="k">AS</span> <span class="n">delete_flag</span>
+            <span class="k">FROM</span> <span class="n">empl</span> <span class="p">)</span> <span class="n">src</span>
         <span class="k">ON</span> <span class="p">(</span> <span class="n">tar</span><span class="p">.</span><span class="n">empno</span> <span class="o">=</span> <span class="n">src</span><span class="p">.</span><span class="n">empno</span> <span class="p">)</span>
 <span class="k">WHEN</span> <span class="k">NOT</span> <span class="n">MATCHED</span> <span class="k">THEN</span>
     <span class="k">INSERT</span> <span class="p">(</span> <span class="n">empno</span>
@@ -1837,17 +1861,17 @@
 
 <span class="c1">-- INSERT WITHOUT COLUMNS</span>
 <span class="n">MERGE</span> <span class="cm">/*+ PARALLEL */</span> <span class="k">INTO</span> <span class="n">cfe</span><span class="p">.</span><span class="n">tmp_eab</span> <span class="n">a</span>
-    <span class="k">USING</span>   <span class="p">(</span>   <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL DRIVING_SITE(C) */</span> <span class="k">c</span><span class="p">.</span><span class="o">*</span>
-                <span class="k">FROM</span> <span class="n">tbaadm</span><span class="p">.</span><span class="n">eab</span><span class="o">@</span><span class="n">finnacle</span> <span class="k">c</span>
-                    <span class="k">INNER</span> <span class="k">JOIN</span> <span class="p">(</span>    <span class="k">SELECT</span>  <span class="n">acid</span>
-                                            <span class="p">,</span> <span class="n">eod_date</span>
-                                    <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">tmp_eab</span> <span class="n">e</span>
-                                    <span class="k">WHERE</span> <span class="n">end_eod_date</span> <span class="o">=</span> <span class="p">(</span>  <span class="k">SELECT</span> <span class="k">Max</span><span class="p">(</span> <span class="n">eod_date</span> <span class="p">)</span>
-                                                            <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">tmp_eab</span>
-                                                            <span class="k">WHERE</span> <span class="n">acid</span> <span class="o">=</span> <span class="n">e</span><span class="p">.</span><span class="n">acid</span> <span class="p">)</span>
-                                        <span class="k">AND</span> <span class="n">end_eod_date</span> <span class="o">&lt;</span> <span class="s1">&#39;31-Dec-2099&#39;</span> <span class="p">)</span> <span class="n">d</span>
-                        <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">acid</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="n">acid</span>
-                            <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">eod_date</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="p">.</span><span class="n">eod_date</span> <span class="p">)</span> <span class="n">b</span>
+    <span class="k">USING</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="cm">/*+ PARALLEL DRIVING_SITE(C) */</span> <span class="k">c</span><span class="p">.</span><span class="o">*</span>
+            <span class="k">FROM</span> <span class="n">tbaadm</span><span class="p">.</span><span class="n">eab</span><span class="o">@</span><span class="n">finnacle</span> <span class="k">c</span>
+                <span class="k">INNER</span> <span class="k">JOIN</span> <span class="p">(</span>    <span class="k">SELECT</span>  <span class="n">acid</span>
+                                        <span class="p">,</span> <span class="n">eod_date</span>
+                                <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">tmp_eab</span> <span class="n">e</span>
+                                <span class="k">WHERE</span> <span class="n">end_eod_date</span> <span class="o">=</span> <span class="p">(</span>  <span class="k">SELECT</span> <span class="k">Max</span><span class="p">(</span> <span class="n">eod_date</span> <span class="p">)</span>
+                                                        <span class="k">FROM</span> <span class="n">cfe</span><span class="p">.</span><span class="n">tmp_eab</span>
+                                                        <span class="k">WHERE</span> <span class="n">acid</span> <span class="o">=</span> <span class="n">e</span><span class="p">.</span><span class="n">acid</span> <span class="p">)</span>
+                                    <span class="k">AND</span> <span class="n">end_eod_date</span> <span class="o">&lt;</span> <span class="s1">&#39;31-Dec-2099&#39;</span> <span class="p">)</span> <span class="n">d</span>
+                    <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">acid</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="n">acid</span>
+                        <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">eod_date</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="p">.</span><span class="n">eod_date</span> <span class="p">)</span> <span class="n">b</span>
         <span class="k">ON</span> <span class="p">(</span> <span class="n">a</span><span class="p">.</span><span class="n">acid</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">acid</span>
                     <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">eod_date</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">eod_date</span> <span class="p">)</span>
 <span class="k">WHEN</span> <span class="n">MATCHED</span> <span class="k">THEN</span>
@@ -2480,7 +2504,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Andreas Reichel.
+        &copy; Copyright 2021, Andreas Reichel.
 
     </p>
   </div>

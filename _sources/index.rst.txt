@@ -43,4 +43,4 @@ Platform:
    :hidden:
 
    changelog
-   dependencies
+   demo

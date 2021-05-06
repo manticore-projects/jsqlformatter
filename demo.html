@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dependencies &mdash; JSQLFormatter 0.1.6 documentation</title>
+  <title>Interactive Demo &mdash; JSQLFormatter 0.1.6 documentation</title>
   
 
   
@@ -137,7 +137,7 @@
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-2">Changes 0.1.2</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Dependencies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Interactive Demo</a></li>
 </ul>
 
             
@@ -179,7 +179,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Dependencies</li>
+      <li>Interactive Demo</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -194,9 +194,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h1>
-</div>
+  <div class="section" id="interactive-demo">
+<h1>Interactive Demo<a class="headerlink" href="#interactive-demo" title="Permalink to this headline">¶</a></h1>
+<p>Enter your SQL code and beautify it. Result can be saved as SQL, HTML or RTF.
+Parser Errors will be highlighted. Please report failing valid SQL statements.</p>
+<p>Uses a patched <a class="reference external" href="https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.6/jsqlparser-4.1-SNAPSHOT.jar">JSQLParser Snapshot</a>.</p>
+<iframe id="vboxFrame" src="_static/vbox.html" height="480" width="100%"></iframe></div>
+<script>
+  let url    = "_static/vbox.html";
+  let params = "?"+window.location.search.substr(1);
+  let iframeUrl = url+params;
+  vboxFrame.src = iframeUrl;
+</script></div>
 
 
            </div>
@@ -215,7 +224,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Andreas Reichel.
+        &copy; Copyright 2021, Andreas Reichel.
 
     </p>
   </div>
