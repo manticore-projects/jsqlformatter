@@ -60,6 +60,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.select.OrderByElement.NullOrdering;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.values.ValuesStatement;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.graalvm.nativeimage.IsolateThread;
@@ -1603,28 +1604,7 @@ public class JSQLFormatter {
           (oracleHint != null || distinct != null) ? BreakLine.ALWAYS : BreakLine.AFTER_FIRST;
 
       List<SelectItem> selectItems = plainSelect.getSelectItems();
-      for (SelectItem selectItem : selectItems) {
-        // All Known Implementing Classes:
-        // AllColumns, AllTableColumns, SelectExpressionItem
-        if (selectItem instanceof SelectExpressionItem) {
-          SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
-
-          Alias alias = selectExpressionItem.getAlias();
-          Expression expression = selectExpressionItem.getExpression();
-
-          appendExpression(expression, alias, builder, subIndent, i, selectItems.size(), true, bl);
-        } else if (selectItem instanceof AllColumns) {
-          AllColumns allColumns = (AllColumns) selectItem;
-          appendAllColumns(allColumns, builder, indent, i, selectItems.size());
-        } else if (selectItem instanceof AllTableColumns) {
-          AllTableColumns allTableColumns = (AllTableColumns) selectItem;
-          appendAllTableColumns(allTableColumns, builder, indent, i, selectItems.size());
-        } else if (selectItem != null) {
-          throw new UnsupportedOperationException(selectItem.getClass().getName());
-        }
-
-        i++;
-      }
+			appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
 
       // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
       // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
@@ -1677,10 +1657,50 @@ public class JSQLFormatter {
           k++;
         }
       }
-    } else if (selectBody != null) {
+    } else if (selectBody instanceof ValuesStatement) {
+			ValuesStatement valuesStatement = (ValuesStatement) selectBody;
+			List<Expression> expressions = valuesStatement.getExpressions();
+			
+			int i = 0;
+      if (breakLineBefore) {
+        appendNormalizedLineBreak(builder);
+      }
+      for (int j = 0; indentFirstLine && j < indent; j++) builder.append(indentString);
+			
+			appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
+      appendExpressionsList(expressions, BreakLine.AS_NEEDED, builder, indent);
+			builder.append(" )");
+			
+		} else if (selectBody != null) {
       throw new UnsupportedOperationException(selectBody.getClass().getName());
     }
   }
+
+	public static void appendSelectItemList(List<SelectItem> selectItems, StringBuilder builder,
+																					int subIndent, int i, BreakLine bl, int indent) throws UnsupportedOperationException {
+		for (SelectItem selectItem : selectItems) {
+			// All Known Implementing Classes:
+			// AllColumns, AllTableColumns, SelectExpressionItem
+			if (selectItem instanceof SelectExpressionItem) {
+				SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+				
+				Alias alias = selectExpressionItem.getAlias();
+				Expression expression = selectExpressionItem.getExpression();
+				
+				appendExpression(expression, alias, builder, subIndent, i, selectItems.size(), true, bl);
+			} else if (selectItem instanceof AllColumns) {
+				AllColumns allColumns = (AllColumns) selectItem;
+				appendAllColumns(allColumns, builder, indent, i, selectItems.size());
+			} else if (selectItem instanceof AllTableColumns) {
+				AllTableColumns allTableColumns = (AllTableColumns) selectItem;
+				appendAllTableColumns(allTableColumns, builder, indent, i, selectItems.size());
+			} else if (selectItem != null) {
+				throw new UnsupportedOperationException(selectItem.getClass().getName());
+			}
+			
+			i++;
+		}
+	}
 
   private static void appendOrderByElements(
       List<OrderByElement> orderByElements, StringBuilder builder, int indent) {
@@ -1875,11 +1895,11 @@ public class JSQLFormatter {
     List<SelectItem> selectItems = withItem.getWithItemList();
     if (selectItems != null && selectItems.size() > 0) {
       builder.append("( ");
-      int k = 0;
-      for (SelectItem selectItem : selectItems) {
-        // @todo: write code for selectItems
-        k++;
-      }
+			
+			int subIndent = getSubIndent(builder, indent, selectItems.size() > 1);
+      BreakLine bl = BreakLine.AFTER_FIRST;
+			
+      appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
       builder.append(" ) ");
     }
 
@@ -2430,14 +2450,18 @@ public class JSQLFormatter {
 
   private static void appendExpressionsList(
       ExpressionList expressionList, BreakLine breakLine, StringBuilder builder, int indent) {
-    int size = expressionList.getExpressions().size();
+    appendExpressionsList(expressionList.getExpressions(), breakLine, builder, indent);
+  }
+	
+	private static void appendExpressionsList(
+      List<Expression> expressions, BreakLine breakLine, StringBuilder builder, int indent) {
+    int size = expressions.size();
     int subIndent =
         breakLine.equals(BreakLine.NEVER) || size <= 3
             ? indent
             : getSubIndent(builder, indent, size > 3);
 
     int i = 0;
-    List<Expression> expressions = expressionList.getExpressions();
     for (Expression expression : expressions) {
       switch (breakLine) {
         case AS_NEEDED:
