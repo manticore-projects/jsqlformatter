@@ -20,8 +20,10 @@ package com.manticore.jsqlformatter;
 
 import com.diogonunes.jcolor.AnsiFormat;
 import com.diogonunes.jcolor.Attribute;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1004,6 +1006,30 @@ public class JSQLFormatter {
 
     return builder.toString().trim();
   }
+	
+	public static StringBuilder formatToJava(String sqlStr, int indent, String... options) throws Exception {
+		String formatted = format(sqlStr, options);
+		StringReader stringReader = new StringReader(formatted);
+		BufferedReader bufferedReader = new BufferedReader(stringReader);
+		String line;
+		StringBuilder builder = new StringBuilder();
+		int i=0;
+		while ((line = bufferedReader.readLine())!=null) {
+			if (i>0) {
+				for (int j=0; j<indent - 2 ; j++) {
+					builder.append(" ");
+				}
+				builder.append("+ ");
+			} else {
+				for (int j=0; j<indent; j++) {
+					builder.append(" ");
+				}
+			}
+			builder.append("\"").append(line).append("\"\n");
+			i++;
+		}
+		return builder;
+	}
 
   public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
     ArrayList<Node> nodes = new ArrayList<>();
@@ -1896,17 +1922,69 @@ public class JSQLFormatter {
     if (selectItems != null && selectItems.size() > 0) {
       builder.append("( ");
 			
-			int subIndent = getSubIndent(builder, indent, selectItems.size() > 1);
-      BreakLine bl = BreakLine.AFTER_FIRST;
-			
+			int subIndent = getSubIndent(builder, indent, selectItems.size() > 2);
+      BreakLine bl = selectItems.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+
       appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
       builder.append(" ) ");
     }
+		
+		if (withItem.isUseValues()) {
+			appendNormalizedLineBreak(builder);
+			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+			appendKeyWord(builder, outputFormat, "AS", "", " ( ");
+		} else {
+			appendKeyWord(builder, outputFormat, "AS", "", " (");
+			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+		}
+    
+		if (withItem.isUseValues()) {
+			ItemsList itemsList = withItem.getItemsList();
+			boolean useBracketsForValues = withItem.isUsingBracketsForValues();
+																									 
+			appendKeyWord(builder, outputFormat, "VALUES", "", " ");
 
-    appendKeyWord(builder, outputFormat, "AS", "", " (");
+      if (itemsList instanceof MultiExpressionList) {
+        MultiExpressionList multiExpressionList = (MultiExpressionList) itemsList;
+				int m = multiExpressionList.getExpressionLists().size();
+				int subIndent = getSubIndent(builder, indent, m>1);
+				int k=0;
+        for (Iterator<ExpressionList> it = multiExpressionList.getExprList().iterator();
+            it.hasNext(); ) {
+					
+						if (k > 0) {
+							appendNormalizedLineBreak(builder);
+							for (int j = 0; j < subIndent; j++) builder.append(indentString);
+						}
 
-    for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-    appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
+						switch (separation) {
+							case BEFORE:
+								builder.append(k > 0 ? ", (" : "( ");
+								break;
+							default:
+								builder.append("( ");
+						}
+						appendExpressionsList(it.next().getExpressions(), BreakLine.AS_NEEDED, builder, subIndent);
+						
+						switch (separation) {
+							case AFTER:
+								appendNormalizingTrailingWhiteSpace(builder, i < m - 1 ? " )," : " )");
+								break;
+							case BEFORE:
+								appendNormalizingTrailingWhiteSpace(builder, " )");
+								break;
+						}
+						k++;
+        }
+      } else if (itemsList instanceof ExpressionList) {
+        ExpressionList expressionList = (ExpressionList) itemsList;
+        appendExpressionsList(expressionList, BreakLine.AS_NEEDED, builder, indent);
+//        builder.append(
+//            PlainSelect.getStringList(expressionList.getExpressions(), true, useBracketsForValues));
+      }
+		} else {
+			appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
+		}
 
     switch (separation) {
       case AFTER:
