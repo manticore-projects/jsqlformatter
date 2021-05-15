@@ -508,7 +508,6 @@ public class JSQLFormatter {
   private static void appendDelete(StringBuilder builder, Delete delete, int indent) {
     int i = 0;
 
-    // der.append(com.diogonunes.jcolor.Ansi.generateCode(CLEAR()));
     appendKeyWord(builder, outputFormat, "DELETE", "", " ");
 
     OracleHint oracleHint = delete.getOracleHint();
@@ -557,8 +556,27 @@ public class JSQLFormatter {
 
     Limit limit = delete.getLimit();
     if (limit != null) {
-      // @todo: implement limit in DELETE
-      throw new UnsupportedOperationException("Limit in DELETE is not supported yet.");
+			appendNormalizedLineBreak(builder);
+		  for (int j = 0; j < indent; j++) builder.append(indentString);
+				
+      appendKeyWord(builder, outputFormat, "LIMIT", "", "");
+      if (limit.isLimitNull()) {
+        appendKeyWord(builder, outputFormat, "NULL", " ", "");
+      } else {
+        if (limit.isLimitAll()) {
+          appendKeyWord(builder, outputFormat, "ALL", " ", "");
+        } else {
+          if (null != limit.getOffset()) {
+            appendExpression(
+                limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+            builder.append(", ");
+          }
+          if (null != limit.getRowCount()) {
+            appendExpression(
+                limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+          }
+        }
+      }
     }
   }
 
@@ -990,46 +1008,53 @@ public class JSQLFormatter {
           appendNormalizedLineBreak(builder);
         } catch (Exception ex1) {
 
-          LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
+          if (statementSql.trim().length() <= commentMap.getLength()) {
+            LOGGER.info("Found only comments, but no SQL code.");
+            builder.append(statementSql).append("\n");
+          } else {
 
-          exceptions.add(
-              new Exception(
-                  "Failed for format statement between " + " and " + "\n" + statementSql));
-          builder
-              .append("-- failed to format start\n")
-              .append(statementSql)
-              .append("\n-- failed to format end\n")
-              .append("\n");
+            LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
+
+            exceptions.add(
+                new Exception(
+                    "Failed for format statement between " + " and " + "\n" + statementSql));
+            builder
+                .append("-- failed to format start\n")
+                .append(statementSql)
+                .append("\n-- failed to format end\n")
+                .append("\n");
+          }
         }
       } else break;
     }
 
     return builder.toString().trim();
   }
-	
-	public static StringBuilder formatToJava(String sqlStr, int indent, String... options) throws Exception {
-		String formatted = format(sqlStr, options);
-		StringReader stringReader = new StringReader(formatted);
-		BufferedReader bufferedReader = new BufferedReader(stringReader);
-		String line;
-		StringBuilder builder = new StringBuilder();
-		int i=0;
-		while ((line = bufferedReader.readLine())!=null) {
-			if (i>0) {
-				for (int j=0; j<indent - 2 ; j++) {
-					builder.append(" ");
-				}
-				builder.append("+ ");
-			} else {
-				for (int j=0; j<indent; j++) {
-					builder.append(" ");
-				}
-			}
-			builder.append("\"").append(line).append("\"\n");
-			i++;
-		}
-		return builder;
-	}
+
+  public static StringBuilder formatToJava(String sqlStr, int indent, String... options)
+      throws Exception {
+    String formatted = format(sqlStr, options);
+    StringReader stringReader = new StringReader(formatted);
+    BufferedReader bufferedReader = new BufferedReader(stringReader);
+    String line;
+    StringBuilder builder = new StringBuilder();
+    int i = 0;
+    while ((line = bufferedReader.readLine()) != null) {
+      if (i > 0) {
+        for (int j = 0; j < indent - 2; j++) {
+          builder.append(" ");
+        }
+        builder.append("+ ");
+      } else {
+        for (int j = 0; j < indent; j++) {
+          builder.append(" ");
+        }
+      }
+      builder.append("\"").append(line).append("\"\n");
+      i++;
+    }
+    return builder;
+  }
 
   public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
     ArrayList<Node> nodes = new ArrayList<>();
@@ -1630,7 +1655,7 @@ public class JSQLFormatter {
           (oracleHint != null || distinct != null) ? BreakLine.ALWAYS : BreakLine.AFTER_FIRST;
 
       List<SelectItem> selectItems = plainSelect.getSelectItems();
-			appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
+      appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
 
       // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
       // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
@@ -1659,6 +1684,30 @@ public class JSQLFormatter {
 
       List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
       appendOrderByElements(orderByElements, builder, indent);
+
+      Limit limit = plainSelect.getLimit();
+      if (limit != null) {
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "LIMIT", "", " ");
+        if (limit.isLimitNull()) {
+          appendKeyWord(builder, outputFormat, "NULL", "", " ");
+        } else {
+          if (limit.isLimitAll()) {
+            appendKeyWord(builder, outputFormat, "ALL", " ", " ");
+          } else {
+            if (null != limit.getOffset()) {
+              appendExpression(
+                  limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+              builder.append(", ");
+            }
+            if (null != limit.getRowCount()) {
+              appendExpression(
+                  limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+            }
+          }
+        }
+      }
     } else if (selectBody instanceof SetOperationList) {
       SetOperationList setOperationList = (SetOperationList) selectBody;
 
@@ -1684,49 +1733,55 @@ public class JSQLFormatter {
         }
       }
     } else if (selectBody instanceof ValuesStatement) {
-			ValuesStatement valuesStatement = (ValuesStatement) selectBody;
-			List<Expression> expressions = valuesStatement.getExpressions();
-			
-			int i = 0;
+      ValuesStatement valuesStatement = (ValuesStatement) selectBody;
+      List<Expression> expressions = valuesStatement.getExpressions();
+
+      int i = 0;
       if (breakLineBefore) {
         appendNormalizedLineBreak(builder);
       }
       for (int j = 0; indentFirstLine && j < indent; j++) builder.append(indentString);
-			
-			appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
+
+      appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
       appendExpressionsList(expressions, BreakLine.AS_NEEDED, builder, indent);
-			builder.append(" )");
-			
-		} else if (selectBody != null) {
+      builder.append(" )");
+
+    } else if (selectBody != null) {
       throw new UnsupportedOperationException(selectBody.getClass().getName());
     }
   }
 
-	public static void appendSelectItemList(List<SelectItem> selectItems, StringBuilder builder,
-																					int subIndent, int i, BreakLine bl, int indent) throws UnsupportedOperationException {
-		for (SelectItem selectItem : selectItems) {
-			// All Known Implementing Classes:
-			// AllColumns, AllTableColumns, SelectExpressionItem
-			if (selectItem instanceof SelectExpressionItem) {
-				SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
-				
-				Alias alias = selectExpressionItem.getAlias();
-				Expression expression = selectExpressionItem.getExpression();
-				
-				appendExpression(expression, alias, builder, subIndent, i, selectItems.size(), true, bl);
-			} else if (selectItem instanceof AllColumns) {
-				AllColumns allColumns = (AllColumns) selectItem;
-				appendAllColumns(allColumns, builder, indent, i, selectItems.size());
-			} else if (selectItem instanceof AllTableColumns) {
-				AllTableColumns allTableColumns = (AllTableColumns) selectItem;
-				appendAllTableColumns(allTableColumns, builder, indent, i, selectItems.size());
-			} else if (selectItem != null) {
-				throw new UnsupportedOperationException(selectItem.getClass().getName());
-			}
-			
-			i++;
-		}
-	}
+  public static void appendSelectItemList(
+      List<SelectItem> selectItems,
+      StringBuilder builder,
+      int subIndent,
+      int i,
+      BreakLine bl,
+      int indent)
+      throws UnsupportedOperationException {
+    for (SelectItem selectItem : selectItems) {
+      // All Known Implementing Classes:
+      // AllColumns, AllTableColumns, SelectExpressionItem
+      if (selectItem instanceof SelectExpressionItem) {
+        SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+
+        Alias alias = selectExpressionItem.getAlias();
+        Expression expression = selectExpressionItem.getExpression();
+
+        appendExpression(expression, alias, builder, subIndent, i, selectItems.size(), true, bl);
+      } else if (selectItem instanceof AllColumns) {
+        AllColumns allColumns = (AllColumns) selectItem;
+        appendAllColumns(allColumns, builder, indent, i, selectItems.size());
+      } else if (selectItem instanceof AllTableColumns) {
+        AllTableColumns allTableColumns = (AllTableColumns) selectItem;
+        appendAllTableColumns(allTableColumns, builder, indent, i, selectItems.size());
+      } else if (selectItem != null) {
+        throw new UnsupportedOperationException(selectItem.getClass().getName());
+      }
+
+      i++;
+    }
+  }
 
   private static void appendOrderByElements(
       List<OrderByElement> orderByElements, StringBuilder builder, int indent) {
@@ -1921,70 +1976,72 @@ public class JSQLFormatter {
     List<SelectItem> selectItems = withItem.getWithItemList();
     if (selectItems != null && selectItems.size() > 0) {
       builder.append("( ");
-			
-			int subIndent = getSubIndent(builder, indent, selectItems.size() > 2);
+
+      int subIndent = getSubIndent(builder, indent, selectItems.size() > 2);
       BreakLine bl = selectItems.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
 
       appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
       builder.append(" ) ");
     }
-		
-		if (withItem.isUseValues()) {
-			appendNormalizedLineBreak(builder);
-			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-			appendKeyWord(builder, outputFormat, "AS", "", " ( ");
-		} else {
-			appendKeyWord(builder, outputFormat, "AS", "", " (");
-			for (int j = 0; j < indent + 1; j++) builder.append(indentString);
-		}
-    
-		if (withItem.isUseValues()) {
-			ItemsList itemsList = withItem.getItemsList();
-			boolean useBracketsForValues = withItem.isUsingBracketsForValues();
-																									 
-			appendKeyWord(builder, outputFormat, "VALUES", "", " ");
+
+    if (withItem.isUseValues()) {
+      appendNormalizedLineBreak(builder);
+      for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+      appendKeyWord(builder, outputFormat, "AS", "", " ( ");
+    } else {
+      appendKeyWord(builder, outputFormat, "AS", "", " (");
+      for (int j = 0; j < indent + 1; j++) builder.append(indentString);
+    }
+
+    if (withItem.isUseValues()) {
+      ItemsList itemsList = withItem.getItemsList();
+      boolean useBracketsForValues = withItem.isUsingBracketsForValues();
+
+      appendKeyWord(builder, outputFormat, "VALUES", "", " ");
 
       if (itemsList instanceof MultiExpressionList) {
         MultiExpressionList multiExpressionList = (MultiExpressionList) itemsList;
-				int m = multiExpressionList.getExpressionLists().size();
-				int subIndent = getSubIndent(builder, indent, m>1);
-				int k=0;
+        int m = multiExpressionList.getExpressionLists().size();
+        int subIndent = getSubIndent(builder, indent, m > 1);
+        int k = 0;
         for (Iterator<ExpressionList> it = multiExpressionList.getExprList().iterator();
             it.hasNext(); ) {
-					
-						if (k > 0) {
-							appendNormalizedLineBreak(builder);
-							for (int j = 0; j < subIndent; j++) builder.append(indentString);
-						}
 
-						switch (separation) {
-							case BEFORE:
-								builder.append(k > 0 ? ", (" : "( ");
-								break;
-							default:
-								builder.append("( ");
-						}
-						appendExpressionsList(it.next().getExpressions(), BreakLine.AS_NEEDED, builder, subIndent);
-						
-						switch (separation) {
-							case AFTER:
-								appendNormalizingTrailingWhiteSpace(builder, i < m - 1 ? " )," : " )");
-								break;
-							case BEFORE:
-								appendNormalizingTrailingWhiteSpace(builder, " )");
-								break;
-						}
-						k++;
+          if (k > 0) {
+            appendNormalizedLineBreak(builder);
+            for (int j = 0; j < subIndent; j++) builder.append(indentString);
+          }
+
+          switch (separation) {
+            case BEFORE:
+              builder.append(k > 0 ? ", (" : "( ");
+              break;
+            default:
+              builder.append("( ");
+          }
+          appendExpressionsList(
+              it.next().getExpressions(), BreakLine.AS_NEEDED, builder, subIndent);
+
+          switch (separation) {
+            case AFTER:
+              appendNormalizingTrailingWhiteSpace(builder, i < m - 1 ? " )," : " )");
+              break;
+            case BEFORE:
+              appendNormalizingTrailingWhiteSpace(builder, " )");
+              break;
+          }
+          k++;
         }
       } else if (itemsList instanceof ExpressionList) {
         ExpressionList expressionList = (ExpressionList) itemsList;
         appendExpressionsList(expressionList, BreakLine.AS_NEEDED, builder, indent);
-//        builder.append(
-//            PlainSelect.getStringList(expressionList.getExpressions(), true, useBracketsForValues));
+        //        builder.append(
+        //            PlainSelect.getStringList(expressionList.getExpressions(), true,
+        // useBracketsForValues));
       }
-		} else {
-			appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
-		}
+    } else {
+      appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
+    }
 
     switch (separation) {
       case AFTER:
@@ -2530,8 +2587,8 @@ public class JSQLFormatter {
       ExpressionList expressionList, BreakLine breakLine, StringBuilder builder, int indent) {
     appendExpressionsList(expressionList.getExpressions(), breakLine, builder, indent);
   }
-	
-	private static void appendExpressionsList(
+
+  private static void appendExpressionsList(
       List<Expression> expressions, BreakLine breakLine, StringBuilder builder, int indent) {
     int size = expressions.size();
     int subIndent =

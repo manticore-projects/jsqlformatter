@@ -206,4 +206,13 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
     return builder;
   }
+	
+	public int getLength() {
+		int length = 0;
+		for (Comment c: values()) {
+			length += c.text.length();
+		}
+		
+		return length;
+	}
 }
