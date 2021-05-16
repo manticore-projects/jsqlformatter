@@ -115,6 +115,7 @@
                   <include>com.github.jsqlparser:jsqlparser</include>
                 </includes>
                 <excludes>
+                  <exclude>com.ibm.icu:*</exclude>
                   <exclude>commons-cli:*</exclude>
                   <exclude>JColor:*</exclude>
                 </excludes>

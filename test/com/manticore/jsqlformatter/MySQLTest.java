@@ -24,14 +24,14 @@ import org.junit.runners.Parameterized.Parameters;
 
 /** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
-public class StandardAggregateTest extends StandardSelectTest {
+public class MySQLTest extends StandardSelectTest {
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<Object[]> getSqlMap() {
-    return getSqlMap(StandardAggregateTest.class);
+    return getSqlMap(MySQLTest.class);
   }
 
-  public StandardAggregateTest(String input, String expected) {
+  public MySQLTest(String input, String expected) {
     super(input, expected);
   }
 }

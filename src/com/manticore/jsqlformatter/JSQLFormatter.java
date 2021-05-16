@@ -2541,6 +2541,28 @@ public class JSQLFormatter {
       appendExpressionsList(expressionList, BreakLine.AS_NEEDED, builder, indent);
       builder.append(" )");
 
+    } else if (expression instanceof MySQLGroupConcat) {
+      MySQLGroupConcat mySQLGroupConcat = (MySQLGroupConcat) expression;
+			appendFunction(builder, outputFormat, "GROUP_CONCAT", "", "( ");
+			
+			int subIndent = getSubIndent(builder, indent, true);
+			
+        if (mySQLGroupConcat.isDistinct()) {
+					  appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
+        }
+      appendExpressionsList(
+          mySQLGroupConcat.getExpressionList(), BreakLine.AS_NEEDED, builder, subIndent);
+			  List<OrderByElement> orderByElements = mySQLGroupConcat.getOrderByElements();
+      appendOrderByElements(orderByElements, builder, subIndent);
+			
+			String separator = mySQLGroupConcat.getSeparator();
+        if (separator != null) {
+					appendNormalizedLineBreak(builder);
+					for (int j = 0; j < subIndent; j++) builder.append(indentString);
+					appendKeyWord(builder, outputFormat, "SEPARATOR", "", " " + separator);
+        }
+        builder.append(" )");
+
     } else {
       LOGGER.warning(
           "Unhandled expression: "
