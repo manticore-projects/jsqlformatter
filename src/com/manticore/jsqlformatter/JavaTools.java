@@ -39,7 +39,6 @@ import org.snt.inmemantlr.tree.ParseTreeNode;
  * @author <a href="mailto:andreas@manticore-projects.com">Andreas Reichel</a>
  * @version 0.1
  */
-
 public class JavaTools {
   private static final Logger LOGGER = Logger.getLogger(JavaTools.class.getName());
 
@@ -51,17 +50,50 @@ public class JavaTools {
   }
 
   public static void main(String[] args) {
+
+    /*
+      String columnName = "";
+      String tableName = "";
+      String test2 =
+          new StringBuilder("SELECT ")
+              .append(columnName)
+              .append(" from ")
+              .append(tableName)
+              .append(";")
+              .toString();
+      String test = "SELECT " + columnName + " from " + tableName + ";";
+    */
+
     final String[] escaped = {
       "\"SELECT \" + columnName + \" from \" + noVariableAssigned + \";\";",
       "String test = \"SELECT \" + columnName + \" from \" + tableName + \";\";",
       "String test2 = new StringBuilder(\"SELECT \").append(columnName).append(\" from \").append(tableName).append(\";\").toString();",
       "\"SELECT \" + columnName2 + \" from \" + noVariableAssigned2 + \";\";",
-      "assertSqlCanBeParsedAndDeparsed(\"WITH split (word, str, hascomma) AS (VALUES ('', 'Auto,A,1234444', 1) UNION ALL SELECT substr(str, 0, CASE WHEN instr(str, ',') THEN instr(str, ',') ELSE length(str) + 1 END), ltrim(substr(str, instr(str, ',')), ','), instr(str, ',') FROM split WHERE hascomma) SELECT trim(word) FROM split WHERE word != ''\");"
+      "assertSqlCanBeParsedAndDeparsed(\"WITH split (word, str, hascomma) AS (VALUES ('', 'Auto,A,1234444', 1) UNION ALL SELECT substr(str, 0, CASE WHEN instr(str, ',') THEN instr(str, ',') ELSE length(str) + 1 END), ltrim(substr(str, instr(str, ',')), ','), instr(str, ',') FROM split WHERE hascomma) SELECT trim(word) FROM split WHERE word != ''\");",
+      "StringBuilder queryStrBuilder2 = new StringBuilder()\n"
+          + "	.append(\"WITH split (    word\\n\")\n"
+          + "	.append(\"                , str\\n\")\n"
+          + "	.append(\"                , hascomma ) AS (\\n\")\n"
+          + "	.append(\"        VALUES ( '', 'Auto,A,1234444', 1 )\\n\")\n"
+          + "	.append(\"        UNION ALL\\n\")\n"
+          + "	.append(\"        SELECT  Substr( str, 0, CASE\\n\")\n"
+          + "	.append(\"                        WHEN Instr( str, ',' )\\n\")\n"
+          + "	.append(\"                            THEN Instr( str, ',' )\\n\")\n"
+          + "	.append(\"                        ELSE Length( str ) + 1\\n\")\n"
+          + "	.append(\"                    END )\\n\")\n"
+          + "	.append(\"                , Ltrim( Substr( str, Instr( str, ',' ) ), ',' )\\n\")\n"
+          + "	.append(\"                , Instr( str, ',' )\\n\")\n"
+          + "	.append(\"        FROM split\\n\")\n"
+          + "	.append(\"        WHERE hascomma )\\n\")\n"
+          + "	.append(\"SELECT Trim( word )\\n\")\n"
+          + "	.append(\"FROM split\\n\")\n"
+          + "	.append(\"WHERE word != ''\\n\")\n"
+          + "	.append(\";\\n\");"
     };
     for (String s : escaped) {
       try {
         String sql = formatJava(s);
-        String javaStr = toJavaStringBuilder(sql);
+        String javaStr = toJavaMessageFormat(sql);
 
         System.out.println(javaStr);
       } catch (Exception ex) {
@@ -95,8 +127,8 @@ public class JavaTools {
     gp.setListener(t);
     try {
       gp.compile();
-      gp.writeAntlrAritfactsTo("/tmp/grammar");
-      gp.store("/tmp/grammar/gp.out", true);
+      //gp.writeAntlrAritfactsTo("/tmp/grammar");
+      //gp.store("/tmp/grammar/gp.out", true);
 
       ParseTree parseTree;
       gp.parse(source.toString(), GenericParser.CaseSensitiveType.NONE);
@@ -111,9 +143,13 @@ public class JavaTools {
       append(builder, root, indent, declarations);
 
       for (LocalVariableDeclaration declaration : declarations) {
+				String unformattedSql = declaration.sqlBuilder.toString();
+				unformattedSql= unformattedSql.replace("\\n", " ");
+				unformattedSql= unformattedSql.replace("\\t", " ");
+				
         formatted
             .append("\n")
-            .append(JSQLFormatter.format(declaration.sqlBuilder.toString(), options));
+            .append(JSQLFormatter.format(unformattedSql, options));
       }
     } catch (Exception ex) {
       throw new Exception("Could not parse Java Code:\n" + javaCode, ex);
