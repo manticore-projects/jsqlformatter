@@ -317,15 +317,31 @@ public class JSQLFormatter {
 
   private static StringBuilder appendOperator(
       StringBuilder builder, OutputFormat format, String operator, String before, String after) {
-    switch (format) {
-      case PLAIN:
-        builder.append(before).append(operator).append(after);
+		
+		String s;
+    switch (keywordSpelling) {
+      case UPPER:
+        s = operator.toUpperCase();
         break;
-      case ANSI:
-        builder.append(before).append(ANSI_FORMAT_OPERATOR.format(operator)).append(after);
+      case LOWER:
+        s = operator.toLowerCase();
+        break;
+      case CAMEL:
+        s = toCamelCase(operator);
         break;
       default:
-        builder.append(before).append(operator).append(after);
+        s = operator;
+    }
+		
+    switch (format) {
+      case PLAIN:
+        builder.append(before).append(s).append(after);
+        break;
+      case ANSI:
+        builder.append(before).append(ANSI_FORMAT_OPERATOR.format(s)).append(after);
+        break;
+      default:
+        builder.append(before).append(s).append(after);
         break;
     }
     return builder;
@@ -543,7 +559,7 @@ public class JSQLFormatter {
     Table table = delete.getTable();
     Alias alias = table.getAlias();
 
-    appendFromItem(table, alias, builder, indent, 0, 1);
+    appendTable(table, alias, builder, indent, 0, 1);
 
     List<Join> joins = delete.getJoins();
     appendJoins(joins, builder, indent);
@@ -1243,7 +1259,7 @@ public class JSQLFormatter {
     Table table = merge.getTable();
     Alias alias = table.getAlias();
 
-    appendFromItem(table, alias, builder, indent, 0, 1);
+    appendTable(table, alias, builder, indent, 0, 1);
 
     appendNormalizedLineBreak(builder);
     for (int j = 0; j < indent + 1; j++) builder.append(indentString);
@@ -1267,7 +1283,7 @@ public class JSQLFormatter {
     table = merge.getUsingTable();
     if (table != null) {
       alias = table.getAlias();
-      appendFromItem(table, alias, builder, indent, 0, 1);
+      appendTable(table, alias, builder, indent, 0, 1);
     }
 
     Expression onExpression = merge.getOnCondition();
@@ -1458,7 +1474,7 @@ public class JSQLFormatter {
     Table table = insert.getTable();
     Alias alias = table.getAlias();
 
-    appendFromItem(table, alias, builder, indent, 0, 1);
+    appendTable(table, alias, builder, indent, 0, 1);
 
     List<Column> columns = insert.getColumns();
     if (columns != null) {
@@ -1502,7 +1518,7 @@ public class JSQLFormatter {
     Table table = update.getTable();
     Alias alias = table.getAlias();
 
-    appendFromItem(table, alias, builder, indent, 0, 1);
+    appendTable(table, alias, builder, indent, 0, 1);
 
     int i = 0;
     appendNormalizedLineBreak(builder);
@@ -1660,18 +1676,19 @@ public class JSQLFormatter {
       // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
       // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
       FromItem fromItem = plainSelect.getFromItem();
+				if (fromItem!=null) {
+				i = 0;
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j < indent; j++) builder.append(indentString);
+				appendKeyWord(builder, outputFormat, "FROM", "", " ");
 
-      i = 0;
-      appendNormalizedLineBreak(builder);
-      for (int j = 0; j < indent; j++) builder.append(indentString);
-      appendKeyWord(builder, outputFormat, "FROM", "", " ");
+				appendFromItem(fromItem, builder, indent, i, 1);
 
-      appendFromItem(fromItem, builder, indent, i, 1);
+				i++;
 
-      i++;
-
-      List<Join> joins = plainSelect.getJoins();
-      appendJoins(joins, builder, indent);
+				List<Join> joins = plainSelect.getJoins();
+				appendJoins(joins, builder, indent);
+			}
 
       Expression whereExpression = plainSelect.getWhere();
       appendWhere(whereExpression, builder, indent);
@@ -2639,37 +2656,42 @@ public class JSQLFormatter {
 
   private static void appendFromItem(
       FromItem fromItem, StringBuilder builder, int indent, int i, int n) {
+		
+		if (fromItem!=null) {
+			if (i > 0) {
+				appendNormalizedLineBreak(builder);
+				for (int j = 0; j <= indent; j++) builder.append(indentString);
+			}
 
-    if (i > 0) {
-      appendNormalizedLineBreak(builder);
-      for (int j = 0; j <= indent; j++) builder.append(indentString);
-    }
+			switch (separation) {
+				case BEFORE:
+					builder.append(i > 0 ? ", " : "");
+			}
 
-    switch (separation) {
-      case BEFORE:
-        builder.append(i > 0 ? ", " : "");
-    }
+			Alias alias = fromItem.getAlias();
 
-    Alias alias = fromItem.getAlias();
+			// All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
+			// SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
+			if (fromItem instanceof Table) {
+				Table table = (Table) fromItem;
+				appendTable(table, alias, builder, indent, i, n);
+			} else if (fromItem instanceof SubSelect) {
+				SubSelect subSelect = (SubSelect) fromItem;
+				appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
 
-    // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
-    // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
-    if (fromItem instanceof Table) {
-      Table table = (Table) fromItem;
-      appendFromItem(table, alias, builder, indent, i, n);
-    } else if (fromItem instanceof SubSelect) {
-      SubSelect subSelect = (SubSelect) fromItem;
-      appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
+			} else {
+				//@todo: implement all Implementing Classes correctly
+				
+				LOGGER.warning(fromItem.getClass().getName() + " os not supported yet.");
+				builder.append(fromItem.toString());
+			}
 
-    } else {
-      System.out.println(fromItem.getClass().getName());
-    }
-
-    switch (separation) {
-      case AFTER:
-        appendNormalizingTrailingWhiteSpace(builder, i < n - 1 ? ", " : "");
-        break;
-    }
+			switch (separation) {
+				case AFTER:
+					appendNormalizingTrailingWhiteSpace(builder, i < n - 1 ? ", " : "");
+					break;
+			}
+		}
   }
 
   private static void appendSubSelect(
@@ -2724,16 +2746,18 @@ public class JSQLFormatter {
     }
   }
 
-  private static void appendFromItem(
+  private static void appendTable(
       Table table, Alias alias, StringBuilder builder, int indent, int i, int n) {
+		
+		if (table!=null) {
+			appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
+			if (alias != null) {
+				appendNormalizingTrailingWhiteSpace(builder, " ");
+				if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
 
-    appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
-    if (alias != null) {
-      appendNormalizingTrailingWhiteSpace(builder, " ");
-      if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
-
-      appendAlias(builder, outputFormat, alias.getName(), "", " ");
-    }
+				appendAlias(builder, outputFormat, alias.getName(), "", " ");
+			}
+		}
   }
 
   private static void appendSetOperation(
@@ -3089,7 +3113,7 @@ public class JSQLFormatter {
 
       Alias alias = likeTable.getAlias();
 
-      appendFromItem(likeTable, alias, builder, indent + 1, 0, 1);
+      appendTable(likeTable, alias, builder, indent + 1, 0, 1);
 
       if (selectParenthesis) builder.append(" )");
     }
