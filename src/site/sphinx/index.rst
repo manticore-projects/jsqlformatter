@@ -22,6 +22,9 @@ Features:
     * Comma Before or After
     * Upper/Lower/Camel-Case Spelling of Keywords, Functions and Object Names
 
+  * Import from Java String or StringBuilder Code preserving variables
+  * Export to Java String, StringBuilder or MessageFormat handling variables
+
 .........
 Platform:
 .........	

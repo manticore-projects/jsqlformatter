@@ -6,7 +6,13 @@ Latest Changes
 --------------
 
 .. git_changelog::
-    :rev-list: 0.1.6..
+    :rev-list: 0.1.7..
+
+Changes 0.1.7
+--------------
+
+.. git_changelog::
+    :rev-list: 0.1.6..0.1.7
 
 Changes 0.1.6
 --------------
