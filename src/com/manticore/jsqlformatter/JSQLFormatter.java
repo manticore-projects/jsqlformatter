@@ -317,8 +317,8 @@ public class JSQLFormatter {
 
   private static StringBuilder appendOperator(
       StringBuilder builder, OutputFormat format, String operator, String before, String after) {
-		
-		String s;
+
+    String s;
     switch (keywordSpelling) {
       case UPPER:
         s = operator.toUpperCase();
@@ -332,7 +332,7 @@ public class JSQLFormatter {
       default:
         s = operator;
     }
-		
+
     switch (format) {
       case PLAIN:
         builder.append(before).append(s).append(after);
@@ -572,9 +572,9 @@ public class JSQLFormatter {
 
     Limit limit = delete.getLimit();
     if (limit != null) {
-			appendNormalizedLineBreak(builder);
-		  for (int j = 0; j < indent; j++) builder.append(indentString);
-				
+      appendNormalizedLineBreak(builder);
+      for (int j = 0; j < indent; j++) builder.append(indentString);
+
       appendKeyWord(builder, outputFormat, "LIMIT", "", "");
       if (limit.isLimitNull()) {
         appendKeyWord(builder, outputFormat, "NULL", " ", "");
@@ -1676,19 +1676,19 @@ public class JSQLFormatter {
       // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
       // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
       FromItem fromItem = plainSelect.getFromItem();
-				if (fromItem!=null) {
-				i = 0;
-				appendNormalizedLineBreak(builder);
-				for (int j = 0; j < indent; j++) builder.append(indentString);
-				appendKeyWord(builder, outputFormat, "FROM", "", " ");
+      if (fromItem != null) {
+        i = 0;
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "FROM", "", " ");
 
-				appendFromItem(fromItem, builder, indent, i, 1);
+        appendFromItem(fromItem, builder, indent, i, 1);
 
-				i++;
+        i++;
 
-				List<Join> joins = plainSelect.getJoins();
-				appendJoins(joins, builder, indent);
-			}
+        List<Join> joins = plainSelect.getJoins();
+        appendJoins(joins, builder, indent);
+      }
 
       Expression whereExpression = plainSelect.getWhere();
       appendWhere(whereExpression, builder, indent);
@@ -1704,8 +1704,8 @@ public class JSQLFormatter {
 
       Limit limit = plainSelect.getLimit();
       if (limit != null) {
-				appendNormalizedLineBreak(builder);
-				for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) builder.append(indentString);
         appendKeyWord(builder, outputFormat, "LIMIT", "", " ");
         if (limit.isLimitNull()) {
           appendKeyWord(builder, outputFormat, "NULL", "", " ");
@@ -2560,25 +2560,25 @@ public class JSQLFormatter {
 
     } else if (expression instanceof MySQLGroupConcat) {
       MySQLGroupConcat mySQLGroupConcat = (MySQLGroupConcat) expression;
-			appendFunction(builder, outputFormat, "GROUP_CONCAT", "", "( ");
-			
-			int subIndent = getSubIndent(builder, indent, true);
-			
-        if (mySQLGroupConcat.isDistinct()) {
-					  appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
-        }
+      appendFunction(builder, outputFormat, "GROUP_CONCAT", "", "( ");
+
+      int subIndent = getSubIndent(builder, indent, true);
+
+      if (mySQLGroupConcat.isDistinct()) {
+        appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
+      }
       appendExpressionsList(
           mySQLGroupConcat.getExpressionList(), BreakLine.AS_NEEDED, builder, subIndent);
-			  List<OrderByElement> orderByElements = mySQLGroupConcat.getOrderByElements();
+      List<OrderByElement> orderByElements = mySQLGroupConcat.getOrderByElements();
       appendOrderByElements(orderByElements, builder, subIndent);
-			
-			String separator = mySQLGroupConcat.getSeparator();
-        if (separator != null) {
-					appendNormalizedLineBreak(builder);
-					for (int j = 0; j < subIndent; j++) builder.append(indentString);
-					appendKeyWord(builder, outputFormat, "SEPARATOR", "", " " + separator);
-        }
-        builder.append(" )");
+
+      String separator = mySQLGroupConcat.getSeparator();
+      if (separator != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "SEPARATOR", "", " " + separator);
+      }
+      builder.append(" )");
 
     } else {
       LOGGER.warning(
@@ -2656,42 +2656,42 @@ public class JSQLFormatter {
 
   private static void appendFromItem(
       FromItem fromItem, StringBuilder builder, int indent, int i, int n) {
-		
-		if (fromItem!=null) {
-			if (i > 0) {
-				appendNormalizedLineBreak(builder);
-				for (int j = 0; j <= indent; j++) builder.append(indentString);
-			}
 
-			switch (separation) {
-				case BEFORE:
-					builder.append(i > 0 ? ", " : "");
-			}
+    if (fromItem != null) {
+      if (i > 0) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j <= indent; j++) builder.append(indentString);
+      }
 
-			Alias alias = fromItem.getAlias();
+      switch (separation) {
+        case BEFORE:
+          builder.append(i > 0 ? ", " : "");
+      }
 
-			// All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
-			// SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
-			if (fromItem instanceof Table) {
-				Table table = (Table) fromItem;
-				appendTable(table, alias, builder, indent, i, n);
-			} else if (fromItem instanceof SubSelect) {
-				SubSelect subSelect = (SubSelect) fromItem;
-				appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
+      Alias alias = fromItem.getAlias();
 
-			} else {
-				//@todo: implement all Implementing Classes correctly
-				
-				LOGGER.warning(fromItem.getClass().getName() + " os not supported yet.");
-				builder.append(fromItem.toString());
-			}
+      // All Known Implementing Classes: LateralSubSelect, ParenthesisFromItem,
+      // SpecialSubSelect, SubJoin, SubSelect, Table, TableFunction, ValuesList
+      if (fromItem instanceof Table) {
+        Table table = (Table) fromItem;
+        appendTable(table, alias, builder, indent, i, n);
+      } else if (fromItem instanceof SubSelect) {
+        SubSelect subSelect = (SubSelect) fromItem;
+        appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
 
-			switch (separation) {
-				case AFTER:
-					appendNormalizingTrailingWhiteSpace(builder, i < n - 1 ? ", " : "");
-					break;
-			}
-		}
+      } else {
+        // @todo: implement all Implementing Classes correctly
+
+        LOGGER.warning(fromItem.getClass().getName() + " os not supported yet.");
+        builder.append(fromItem.toString());
+      }
+
+      switch (separation) {
+        case AFTER:
+          appendNormalizingTrailingWhiteSpace(builder, i < n - 1 ? ", " : "");
+          break;
+      }
+    }
   }
 
   private static void appendSubSelect(
@@ -2748,16 +2748,16 @@ public class JSQLFormatter {
 
   private static void appendTable(
       Table table, Alias alias, StringBuilder builder, int indent, int i, int n) {
-		
-		if (table!=null) {
-			appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
-			if (alias != null) {
-				appendNormalizingTrailingWhiteSpace(builder, " ");
-				if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
 
-				appendAlias(builder, outputFormat, alias.getName(), "", " ");
-			}
-		}
+    if (table != null) {
+      appendObjectName(builder, outputFormat, table.getFullyQualifiedName(), "", "");
+      if (alias != null) {
+        appendNormalizingTrailingWhiteSpace(builder, " ");
+        if (alias.isUseAs()) appendKeyWord(builder, outputFormat, "AS", "", " ");
+
+        appendAlias(builder, outputFormat, alias.getName(), "", " ");
+      }
+    }
   }
 
   private static void appendSetOperation(

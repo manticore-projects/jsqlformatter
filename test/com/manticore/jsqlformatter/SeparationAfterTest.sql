@@ -1,4 +1,3 @@
-
 -- INSERT NEW LEDGER ACCOUNTS
 -- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 select /*+ parallel */
@@ -18,9 +17,9 @@ from (  select *
                 from CFE.LEDGER_BRANCH C
                     inner join CFE.ACCOUNTING_SCOPE C1
                         on C1.ID_ACCOUNTING_SCOPE = C.ID_ACCOUNTING_SCOPE
-                            AND C1.ID_STATUS = 'C',
+                            and C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D
-                MINUS
+                minus
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -29,7 +28,7 @@ from (  select *
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D
                         on C.ID_CURRENCY = D.ID_CURRENCY )
-        UNION
+        union
         select *
         from (  select distinct
                     C.CODE,
@@ -39,9 +38,9 @@ from (  select *
                 from CFE.LEDGER_BRANCH C
                     inner join CFE.ACCOUNTING_SCOPE C1
                         on C1.ID_ACCOUNTING_SCOPE = C.ID_ACCOUNTING_SCOPE
-                            AND C1.ID_STATUS = 'C',
+                            and C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D
-                MINUS
+                minus
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -50,7 +49,7 @@ from (  select *
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D
                         on C.ID_CURRENCY = D.ID_CURRENCY )
-        UNION
+        union
         select *
         from (  select distinct
                     C.CODE CODE,
@@ -60,10 +59,10 @@ from (  select *
                 from CFE.LEDGER_BRANCH C
                     inner join CFE.ACCOUNTING_SCOPE C1
                         on C1.ID_ACCOUNTING_SCOPE = C.ID_ACCOUNTING_SCOPE
-                            AND C1.ID_STATUS = 'C',
+                            and C1.ID_STATUS = 'C',
                     COMMON.LEDGER_CURRENCY D,
                     CFE.FEE_TYPE E
-                MINUS
+                minus
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
@@ -81,16 +80,16 @@ with SCOPE as (
         select *
         from CFE.ACCOUNTING_SCOPE
         where ID_STATUS = 'C'
-            AND ID_ACCOUNTING_SCOPE_CODE = :SCOPE ),
+            and ID_ACCOUNTING_SCOPE_CODE = :SCOPE ),
     EX as (
         select *
         from CFE.EXECUTION
         where ID_STATUS = 'R'
-            AND VALUE_DATE = (  select Max( VALUE_DATE )
+            and VALUE_DATE = (  select Max( VALUE_DATE )
                                 from CFE.EXECUTION
                                 where ID_STATUS = 'R'
-                                    AND ( :VALUE_DATE IS NULL
-                                            OR VALUE_DATE <= :VALUE_DATE ) ) ),
+                                    and ( :VALUE_DATE is null
+                                            or VALUE_DATE <= :VALUE_DATE ) ) ),
     FXR as (
         select  ID_CURRENCY_FROM,
                 FXRATE
@@ -100,10 +99,10 @@ with SCOPE as (
         where F.VALUE_DATE = (  select Max( VALUE_DATE )
                                 from COMMON.FXRATE_HST
                                 where ID_CURRENCY_FROM = F.ID_CURRENCY_FROM
-                                    AND ID_CURRENCY_INTO = F.ID_CURRENCY_INTO
-                                    AND VALUE_DATE <= EX.VALUE_DATE )
-            AND ID_CURRENCY_INTO = :BOOK_CURRENCY
-        UNION ALL
+                                    and ID_CURRENCY_INTO = F.ID_CURRENCY_INTO
+                                    and VALUE_DATE <= EX.VALUE_DATE )
+            and ID_CURRENCY_INTO = :BOOK_CURRENCY
+        union all
         select  :BOOK_CURRENCY,
                 1
         from DUAL )
@@ -119,10 +118,10 @@ from EX,
     SCOPE
     inner join CFE.LEDGER_BRANCH_BRANCH A
         on A.ID_ACCOUNTING_SCOPE = SCOPE.ID_ACCOUNTING_SCOPE
-            AND A.CODE = A.CODE_INFERIOR
+            and A.CODE = A.CODE_INFERIOR
     inner join CFE.LEDGER_BRANCH B
         on B.ID_ACCOUNTING_SCOPE = SCOPE.ID_ACCOUNTING_SCOPE
-            AND B.CODE = A.CODE
+            and B.CODE = A.CODE
     inner join (    select  B.CODE,
                             Round( D.AMOUNT * FXR.FXRATE, 2 ) BALANCE_BC
                     from SCOPE
@@ -130,7 +129,7 @@ from EX,
                             on B.ID_ACCOUNTING_SCOPE = SCOPE.ID_ACCOUNTING_SCOPE
                         inner join CFE.LEDGER_ACCOUNT C
                             on B.CODE_INFERIOR = C.CODE
-                                AND C.ID_ACCOUNTING_SCOPE_CODE = SCOPE.ID_ACCOUNTING_SCOPE_CODE
+                                and C.ID_ACCOUNTING_SCOPE_CODE = SCOPE.ID_ACCOUNTING_SCOPE_CODE
                         inner join (    select  ID_ACCOUNT,
                                                 Sum( AMOUNT ) BALANCE
                                         from (  select  ID_ACCOUNT_CREDIT ID_ACCOUNT,
@@ -138,7 +137,7 @@ from EX,
                                                 from CFE.LEDGER_ACCOUNT_ENTRY
                                                     inner join EX
                                                         on LEDGER_ACCOUNT_ENTRY.POSTING_DATE <= EX.POSTING_DATE
-                                                UNION ALL
+                                                union all
                                                 select  ID_ACCOUNT_DEBIT,
                                                         - AMOUNT
                                                 from CFE.LEDGER_ACCOUNT_ENTRY
@@ -194,5 +193,5 @@ from (  select distinct
         from CFE.INSTRUMENT_ATTRIBUTE A
             left join CFE.ATTRIBUTE_VALUE_REF B
                 on A.ATTRIBUTE_VALUE = B.ATTRIBUTE_VALUE
-        where B.ATTRIBUTE_VALUE IS NULL ) A
+        where B.ATTRIBUTE_VALUE is null ) A
 ;
