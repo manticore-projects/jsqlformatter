@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>2. How to use it &mdash; JSQLFormatter 0.1.6 documentation</title>
+  <title>2. How to use it &mdash; JSQLFormatter 0.1.7 documentation</title>
   
 
   
@@ -19,6 +20,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -37,6 +39,10 @@
   
 
   
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
     <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
   
 
@@ -44,7 +50,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="JSQLFormatter 0.1.6 documentation" href="index.html"/>
+    <link rel="top" title="JSQLFormatter 0.1.7 documentation" href="index.html"/>
         <link rel="next" title="3. Samples" href="samples.html"/>
         <link rel="prev" title="1. Installation" href="install.html"/> 
 
@@ -132,6 +138,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#latest-changes">Latest Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-7">Changes 0.1.7</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-6">Changes 0.1.6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-5">Changes 0.1.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#changes-0-1-4">Changes 0.1.4</a></li>
@@ -196,9 +203,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="how-to-use-it">
+  <section id="how-to-use-it">
 <h1><span class="section-number">2. </span>How to use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="static-binaries">
+<section id="static-binaries">
 <h2><span class="section-number">2.1. </span>Static Binaries<a class="headerlink" href="#static-binaries" title="Permalink to this headline">¶</a></h2>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">JVM</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Linux Shell</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Windows Power Shell</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>java -jar JSQLFormatter.jar <span class="o">[</span>-i &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-o &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>-f &lt;arg&gt; <span class="p">|</span> --ansi <span class="p">|</span> --html<span class="o">]</span>   <span class="o">[</span>-t &lt;arg&gt; <span class="p">|</span> -2 <span class="p">|</span> -8<span class="o">]</span>   <span class="o">[</span>--keywordSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--functionSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--objectSpelling &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--separation &lt;arg&gt;<span class="o">]</span> <span class="o">[</span>--squareBracketQuotation &lt;arg&gt;<span class="o">]</span> --squareBracketQuotation &lt;arg&gt;
@@ -211,7 +218,7 @@
 </pre></div>
 </div>
 </div></div>
-<div class="section" id="command-line-options-cli">
+<section id="command-line-options-cli">
 <h3><span class="section-number">2.1.1. </span>Command Line Options (CLI)<a class="headerlink" href="#command-line-options-cli" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd><span class="option">--inputFile</span>, <span class="option">-i <var>&lt;arg&gt;</var></span></kbd></dt>
@@ -272,9 +279,9 @@
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="dynamic-libraries">
+</section>
+</section>
+<section id="dynamic-libraries">
 <h2><span class="section-number">2.2. </span>Dynamic Libraries<a class="headerlink" href="#dynamic-libraries" title="Permalink to this headline">¶</a></h2>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Java</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">C++</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">com.manticore.jsqlformatter.JSqlFormatter</span><span class="p">;</span>
@@ -312,8 +319,8 @@
 </pre></div>
 </div>
 </div></div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -356,12 +363,13 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.6',
+            VERSION:'0.1.7',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE: 'true'
         };
     </script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>

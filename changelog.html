@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; JSQLFormatter 0.1.6 documentation</title>
+  <title>Changelog &mdash; JSQLFormatter 0.1.7 documentation</title>
   
 
   
@@ -19,6 +20,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -36,6 +38,10 @@
   
 
   
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
     <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
   
 
@@ -43,7 +49,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="JSQLFormatter 0.1.6 documentation" href="index.html"/>
+    <link rel="top" title="JSQLFormatter 0.1.7 documentation" href="index.html"/>
         <link rel="next" title="Interactive Demo" href="demo.html"/>
         <link rel="prev" title="3. Samples" href="samples.html"/> 
 
@@ -131,6 +137,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#latest-changes">Latest Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changes-0-1-7">Changes 0.1.7</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#changes-0-1-6">Changes 0.1.6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#changes-0-1-5">Changes 0.1.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#changes-0-1-4">Changes 0.1.4</a></li>
@@ -195,11 +202,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="changelog">
+  <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="latest-changes">
+<section id="latest-changes">
 <h2>Latest Changes<a class="headerlink" href="#latest-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+</ul>
+</section>
+<section id="changes-0-1-7">
+<h2>Changes 0.1.7<a class="headerlink" href="#changes-0-1-7" title="Permalink to this headline">¶</a></h2>
 <ul>
+<li><p><strong>Prepare release 0.1.7</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-18 03:44:24</em></p></li>
+<li><p><strong>use a more complex sample based on MessageFormat</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-18 03:27:13</em></p></li>
+<li><p><strong>filter left over \n or \t </strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-18 03:18:09</em></p></li>
+<li><p><strong>Implement toJavaString, toJavaStringBuilder and toJavaMessageFormat</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-18 02:48:52</em></p></li>
+<li><p><strong>FromItem not mandatory in H2/MySQL and friends, fixes issue #6</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-18 01:08:46</em></p>
+<p>Upper-/Lower-Case spelling of operators, fixes issue #5</p>
+</li>
+<li><p><strong>Implement MySQL Group_Concat(), fixes issue #4</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-16 09:15:23</em></p></li>
+<li><p><strong>Do not throw an exception on empty statements with comments only, fixes issue #2</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-15 12:34:04</em></p>
+<p>Format LIMIT OFFSET properly, fixes issue #3</p>
+</li>
+<li><p><strong>Better WITH VALUES list support</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-10 07:17:52</em></p>
+<p>Insert From Java</p>
+</li>
 <li><p><strong>Add WITH statements with SelectItems and Value Expression List</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-07 03:47:49</em></p></li>
 <li><p><strong>Incorporate Nested WITHs based on Subqueries</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-06 05:18:09</em></p>
 <p>Develop interactive Demo</p>
@@ -207,8 +233,8 @@
 <li><p><strong>re-format code</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-04 00:15:23</em></p></li>
 <li><p><strong>corrections</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-01 09:42:34</em></p></li>
 </ul>
-</div>
-<div class="section" id="changes-0-1-6">
+</section>
+<section id="changes-0-1-6">
 <h2>Changes 0.1.6<a class="headerlink" href="#changes-0-1-6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><strong>Update documentation for 0.1.6</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-05-01 09:13:58</em></p></li>
@@ -225,8 +251,8 @@
 <li><p><strong>Merge origin/main into main</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-29 13:17:03</em></p></li>
 <li><p><strong>Finalize documentation</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-29 12:49:02</em></p></li>
 </ul>
-</div>
-<div class="section" id="changes-0-1-5">
+</section>
+<section id="changes-0-1-5">
 <h2>Changes 0.1.5<a class="headerlink" href="#changes-0-1-5" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>Finalize documentation</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-29 12:49:02</em></p></li>
@@ -248,8 +274,8 @@
 <li><p><strong>Improve the Comment formatting for multi-line comments</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-26 14:37:03</em></p></li>
 <li><p><strong>Update the Readme for 0.1.4</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-25 06:11:32</em></p></li>
 </ul>
-</div>
-<div class="section" id="changes-0-1-4">
+</section>
+<section id="changes-0-1-4">
 <h2>Changes 0.1.4<a class="headerlink" href="#changes-0-1-4" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>Improve the documentation</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-25 05:36:57</em></p></li>
@@ -268,8 +294,8 @@
 <li><p><strong>Update README.md</strong><span> by </span><em>manticore-projects</em><span> at </span><em>2021-04-19 07:03:14</em></p></li>
 <li><p><strong>Update README.md</strong><span> by </span><em>manticore-projects</em><span> at </span><em>2021-04-19 07:02:16</em></p></li>
 </ul>
-</div>
-<div class="section" id="changes-0-1-3">
+</section>
+<section id="changes-0-1-3">
 <h2>Changes 0.1.3<a class="headerlink" href="#changes-0-1-3" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>Update README.md</strong><span> by </span><em>manticore-projects</em><span> at </span><em>2021-04-19 06:55:56</em></p></li>
@@ -293,8 +319,8 @@ Bump to 0.1.3</p>
 <li><p><strong>Support MergeInsert WHERE clause </strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-12 00:20:33</em></p></li>
 <li><p><strong>Reduce the size for the Ueber-JAR</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-11 14:28:16</em></p></li>
 </ul>
-</div>
-<div class="section" id="changes-0-1-2">
+</section>
+<section id="changes-0-1-2">
 <h2>Changes 0.1.2<a class="headerlink" href="#changes-0-1-2" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>Update the README</strong><span> by </span><em>Andreas Reichel</em><span> at </span><em>2021-04-11 13:51:42</em></p></li>
@@ -326,8 +352,8 @@ correct the unit tests</p>
 </li>
 <li><p><strong>Initial commit</strong><span> by </span><em>manticore-projects</em><span> at </span><em>2021-04-09 03:10:31</em></p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -370,12 +396,13 @@ correct the unit tests</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.6',
+            VERSION:'0.1.7',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE: 'true'
         };
     </script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>

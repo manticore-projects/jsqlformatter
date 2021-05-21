@@ -50,21 +50,21 @@ Static Binaries
      - File
      - Size
    * - Linux x64
-     - :downloads:`JSQLFormatter <0.1.6/JSQLFormatter>`
-     - (3.1 MB) 
+     - :downloads:`JSQLFormatter <0.1.7/JSQLFormatter>`
+     - (3 MB) 
    * - Windows x64
-     - :downloads:`JSQLFormatter.exe <0.1.6/JSQLFormatter.exe>`
-     - (2.9 MB) 
+     - :downloads:`JSQLFormatter.exe <0.1.7/JSQLFormatter.exe>`
+     - (3 MB) 
    * - Java
-     - :downloads:`JSQLFormatter.jar <0.1.6/JSQLFormatter-0.1.6.jar>`
+     - :downloads:`JSQLFormatter.jar <0.1.7/JSQLFormatter-0.1.7.jar>`
      - (700 kB) 
    * - MacOS
-     - :downloads:`JSQLFormatter.dmg <0.1.6/JSQLFormatter.dmg>`
-     - (2.9 MB) 
+     - :downloads:`JSQLFormatter.dmg <0.1.7/JSQLFormatter.dmg>`
+     - (3 MB) 
      
 .. note::
 
-  On MacOS, grant an exception for a blocked app by clicking the Open Anyway button in the General pane of Security & Privacy preferences.s
+  On MacOS, grant an exception for a blocked app by clicking the Open Anyway button in the General pane of Security & Privacy preferences.
 
 Native Dynamic Libraries
 ---------------------------------------------
@@ -82,5 +82,5 @@ Plugins
      - File
      - Size
    * - Netbeans 12
-     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.6/externalcodeformatter-sql.nbm>`
+     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.7/externalcodeformatter-sql.nbm>`
      - (45.2 MB) 
