@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://oss.sonatype.org/content/groups/public/')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    implementation 'com.github.jsqlparser:jsqlparser:4.2-SNAPSHOT'
+    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'com.diogonunes:JColor:5.0.1'
+    implementation 'org.graalvm.sdk:graal-sdk:21.0.0.2'
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'com.github.julianthome:inmemantlr-api:1.9.0'
+    testImplementation 'junit:junit:4.12'
+}
+
+group = 'com.manticore-projects.jsqlformatter'
+version = '0.1.9'
+description = 'JSQLFormatter'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

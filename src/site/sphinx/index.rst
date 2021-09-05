@@ -39,6 +39,7 @@ Platform:
 
    install
    usage
+   syntax
    samples
 
 .. toctree::

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.manticore-projects.jsqlformatter</groupId>
 	<artifactId>jsqlformatter</artifactId>
-	<version>0.1.7</version>
+	<version>0.1.8</version>
 	<packaging>jar</packaging>
 	<name>JSQLFormatter</name>
 	<description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>com.github.jsqlparser</groupId>
 			<artifactId>jsqlparser</artifactId>
-			<version>4.1-SNAPSHOT</version>
+			<version>4.2-SNAPSHOT</version>
 		</dependency>
     
 		<!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
@@ -81,7 +81,7 @@
 		<dependency>
     <groupId>com.github.julianthome</groupId>
     <artifactId>inmemantlr-api</artifactId>
-    <version>1.7.0</version>
+    <version>1.9.0</version>
 </dependency>
 
     
