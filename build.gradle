@@ -47,3 +47,9 @@ publishing {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+tasks.withType(Test)  {
+    maxParallelForks = 100
+    forkEvery = 1
+}
+
