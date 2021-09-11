@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 repositories {
@@ -15,7 +16,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.jsqlparser:jsqlparser:4.2-SNAPSHOT'
+    implementation 'com.github.jsqlparser:jsqlparser:4.3-SNAPSHOT'
+    
     implementation 'commons-cli:commons-cli:1.4'
     implementation 'com.diogonunes:JColor:5.0.1'
     implementation 'org.graalvm.sdk:graal-sdk:21.0.0.2'
@@ -27,9 +29,9 @@ dependencies {
 group = 'com.manticore-projects.jsqlformatter'
 version = '0.1.9'
 description = 'JSQLFormatter'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
     withJavadocJar()
 }
