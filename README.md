@@ -58,17 +58,17 @@ java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
   <dependency>
     <groupId>com.manticore-projects.jsqlformatter</groupId>
     <artifactId>jsqlformatter</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.9</version>
   </dependency>
   ```
 
 * Multi Platform Binaries:
-	- JVM: [jsqlformatter-0.1.7.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.7/jsqlformatter-0.1.7.jar)
-(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.7/jsqlformatter-0.1.7.jar.asc)
-, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.7/jsqlformatter-0.1.7.jar.sha1))
-	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.7/JSQLFormatter) (3 MB, ELF 64-bit LSB pie executable)
-	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.7/JSQLFormatter.exe) (3 MB, PE32+ executable)
-	- MacOS:  [JSQLFormatter.dmg](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.7/JSQLFormatter.dmg) (3 MB, zlib compressed data)
+	- JVM: [jsqlformatter-0.1.9.jar](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.9/jsqlformatter-0.1.9.jar)
+(585kb, [signature(.asc)](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.9/jsqlformatter-0.1.9.jar.asc)
+, checksum: [SHA-1](https://repo1.maven.org/maven2/com/manticore-projects/jsqlformatter/jsqlformatter/0.1.9/jsqlformatter-0.1.9.jar.sha1))
+	- Linux: [JSQLFormatter](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.9/JSQLFormatter) (3 MB, ELF 64-bit LSB pie executable)
+	- Windows: [JSQLFormatter.exe](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.9/JSQLFormatter.exe) (3 MB, PE32+ executable)
+	- MacOS:  [JSQLFormatter.dmg](https://github.com/manticore-projects/jsqlformatter/releases/download/0.1.9/JSQLFormatter.dmg) (3 MB, zlib compressed data)
 
 * RDBMS agnostic, works with Oracle, MS SQL Server, Postgres, H2 etc.
 * tested against hundreds of complex, real life SQL statements of the [Manticore IFRS Accounting Software](http://manticore-projects.com)

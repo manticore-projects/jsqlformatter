@@ -4,36 +4,16 @@ import sys, os
 sys.path.append('/home/are/.local/lib/python3.9/site-packages')
 import sphinx_redactor_theme, rtcat_sphinx_theme
 
-#
-# parsing maven pom.xml
-from xml.etree import ElementTree as et
-
-namespaces = {'xmlns' : 'http://maven.apache.org/POM/4.0.0'}
-
-tree = et.parse('../../../pom.xml')
-root = tree.getroot()
-
-artifactId = root.find("xmlns:artifactId", namespaces=namespaces).text
-projectName = root.find("xmlns:name", namespaces=namespaces).text
-versionName = root.find("xmlns:version", namespaces=namespaces).text
-developerName = root.find("xmlns:developers/xmlns:developer[1]/xmlns:name", namespaces=namespaces).text
-
-#deps = root.findall("xmlns:dependency[xmlns:artifactId='jsqlparser']", namespaces=namespaces)
-#print(deps)
-
-#for d in deps:
-#   artifactId = d.find("xmlns:artifactId", namespaces=namespaces)
-#   version1   = d.find("xmlns:version", namespaces=namespaces)
-#   print(artifactId.text + '\t' + version1.text)
-
-####################################
-
-email_support = "andreas@manticore-projects.com"
-
 #rst_epilog = """
 #.. |EMAIL| replace:: {0}
 #.. |VERSION| replace:: {1}
 #""".format(email_support, versionName)
+
+artifactId = "com.manticore-projects.jsqlformatter"
+projectName = "JSQLFormatter"
+versionName = "0.1.9"
+developerName = "Andreas Reichel"
+email_support = "andreas@manticore-projects.com"
 
 rst_prolog = """
 .. |EMAIL| replace:: {0}

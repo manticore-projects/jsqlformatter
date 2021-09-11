@@ -5,12 +5,12 @@ Samples
 Create
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardCreateTableTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCreateTableTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardCreateIndexTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCreateIndexTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -18,7 +18,7 @@ Create
 Alter
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardAlterTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardAlterTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -26,7 +26,7 @@ Alter
 Select
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardSelectTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardSelectTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -35,7 +35,7 @@ Select
 Merge
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardMergeTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardMergeTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -43,7 +43,7 @@ Merge
 Insert
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardInsertTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardInsertTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -52,7 +52,7 @@ Insert
 Update
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardUpdateTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardUpdateTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -61,7 +61,7 @@ Update
 Comments
 --------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/StandardCommentTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCommentTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -69,19 +69,19 @@ Comments
 MS Sql Server
 -------------------
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/BracketQuotationTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/BracketQuotationTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/MsSqlServerTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/MsSqlServerTest.sql
   :language: SQL
   :force:
   :linenos:
 
 Formatting Options
 -------------------
-.. literalinclude:: ../../../test/com/manticore/jsqlformatter/FormattingOptionsTest.sql
+.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/FormattingOptionsTest.sql
   :language: SQL
   :force:
   :linenos:

@@ -17,6 +17,12 @@ Git
       
         mvn install
 
+   .. tab:: Gradle
+
+      .. code:: Bash
+
+        gradle build
+
    .. tab:: Ant
 
       .. code:: Bash
@@ -50,16 +56,16 @@ Static Binaries
      - File
      - Size
    * - Linux x64
-     - :downloads:`JSQLFormatter <0.1.7/JSQLFormatter>`
+     - :downloads:`JSQLFormatter <0.1.9/JSQLFormatter>`
      - (3 MB) 
    * - Windows x64
-     - :downloads:`JSQLFormatter.exe <0.1.7/JSQLFormatter.exe>`
+     - :downloads:`JSQLFormatter.exe <0.1.9/JSQLFormatter.exe>`
      - (3 MB) 
    * - Java
-     - :downloads:`JSQLFormatter.jar <0.1.7/JSQLFormatter-0.1.7.jar>`
+     - :downloads:`JSQLFormatter.jar <0.1.9/JSQLFormatter-0.1.9.jar>`
      - (700 kB) 
    * - MacOS
-     - :downloads:`JSQLFormatter.dmg <0.1.7/JSQLFormatter.dmg>`
+     - :downloads:`JSQLFormatter.dmg <0.1.9/JSQLFormatter.dmg>`
      - (3 MB) 
      
 .. note::
@@ -82,5 +88,5 @@ Plugins
      - File
      - Size
    * - Netbeans 12
-     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.7/externalcodeformatter-sql.nbm>`
+     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.9/externalcodeformatter-sql.nbm>`
      - (45.2 MB) 

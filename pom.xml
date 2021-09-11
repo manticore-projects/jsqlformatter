@@ -1,356 +1,358 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.manticore-projects.jsqlformatter</groupId>
-	<artifactId>jsqlformatter</artifactId>
-	<version>0.1.8</version>
-	<packaging>jar</packaging>
-	<name>JSQLFormatter</name>
-	<description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
-	<url>https://github.com/manticore-projects/jsqlformatter</url>
-	<licenses>
-		<license>
-			<name>The AGPL-3.0 License</name>
-			<url>https://github.com/manticore-projects/jsqlformatter</url>
-		</license>
-	</licenses>
-	<developers>
-		<developer>
-			<id>manticore</id>
-			<name>Andreas Reichel</name>
-			<email>andreas@manticore-projects.com</email>
-		</developer>
-	</developers>
-	<scm>
-		<connection>scm:git:git@github.com:manticore-projects/jsqlformatter.git</connection>
-		<url>https://github.com/manticore-projects/jsqlformatter</url>
-		<tag>HEAD</tag>
-	</scm>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.manticore-projects.jsqlformatter</groupId>
+    <artifactId>jsqlformatter</artifactId>
+    <version>0.1.9</version>
+    <packaging>jar</packaging>
+    <name>JSQLFormatter</name>
+    <description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
+    <url>https://github.com/manticore-projects/jsqlformatter</url>
+    <licenses>
+        <license>
+            <name>The AGPL-3.0 License</name>
+            <url>https://github.com/manticore-projects/jsqlformatter</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>manticore</id>
+            <name>Andreas Reichel</name>
+            <email>andreas@manticore-projects.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:manticore-projects/jsqlformatter.git</connection>
+        <url>https://github.com/manticore-projects/jsqlformatter</url>
+        <tag>HEAD</tag>
+    </scm>
 
-  
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-  
-	<repositories>
-		<repository>
-			<id>jsqlparser-snapshots</id>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>https://oss.sonatype.org/content/groups/public/</url>
-		</repository>
-	</repositories>
-  
-	<dependencies>
-		<dependency>
-			<groupId>com.github.jsqlparser</groupId>
-			<artifactId>jsqlparser</artifactId>
-			<version>4.2-SNAPSHOT</version>
-		</dependency>
-    
-		<!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.4</version>
-		</dependency>
-    
-		<!-- https://mvnrepository.com/artifact/com.diogonunes/JColor -->
-		<dependency>
-			<groupId>com.diogonunes</groupId>
-			<artifactId>JColor</artifactId>
-			<version>5.0.1</version>
-		</dependency>
-    
-		<!-- https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk -->
-		<dependency>
-			<groupId>org.graalvm.sdk</groupId>
-			<artifactId>graal-sdk</artifactId>
-			<version>21.0.0.2</version>
-		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-		
-		<!-- https://github.com/julianthome/inmemantlr -->
-		<dependency>
-    <groupId>com.github.julianthome</groupId>
-    <artifactId>inmemantlr-api</artifactId>
-    <version>1.9.0</version>
-</dependency>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
-    
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <repositories>
+        <repository>
+            <id>jsqlparser-snapshots</id>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
 
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<!-- <finalName>${project.artifactId}-${project.version}-${git.commit.id.describe-short}</finalName> -->
-		<testSourceDirectory>test</testSourceDirectory>
-    
-		<testResources>
-			<testResource>
-				<directory>${project.basedir}/test</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</testResource>
-		</testResources>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>4.3-SNAPSHOT</version>
+        </dependency>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<!--
-					<includes>
-						<include>${basedir}/dist/lib/polyglot-native-api.jar</include>
-					</includes>
-					-->
-				</configuration>
-			</plugin>
-      
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-publish-plugin</artifactId>
-				<version>3.1.0</version>
-				<configuration>
-					<scmBranch>gh_pages</scmBranch>
-					<tryUpdate>true</tryUpdate>
-					<content>${project.reporting.outputDirectory}</content><!-- mono-module doesn't require site:stage -->
-				</configuration>
-				<executions>
-					<execution>
-						<id>gh_pages</id>
-						<phase>site-deploy</phase><!-- deploy site with maven-scm-publish-plugin -->
-						<goals>
-							<goal>publish-scm</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.4</version>
+        </dependency>
 
-      
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
-				<executions>
-					<execution>
-						<id>source-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<docencoding>UTF-8</docencoding>
-					<locale>en</locale>
-				</configuration>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-      
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.4</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>com.github.jsqlparser:jsqlparser</include>
-								</includes>
-								<excludes>
-									<exclude>com.ibm.icu:*</exclude>
-									<exclude>commons-cli:*</exclude>
-									<exclude>JColor:*</exclude>
-								</excludes>
-							</artifactSet>
-							<minimizeJar>True</minimizeJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+        <!-- https://mvnrepository.com/artifact/com.diogonunes/JColor -->
+        <dependency>
+            <groupId>com.diogonunes</groupId>
+            <artifactId>JColor</artifactId>
+            <version>5.0.1</version>
+        </dependency>
 
-			<plugin>
-				<groupId>de.sormuras.junit</groupId>
-				<artifactId>junit-platform-maven-plugin</artifactId>
-				<version>1.1.2</version>
-				<extensions>true</extensions>
-				<configuration>
-					<isolation>ABSOLUTE</isolation>
-					<executor>JAVA</executor>
-					<javaOptions>
-						<inheritIO>true</inheritIO>
-						<additionalOptions>
-							<jacoco>${jacoco.java.option}</jacoco>
-						</additionalOptions>
-					</javaOptions>
-				</configuration>
-			</plugin>
+        <!-- https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>21.0.0.2</version>
+        </dependency>
 
-			<plugin>
-				<groupId>com.diffplug.spotless</groupId>
-				<artifactId>spotless-maven-plugin</artifactId>
-				<version>2.7.0</version>
-				<configuration>
-					<java>
-						<includes>
-							<include>src/main/java/**/*.java</include>
-							<include>src/test/java/**/*.java</include>
-						</includes>
-						<googleJavaFormat>
-							<version>1.9</version>
-							<style>GOOGLE</style>
-						</googleJavaFormat>
-					</java>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-      
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-      
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-  
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
-				<reportSets>
-					<reportSet>
-						<reports />
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>kr.motd.maven</groupId>
-				<artifactId>sphinx-maven-plugin</artifactId>
-				<version>2.10.0</version>
-				<configuration>
-					<binaryUrl>file:///usr/bin/sphinx-build</binaryUrl>
-					<builder>html</builder>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.8.0</version>
+        </dependency>
 
-	<profiles>
-		<profile>
-			<id>release-sign-artifacts</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+        <!-- https://github.com/julianthome/inmemantlr -->
+        <dependency>
+            <groupId>com.github.julianthome</groupId>
+            <artifactId>inmemantlr-api</artifactId>
+            <version>1.9.0</version>
+        </dependency>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
-			</url>
-		</repository>
-		<site>
-			<id>gh_pages</id>
-			<!--<url>scm:git:ssh://git@github.com/manticore-projects/manticore-projects.github.io.git</url> -->
-			<url>scm:git:ssh://git@github.com/manticore-projects/jsqlformatter.git</url>
-		</site>
-	</distributionManagement>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <!-- <finalName>${project.artifactId}-${project.version}-${git.commit.id.describe-short}</finalName> -->
+        <testSourceDirectory>test</testSourceDirectory>
+
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/test</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <!--
+                    <includes>
+                        <include>${basedir}/dist/lib/polyglot-native-api.jar</include>
+                    </includes>
+                    -->
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <scmBranch>gh_pages</scmBranch>
+                    <tryUpdate>true</tryUpdate>
+                    <content>${project.reporting.outputDirectory}
+                    </content><!-- mono-module doesn't require site:stage -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>gh_pages</id>
+                        <phase>site-deploy</phase><!-- deploy site with maven-scm-publish-plugin -->
+                        <goals>
+                            <goal>publish-scm</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>source-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <locale>en</locale>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.github.jsqlparser:jsqlparser</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>com.ibm.icu:*</exclude>
+                                    <exclude>commons-cli:*</exclude>
+                                    <exclude>JColor:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <minimizeJar>True</minimizeJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>de.sormuras.junit</groupId>
+                <artifactId>junit-platform-maven-plugin</artifactId>
+                <version>1.1.2</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <isolation>ABSOLUTE</isolation>
+                    <executor>JAVA</executor>
+                    <javaOptions>
+                        <inheritIO>true</inheritIO>
+                        <additionalOptions>
+                            <jacoco>${jacoco.java.option}</jacoco>
+                        </additionalOptions>
+                    </javaOptions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+                        <googleJavaFormat>
+                            <version>1.9</version>
+                            <style>GOOGLE</style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+                <reportSets>
+                    <reportSet>
+                        <reports/>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>sphinx-maven-plugin</artifactId>
+                <version>2.10.0</version>
+                <configuration>
+                    <binaryUrl>file:///usr/bin/sphinx-build</binaryUrl>
+                    <builder>html</builder>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
+            </url>
+        </repository>
+        <site>
+            <id>gh_pages</id>
+            <!--<url>scm:git:ssh://git@github.com/manticore-projects/manticore-projects.github.io.git</url> -->
+            <url>scm:git:ssh://git@github.com/manticore-projects/jsqlformatter.git</url>
+        </site>
+    </distributionManagement>
 </project>
