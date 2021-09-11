@@ -109,19 +109,6 @@ public class SQLFileTest {
 
     // Check if the formatted statement still can be parsed and gives the same content
     String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
-
-    //    boolean foundSquareBracketQuotes =
-    // SQUARED_BRACKET_QUOTATION_PATTERN.matcher(expected).find();
-
-    //    Statement parsed =
-    //        CCJSqlParserUtil.parse(
-    //            formatted, parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
-    //
-    //    String sqlStringFromDeparser = buildSqlString(parsed.toString(), true);
-
-    // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
-    //      Check if the formatted statement looks like the expected content
-
     System.out.println(formatted);
 
     assertEquals(expected.trim(), formatted.trim());

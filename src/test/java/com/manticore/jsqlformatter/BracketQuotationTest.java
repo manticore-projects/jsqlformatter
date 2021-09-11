@@ -32,9 +32,6 @@ public class BracketQuotationTest extends StandardSelectTest {
   }
 
   public BracketQuotationTest(String input, String expected) {
-    // CCJSqlParserUtil.parse("select * from mytable", parser ->
-    // parser.withSquareBracketQuotation(true));
-
     super(input, expected);
   }
 }

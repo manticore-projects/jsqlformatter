@@ -438,14 +438,26 @@ SELECT *
 FROM teststmt
 ;
 
-
--- UNIION WITh ORDER BY
-(SELECT __time FROM traffic_protocol_stat_log LIMIT 1) UNION ALL (SELECT __time FROM traffic_protocol_stat_log ORDER BY __time LIMIT 1)
+-- UNION WITh ORDER BY
+(   SELECT __time
+    FROM traffic_protocol_stat_log
+    LIMIT 1 )
+UNION ALL
+(   SELECT __time
+    FROM traffic_protocol_stat_log
+    ORDER BY __time
+    LIMIT 1 )
 ;
 
 -- GROUP BY
-SELECT a, b, c, sum(d)
+SELECT  a
+        , b
+        , c
+        , Sum( d )
 FROM t
-GROUP BY a, b, c
-HAVING sum(d)>0 and count(*)>1
+GROUP BY    a
+            , b
+            , c
+HAVING Sum( d ) > 0
+    AND Count( * ) > 1
 ;

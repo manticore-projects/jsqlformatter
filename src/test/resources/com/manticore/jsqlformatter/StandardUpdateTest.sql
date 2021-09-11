@@ -84,3 +84,17 @@ WHERE EXISTS (  SELECT  a.priority
                     AND e.id_instrument_beneficiary = a1.id_instrument_beneficiary
                     AND e.id_instrument_guarantee = a1.id_instrument_guarantee )
 ;
+
+-- UPDATE SETS ISSUE 1316
+UPDATE prpjpaymentbill b
+SET (   b.packagecode
+        , b.packageremark
+        , b.agentcode ) = ( SELECT  p.payrefreason
+                                    , p.classcode
+                                    , p.riskcode
+                            FROM prpjcommbill p
+                            WHERE p.policertiid = 'SDDH200937010330006366' )   /* this is supposed to be UpdateSet 1 */
+    , b.payrefnotype = '05'                                                    /* this is supposed to be UpdateSet 2 */
+    , b.packageunit = '4101170402'                                             /* this is supposed to be UpdateSet 3 */
+WHERE b.payrefno = 'B370202091026000005'
+;
