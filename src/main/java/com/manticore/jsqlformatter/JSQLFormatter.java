@@ -1465,18 +1465,18 @@ public class JSQLFormatter {
             }
 
             if (updateSet.isUsingBracketsForColumns())
-              builder.append("( ");
+                builder.append("( ");
 
-            int k=0;
+            int k = 0;
             List<Column> columns = updateSet.getColumns();
-            int subIndent3 = columns.size()>1
+            int subIndent3 = columns.size() > 1
                     ? getSubIndent(builder, true)
                     : subIndent;
 
             for (Column column : columns) {
-              appendExpression(column, null, builder, subIndent3, k, columns.size(), true,
-                      BreakLine.AFTER_FIRST);
-              k++;
+                appendExpression(column, null, builder, subIndent3, k, columns.size(), true,
+                        BreakLine.AFTER_FIRST);
+                k++;
             }
 
             if (updateSet.isUsingBracketsForColumns())
@@ -1489,7 +1489,7 @@ public class JSQLFormatter {
             }
 
             ArrayList<Expression> expressions = updateSet.getExpressions();
-            int subIndent2 = getSubIndent(builder, expressions.size()>1);
+            int subIndent2 = getSubIndent(builder, expressions.size() > 1);
             appendExpressionsList(expressions, builder, subIndent2, BreakLine.AFTER_FIRST);
 
             if (updateSet.isUsingBracketsForValues()) {
@@ -1650,7 +1650,7 @@ public class JSQLFormatter {
                     int subIndent = indent;
                     if (setOperationList.getBrackets().get(k)) {
                         builder.append("( ");
-                        subIndent ++;
+                        subIndent++;
                     }
 
                     appendSelectBody(selectBody1, alias1, builder, subIndent, k > 0 || breakLineBefore,
@@ -1854,7 +1854,7 @@ public class JSQLFormatter {
                 FromItem rightFromItem = join.getRightItem();
                 appendFromItem(rightFromItem, builder, indent, 0, 1);
 
-                for (Expression onExpression: join.getOnExpressions()) {
+                for (Expression onExpression : join.getOnExpressions()) {
                     if (onExpression != null) {
                         appendNormalizedLineBreak(builder);
                         for (int j = 0; j <= indent + 1; j++)
@@ -1999,19 +1999,19 @@ public class JSQLFormatter {
     }
 
     private static void appendRowConstructor(RowConstructor rowConstructor,
-                                         StringBuilder builder, int indent, BreakLine breakLine) {
+                                             StringBuilder builder, int indent, BreakLine breakLine) {
 
         if (rowConstructor.getName() != null)
             appendAlias(builder, outputFormat, rowConstructor.getName(), "", "");
 
         int i = 0;
         int n = rowConstructor.getColumnDefinitions().size();
-        if (n>0) {
+        if (n > 0) {
             appendNormalizingTrailingWhiteSpace(builder, " ( ");
-            int subIndent = getSubIndent(builder, n>3);
+            int subIndent = getSubIndent(builder, n > 3);
 
             for (ColumnDefinition columnDefinition : rowConstructor.getColumnDefinitions()) {
-                appendString(columnDefinition.toString(), null, builder, subIndent, i, n, true,  BreakLine.AS_NEEDED);
+                appendString(columnDefinition.toString(), null, builder, subIndent, i, n, true, BreakLine.AS_NEEDED);
                 i++;
             }
         } else {
@@ -2019,7 +2019,7 @@ public class JSQLFormatter {
             if (expressionList.isUsingBrackets()) {
                 appendNormalizingTrailingWhiteSpace(builder, " ( ");
             }
-            appendExpressionsList(expressionList, builder, indent,  BreakLine.AS_NEEDED);
+            appendExpressionsList(expressionList, builder, indent, BreakLine.AS_NEEDED);
             if (expressionList.isUsingBrackets()) {
                 appendNormalizingTrailingWhiteSpace(builder, " )");
             }
@@ -2403,8 +2403,8 @@ public class JSQLFormatter {
             builder.append(" )");
 
         } else if (expression instanceof RowConstructor) {
-                RowConstructor rowConstructor = (RowConstructor) expression;
-                appendRowConstructor(rowConstructor, builder, indent, breakLine);
+            RowConstructor rowConstructor = (RowConstructor) expression;
+            appendRowConstructor(rowConstructor, builder, indent, breakLine);
 
         } else if (expression instanceof MySQLGroupConcat) {
             MySQLGroupConcat mySQLGroupConcat = (MySQLGroupConcat) expression;
@@ -2620,14 +2620,14 @@ public class JSQLFormatter {
     }
 
     private static void appendSubJoin(SubJoin subJoin, StringBuilder builder,
-                                        boolean useBrackets, BreakLine breakLine, int indent) {
+                                      boolean useBrackets, BreakLine breakLine, int indent) {
         if (useBrackets) {
             builder.append("( ");
         }
 
         int subIndent = getSubIndent(builder, false);
 
-        appendFromItem( subJoin.getLeft(),builder, subIndent, 0, 0 );
+        appendFromItem(subJoin.getLeft(), builder, subIndent, 0, 0);
 
         if (breakLine.equals(BreakLine.ALWAYS)) {
             appendNormalizedLineBreak(builder);
