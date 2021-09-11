@@ -22,18 +22,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/**
- * @author Andreas Reichel <andreas@manticore-projects.com>
- */
+/** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
 public class SQLFileTest_short extends SQLFileTest {
 
-    public SQLFileTest_short(String input, String expected) {
-        super(input, expected);
-    }
+  public SQLFileTest_short(String input, String expected) {
+    super(input, expected);
+  }
 
-    @Parameters(name = "{index}: {0}")
-    public static Iterable<Object[]> getSqlMap() {
-        return getSqlMap(SQLFileTest_short.class);
-    }
+  @Parameters(name = "{index}: {0}")
+  public static Iterable<Object[]> getSqlMap() {
+    return getSqlMap(SQLFileTest_short.class);
+  }
 }

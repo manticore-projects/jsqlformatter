@@ -22,21 +22,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/**
- * @author Andreas Reichel <andreas@manticore-projects.com>
- */
+/** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
 public class StandardCommentTest extends StandardSelectTest {
 
+  public StandardCommentTest(String input, String expected) {
+    super(input, expected);
+  }
 
-    public StandardCommentTest(String input, String expected) {
-        super(input, expected);
-    }
-
-    @Parameters(name = "{index}: {0}")
-    public static Iterable<Object[]> getSqlMap() {
-        return getSqlMap(StandardCommentTest.class);
-    }
-
-
+  @Parameters(name = "{index}: {0}")
+  public static Iterable<Object[]> getSqlMap() {
+    return getSqlMap(StandardCommentTest.class);
+  }
 }

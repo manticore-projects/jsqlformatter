@@ -21,18 +21,16 @@ package com.manticore.jsqlformatter;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-/**
- * @author Andreas Reichel <andreas@manticore-projects.com>
- */
+/** @author Andreas Reichel <andreas@manticore-projects.com> */
 @RunWith(Parameterized.class)
 public class EmptyStatementTest extends SQLFileTest {
 
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Iterable<Object[]> getSqlMap() {
-        return getSqlMap(EmptyStatementTest.class);
-    }
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable<Object[]> getSqlMap() {
+    return getSqlMap(EmptyStatementTest.class);
+  }
 
-    public EmptyStatementTest(String input, String expected) {
-        super(input, expected);
-    }
+  public EmptyStatementTest(String input, String expected) {
+    super(input, expected);
+  }
 }
