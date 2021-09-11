@@ -1,4 +1,3 @@
-
 -- INSERT NEW LEDGER ACCOUNTS
 SELECT /*+ PARALLEL */
     cfe.id_account_seq.nextval
@@ -438,12 +437,12 @@ SELECT *
 FROM teststmt
 ;
 
--- UNION WITh ORDER BY
-(   SELECT __time
+(
+    SELECT __time
     FROM traffic_protocol_stat_log
     LIMIT 1 )
-UNION ALL
-(   SELECT __time
+UNION ALL (
+    SELECT __time
     FROM traffic_protocol_stat_log
     ORDER BY __time
     LIMIT 1 )

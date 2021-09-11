@@ -674,7 +674,7 @@ public class JSQLFormatter {
 
             if (line.hasOption("help") || (line.getOptions().length == 0 && line.getArgs().length == 0)) {
                 HelpFormatter formatter = new HelpFormatter();
-                formatter.setOptionComparator((Comparator<Option>) null);
+                formatter.setOptionComparator(null);
 
                 String startupCommand =
                         System.getProperty("java.vm.name").equalsIgnoreCase("Substrate VM") ? "./JSQLFormatter"
@@ -692,7 +692,7 @@ public class JSQLFormatter {
                     throw new Exception(
                             "Can't read the specified INPUT-FILE " + inputFile.getCanonicalPath());
 
-                try (FileInputStream inputStream = new FileInputStream(inputFile);) {
+                try (FileInputStream inputStream = new FileInputStream(inputFile)) {
                     String sqlStr = IOUtils.toString(inputStream, Charset.defaultCharset());
                     System.out.println("\n-- FROM " + inputFile.getName() + "\n"
                             + format(sqlStr, formatterOptions.toArray(new String[formatterOptions.size()])));
@@ -719,7 +719,7 @@ public class JSQLFormatter {
             LOGGER.log(Level.FINE, "Parsing failed.  Reason: " + ex.getMessage(), ex);
 
             HelpFormatter formatter = new HelpFormatter();
-            formatter.setOptionComparator((Comparator<Option>) null);
+            formatter.setOptionComparator(null);
             formatter.printHelp("java -jar H2MigrationTool.jar", options, true);
 
             throw new Exception("Could not parse the Command Line Arguments.", ex);
@@ -959,7 +959,7 @@ public class JSQLFormatter {
 
                     } else if (statement != null) {
                         try {
-                            statementBuilder.append("\n").append(statement.toString());
+                            statementBuilder.append("\n").append(statement);
                         } catch (Exception ex) {
                             throw new UnsupportedOperationException(
                                     "The " + statement.getClass().getName() + " Statement is not supported yet.");
@@ -1638,6 +1638,7 @@ public class JSQLFormatter {
             List<SetOperation> setOperations = setOperationList.getOperations();
 
             int k = 0;
+
             List<SelectBody> selects = setOperationList.getSelects();
             if (selects != null && selects.size() > 0) {
                 for (SelectBody selectBody1 : selects) {
@@ -1645,8 +1646,19 @@ public class JSQLFormatter {
                         SetOperation setOperation = setOperations.get(k - 1);
                         appendSetOperation(setOperation, builder, indent);
                     }
-                    appendSelectBody(selectBody1, alias1, builder, indent, k > 0 || breakLineBefore,
+
+                    int subIndent = indent;
+                    if (setOperationList.getBrackets().get(k)) {
+                        builder.append("( ");
+                        subIndent ++;
+                    }
+
+                    appendSelectBody(selectBody1, alias1, builder, subIndent, k > 0 || breakLineBefore,
                             k > 0 || breakLineBefore || indentFirstLine);
+
+                    if (setOperationList.getBrackets().get(k)) {
+                        builder.append(" )");
+                    }
 
                     k++;
                 }
@@ -1662,9 +1674,8 @@ public class JSQLFormatter {
             for (int j = 0; indentFirstLine && j < indent; j++)
                 builder.append(indentString);
 
-            appendKeyWord(builder, outputFormat, "VALUES", "", " ( ");
+            appendKeyWord(builder, outputFormat, "VALUES", "", " ");
             appendItemsList(itemsList, builder, null, indent, BreakLine.AS_NEEDED);
-            builder.append(" )");
 
         } else if (selectBody != null) {
             throw new UnsupportedOperationException(selectBody.getClass().getName());
@@ -1954,9 +1965,6 @@ public class JSQLFormatter {
             } else if (itemsList instanceof ExpressionList) {
                 ExpressionList expressionList = (ExpressionList) itemsList;
                 appendExpressionsList(expressionList, builder, indent, BreakLine.AS_NEEDED);
-                // builder.append(
-                // PlainSelect.getStringList(expressionList.getExpressions(), true,
-                // useBracketsForValues));
             }
         } else {
             appendSubSelect(withItem.getSubSelect(), builder, false, BreakLine.ALWAYS, indent);
@@ -1987,6 +1995,34 @@ public class JSQLFormatter {
             case BEFORE:
                 builder.append(i > 0 ? ", " : "");
                 builder.append(allColumns.toString());
+        }
+    }
+
+    private static void appendRowConstructor(RowConstructor rowConstructor,
+                                         StringBuilder builder, int indent, BreakLine breakLine) {
+
+        if (rowConstructor.getName() != null)
+            appendAlias(builder, outputFormat, rowConstructor.getName(), "", "");
+
+        int i = 0;
+        int n = rowConstructor.getColumnDefinitions().size();
+        if (n>0) {
+            appendNormalizingTrailingWhiteSpace(builder, " ( ");
+            int subIndent = getSubIndent(builder, n>3);
+
+            for (ColumnDefinition columnDefinition : rowConstructor.getColumnDefinitions()) {
+                appendString(columnDefinition.toString(), null, builder, subIndent, i, n, true,  BreakLine.AS_NEEDED);
+                i++;
+            }
+        } else {
+            ExpressionList expressionList = rowConstructor.getExprList();
+            if (expressionList.isUsingBrackets()) {
+                appendNormalizingTrailingWhiteSpace(builder, " ( ");
+            }
+            appendExpressionsList(expressionList, builder, indent,  BreakLine.AS_NEEDED);
+            if (expressionList.isUsingBrackets()) {
+                appendNormalizingTrailingWhiteSpace(builder, " )");
+            }
         }
     }
 
@@ -2306,7 +2342,7 @@ public class JSQLFormatter {
                     appendNormalizingTrailingWhiteSpace(builder, " )");
                 } else {
                     // @todo: implement this properly and add a test case
-                    builder.append(namedParameters.toString());
+                    builder.append(namedParameters);
                 }
             } else if (allColumns) {
                 builder.append("( * )");
@@ -2315,13 +2351,13 @@ public class JSQLFormatter {
             }
 
             if (attribute != null) {
-                builder.append(".").append(attribute.toString());
+                builder.append(".").append(attribute);
             } else if (attributeName != null) {
                 builder.append(".").append(attributeName);
             }
 
             if (keep != null) {
-                builder.append(" ").append(keep.toString());
+                builder.append(" ").append(keep);
             }
 
             if (escaped)
@@ -2366,6 +2402,10 @@ public class JSQLFormatter {
             appendExpressionsList(expressionList, builder, indent, BreakLine.AS_NEEDED);
             builder.append(" )");
 
+        } else if (expression instanceof RowConstructor) {
+                RowConstructor rowConstructor = (RowConstructor) expression;
+                appendRowConstructor(rowConstructor, builder, indent, breakLine);
+
         } else if (expression instanceof MySQLGroupConcat) {
             MySQLGroupConcat mySQLGroupConcat = (MySQLGroupConcat) expression;
             appendFunction(builder, outputFormat, "GROUP_CONCAT", "", "( ");
@@ -2391,7 +2431,7 @@ public class JSQLFormatter {
 
         } else {
             LOGGER.warning("Unhandled expression: " + expression.getClass().getName() + " = "
-                    + expression.toString());
+                    + expression);
             builder.append(expression);
         }
 
@@ -2453,7 +2493,7 @@ public class JSQLFormatter {
             }
         } else if (itemsList instanceof NamedExpressionList) {
             NamedExpressionList namedExpressionList = (NamedExpressionList) itemsList;
-            builder.append(namedExpressionList.toString());
+            builder.append(namedExpressionList);
         } else if (itemsList instanceof SubSelect) {
 
             SubSelect subSelect = (SubSelect) itemsList;
@@ -2515,11 +2555,15 @@ public class JSQLFormatter {
                 SubSelect subSelect = (SubSelect) fromItem;
                 appendSubSelect(subSelect, builder, true, BreakLine.NEVER, indent);
 
+            } else if (fromItem instanceof SubJoin) {
+                SubJoin subJoin = (SubJoin) fromItem;
+                appendSubJoin(subJoin, builder, true, BreakLine.NEVER, indent);
+
             } else {
                 // @todo: implement all Implementing Classes correctly
 
                 LOGGER.warning(fromItem.getClass().getName() + " os not supported yet.");
-                builder.append(fromItem.toString());
+                builder.append(fromItem);
             }
 
             switch (separation) {
@@ -2573,6 +2617,29 @@ public class JSQLFormatter {
                 appendKeyWord(builder, outputFormat, "AS", "", " ");
             appendAlias(builder, outputFormat, alias1.getName(), "", " ");
         }
+    }
+
+    private static void appendSubJoin(SubJoin subJoin, StringBuilder builder,
+                                        boolean useBrackets, BreakLine breakLine, int indent) {
+        if (useBrackets) {
+            builder.append("( ");
+        }
+
+        int subIndent = getSubIndent(builder, false);
+
+        appendFromItem( subJoin.getLeft(),builder, subIndent, 0, 0 );
+
+        if (breakLine.equals(BreakLine.ALWAYS)) {
+            appendNormalizedLineBreak(builder);
+        }
+
+
+        appendJoins(subJoin.getJoinList(), builder, subIndent);
+
+        if (useBrackets) {
+            builder.append(" )");
+        }
+
     }
 
     private static void appendTable(Table table, Alias alias, StringBuilder builder, int indent,
@@ -2939,8 +3006,13 @@ public class JSQLFormatter {
         }
 
         Select select = createTable.getSelect();
-        boolean selectParenthesis = createTable.isSelectParenthesis();
+        boolean selectParenthesis = false;
+
         if (select != null) {
+            if (select.getSelectBody() instanceof PlainSelect) {
+                selectParenthesis = ((PlainSelect) select.getSelectBody()).isUseBrackets();
+            }
+
             appendNormalizedLineBreak(builder);
             for (int j = 0; j <= indent; j++)
                 builder.append(indentString);
@@ -3357,7 +3429,7 @@ public class JSQLFormatter {
         AUTO, YES, NO
     }
 
-    public static enum FormattingOption {
+    public enum FormattingOption {
         SQUARE_BRACKET_QUOTATION("squareBracketQuotation"), OUTPUT_FORMAT(
                 "outputFormat"), KEYWORD_SPELLING("keywordSpelling"), FUNCTION_SPELLING(
                 "functionSpelling"), OBJECT_SPELLING(
@@ -3365,7 +3437,7 @@ public class JSQLFormatter {
 
         private final String optionName;
 
-        private FormattingOption(String optionName) {
+        FormattingOption(String optionName) {
             this.optionName = optionName;
         }
 
