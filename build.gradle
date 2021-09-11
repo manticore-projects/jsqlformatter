@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.jsqlparser:jsqlparser:4.3-SNAPSHOT'
+    implementation 'com.github.jsqlparser:jsqlparser:4.2'
     
     implementation 'commons-cli:commons-cli:1.4'
     implementation 'com.diogonunes:JColor:5.0.1'
@@ -34,7 +34,7 @@ dependencies {
     implementation 'org.graalvm.sdk:graal-sdk:21.2.0'
 
     implementation 'commons-io:commons-io:2.8.0'
-    implementation 'com.github.julianthome:inmemantlr-api:1.9.0'
+    implementation 'com.github.julianthome:inmemantlr-api:1.7.0'
     testImplementation 'junit:junit:4.12'
 }
 
