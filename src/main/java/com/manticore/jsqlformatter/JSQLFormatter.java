@@ -32,6 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -559,21 +561,20 @@ public class JSQLFormatter {
       for (int j = 0; j < indent; j++) builder.append(indentString);
 
       appendKeyWord(builder, outputFormat, "LIMIT", "", "");
-      if (limit.isLimitNull()) {
+
+      Expression rowCount = limit.getRowCount();
+      if (rowCount instanceof AllValue || rowCount instanceof NullValue) {
+        // no offset allowed
         appendKeyWord(builder, outputFormat, "NULL", " ", "");
       } else {
-        if (limit.isLimitAll()) {
-          appendKeyWord(builder, outputFormat, "ALL", " ", "");
-        } else {
-          if (null != limit.getOffset()) {
-            appendExpression(
-                limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
-            builder.append(", ");
-          }
-          if (null != limit.getRowCount()) {
-            appendExpression(
-                limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
-          }
+        if (null != limit.getOffset()) {
+          appendExpression(
+                  limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+          builder.append(", ");
+        }
+        if (null != limit.getRowCount()) {
+          appendExpression(
+                  limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
         }
       }
     }
@@ -1665,24 +1666,47 @@ public class JSQLFormatter {
         appendNormalizedLineBreak(builder);
         for (int j = 0; j < indent; j++) builder.append(indentString);
         appendKeyWord(builder, outputFormat, "LIMIT", "", " ");
-        if (limit.isLimitNull()) {
+
+        Expression rowCount = limit.getRowCount();
+        if (rowCount instanceof AllValue || rowCount instanceof NullValue) {
+          // no offset allowed
           appendKeyWord(builder, outputFormat, "NULL", "", " ");
         } else {
-          if (limit.isLimitAll()) {
-            appendKeyWord(builder, outputFormat, "ALL", " ", " ");
-          } else {
-            if (null != limit.getOffset()) {
-              appendExpression(
-                  limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
-              builder.append(", ");
-            }
-            if (null != limit.getRowCount()) {
-              appendExpression(
-                  limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
-            }
+          if (null != limit.getOffset()) {
+            appendExpression(
+                    limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+            builder.append(", ");
+          }
+          if (null != limit.getRowCount()) {
+            appendExpression(
+                    limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
           }
         }
       }
+
+      Offset offset = plainSelect.getOffset();
+      if (offset != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "OFFSET", "", " ");
+
+        Expression offsetExpression = offset.getOffset();
+        appendExpression(
+                offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+
+        String offsetParam = offset.getOffsetParam();
+        if (offsetParam != null)
+          appendString(
+                  offsetParam,
+                  null,
+                  builder,
+                  indent,
+                  0,
+                  1,
+                  false,
+                  BreakLine.NEVER);
+      }
+
     } else if (selectBody instanceof SetOperationList) {
       SetOperationList setOperationList = (SetOperationList) selectBody;
 
@@ -3335,7 +3359,7 @@ public class JSQLFormatter {
             alterExpression.getColumnDropNotNullList();
 
         String constraintName = alterExpression.getConstraintName();
-        boolean constraintIfExists = alterExpression.isConstraintIfExists();
+        boolean constraintIfExists = alterExpression.isUsingIfExists();
 
         List<String> pkColumns = alterExpression.getPkColumns();
         List<String> ukColumns = alterExpression.getUkColumns();
@@ -3375,6 +3399,26 @@ public class JSQLFormatter {
             appendKeyWord(builder, outputFormat, "TO", " ", " ");
           }
           appendObjectName(builder, outputFormat, columnName, "", "");
+
+        } else if (operation==AlterOperation.DROP && !alterExpression.hasColumn() && alterExpression.getPkColumns()!=null) {
+          // Oracle supports dropping multiple columns
+          // we use the PKColumns List in this case instead of the Column
+
+          List<String> columns = alterExpression.getPkColumns();
+
+          builder.append("(");
+
+          int subIndent = getSubIndent(builder, columns.size()>3);
+          BreakLine bl = columns.size()>3 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+
+          appendStringList(alterExpression.getPkColumns()
+          , null
+          , builder
+          , subIndent
+          , true
+          , bl);
+          builder.append(" )");
+
         } else if (colDataTypeList != null) {
 
           int colWidth = 0;

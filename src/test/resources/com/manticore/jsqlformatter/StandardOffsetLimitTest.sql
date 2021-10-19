@@ -15,3 +15,16 @@ ORDER BY    date_available DESC
             , p.purchased DESC
 LIMIT 200000
 ;
+
+-- LIMIT OFFSET EXPRESSIONS
+SELECT p.*
+FROM product p
+LIMIT '200000'
+OFFSET '5'
+;
+
+-- MYSQL LIMIT OFFSET EXPRESSIONS
+SELECT p.*
+FROM product p
+LIMIT 5, 2000
+;

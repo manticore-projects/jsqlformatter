@@ -10,12 +10,25 @@ ALTER TABLE risk.collateral
     DROP COLUMN id_status
 ;
 
+-- ORACLE DROP MULTIPLE COLUMNS
+ALTER TABLE risk.collateral
+    DROP (id_status, city )
+;
+
+-- ORACLE DROP MANY MULTIPLE COLUMNS
+ALTER TABLE risk.collateral
+    DROP (  id_status
+            , city
+            , column3
+            , column4 )
+;
+
 -- ALTER TABLE ADD COLUMN
 ALTER TABLE risk.collateral
     ADD COLUMN id_status VARCHAR (1) NULL
 ;
 
--- ALTER ALTER COLUMN DROP COLUMN
+-- ALTER TABLE ALTER COLUMN
 ALTER TABLE risk.collateral
     ALTER COLUMN id_status VARCHAR (1) NOT NULL
 ;

@@ -315,3 +315,8 @@ WHERE ( amortised_cost_dirty < 0
                 OR ( g2.attribute_value IS NOT NULL
                         AND g2.attribute_value IN ( '271', '7614' ) )  /*CBN*/ )
 ;
+
+
+-- ISSUE 1381
+SELECT ( 1 + 1 ) = ( 1 + 2 )
+;
