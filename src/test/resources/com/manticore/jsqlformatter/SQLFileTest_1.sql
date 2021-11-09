@@ -317,6 +317,28 @@ WHERE ( amortised_cost_dirty < 0
 ;
 
 
--- ISSUE 1381
-SELECT ( 1 + 1 ) = ( 1 + 2 )
+SELECT *
+FROM schedule_info info
+WHERE ( info.employee_id, info.schedule_date ) IN ( ( 1, '2019-10-01' ), ( 1, '2019-10-02' ) )
+;
+
+
+SELECT *
+FROM table_a
+WHERE other_id IN ( (   SELECT id
+                        FROM table_b
+                        WHERE name LIKE '%aa%' ), ( SELECT id
+                                                    FROM table_b
+                                                    WHERE name LIKE '%bb%' ) )
+;
+
+
+SELECT *
+FROM table1
+UNION
+SELECT *
+FROM table2
+ORDER BY col
+LIMIT 4
+OFFSET 5
 ;

@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -1500,6 +1499,10 @@ public class JSQLFormatter {
 
     appendTable(table, alias, builder, indent, 0, 1);
 
+    if (update.getStartJoins()!=null) {
+      appendJoins(update.getStartJoins(), builder, indent);
+    }
+
     appendNormalizedLineBreak(builder);
     for (int j = 0; j < indent; j++) builder.append(indentString);
     appendKeyWord(builder, outputFormat, "SET", "", " ");
@@ -1555,7 +1558,13 @@ public class JSQLFormatter {
       i++;
     }
 
-    i = 1;
+    if (update.getFromItem()!=null) {
+      appendNormalizedLineBreak(builder);
+      for (int j = 0; j < indent; j++) builder.append(indentString);
+      appendKeyWord(builder, outputFormat, "FROM", "", " ");
+      appendFromItem(update.getFromItem(), builder, indent, 0, 1);
+    }
+
     List<Join> joins = update.getJoins();
     appendJoins(joins, builder, indent);
 
@@ -1743,6 +1752,56 @@ public class JSQLFormatter {
           k++;
         }
       }
+
+      List<OrderByElement> orderByElements = setOperationList.getOrderByElements();
+      appendOrderByElements(orderByElements, builder, indent);
+
+      Limit limit = setOperationList.getLimit();
+      if (limit != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "LIMIT", "", " ");
+
+        Expression rowCount = limit.getRowCount();
+        if (rowCount instanceof AllValue || rowCount instanceof NullValue) {
+          // no offset allowed
+          appendKeyWord(builder, outputFormat, "NULL", "", " ");
+        } else {
+          if (null != limit.getOffset()) {
+            appendExpression(
+                    limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+            builder.append(", ");
+          }
+          if (null != limit.getRowCount()) {
+            appendExpression(
+                    limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+          }
+        }
+      }
+
+      Offset offset = setOperationList.getOffset();
+      if (offset != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "OFFSET", "", " ");
+
+        Expression offsetExpression = offset.getOffset();
+        appendExpression(
+                offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+
+        String offsetParam = offset.getOffsetParam();
+        if (offsetParam != null)
+          appendString(
+                  offsetParam,
+                  null,
+                  builder,
+                  indent,
+                  0,
+                  1,
+                  false,
+                  BreakLine.NEVER);
+      }
+
     } else if (selectBody instanceof ValuesStatement) {
       ValuesStatement valuesStatement = (ValuesStatement) selectBody;
       ItemsList itemsList = valuesStatement.getExpressions();
@@ -2460,7 +2519,6 @@ public class JSQLFormatter {
       Expression leftExpression = inExpression.getLeftExpression();
       boolean useNot = inExpression.isNot();
 
-      MultiExpressionList multiExpressionList = inExpression.getMultiExpressionList();
       ItemsList rightItemsList = inExpression.getRightItemsList();
       Expression rightExpression = inExpression.getRightExpression();
 
@@ -2469,11 +2527,7 @@ public class JSQLFormatter {
       if (useNot) appendOperator(builder, outputFormat, "NOT IN", " ", " ");
       else appendOperator(builder, outputFormat, "IN", " ", " ");
 
-      if (multiExpressionList != null) {
-        builder.append("( ");
-        appendItemsList(multiExpressionList, builder, null, indent, BreakLine.AS_NEEDED);
-        builder.append(" )");
-      } else {
+
         if (rightExpression == null) {
           builder.append("( ");
           appendItemsList(rightItemsList, builder, null, indent, BreakLine.AS_NEEDED);
@@ -2482,7 +2536,6 @@ public class JSQLFormatter {
           appendExpression(
               rightExpression, null, builder, indent, i, n, false, BreakLine.AS_NEEDED);
         }
-      }
     } else if (expression instanceof Function) {
       Function function = (Function) expression;
 

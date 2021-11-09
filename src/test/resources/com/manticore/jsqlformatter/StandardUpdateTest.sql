@@ -98,3 +98,20 @@ SET (   b.packagecode
     , b.packageunit = '4101170402'                                             /* this is supposed to be UpdateSet 3 */
 WHERE b.payrefno = 'B370202091026000005'
 ;
+
+-- UPDATE START JOINS
+UPDATE sc_borrower b
+    INNER JOIN sc_credit_apply a
+        ON a.borrower_id = b.id
+SET b.name = '0.7505105896846266'
+    , a.credit_line = a.credit_line + 1
+WHERE b.id = 3
+;
+
+-- UPDATE JOINS
+UPDATE table1
+SET columna = 5
+FROM table1
+    LEFT JOIN table2
+        ON col1 = col2
+;
