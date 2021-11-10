@@ -2293,37 +2293,7 @@ public class JSQLFormatter {
           false,
           BreakLine.AFTER_FIRST);
 
-    } else if (expression instanceof BinaryExpression) {
-      BinaryExpression binaryExpression = (BinaryExpression) expression;
-      appendExpression(
-          binaryExpression.getLeftExpression(),
-          null,
-          builder,
-          indent + 1,
-          i,
-          n,
-          false,
-          BreakLine.NEVER);
-
-      if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
-        if (!breakLine.equals(BreakLine.NEVER)) {
-          appendNormalizedLineBreak(builder);
-          for (int j = 0; j <= indent + 1; j++) builder.append(indentString);
-        }
-      }
-      appendOperator(builder, outputFormat, binaryExpression.getStringExpression(), " ", " ");
-
-      appendExpression(
-          binaryExpression.getRightExpression(),
-          null,
-          builder,
-          indent + 1,
-          i,
-          n,
-          false,
-          BreakLine.NEVER);
-
-    } else if (expression instanceof EqualsTo) {
+    }  else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
 
       builder.append(equalsTo.getLeftExpression());
@@ -2423,6 +2393,34 @@ public class JSQLFormatter {
           n,
           false,
           BreakLine.AFTER_FIRST);
+
+    } else if (expression instanceof LikeExpression) {
+      LikeExpression likeExpression = (LikeExpression) expression;
+
+      appendExpression(
+              likeExpression.getLeftExpression(),
+              null,
+              builder,
+              indent + 1,
+              i,
+              n,
+              false,
+              BreakLine.AFTER_FIRST);
+
+      if (likeExpression.isNot())
+        appendOperator(builder, outputFormat, "NOT", " ", "");
+
+      appendOperator(builder, outputFormat, "LIKE", " ", " ");
+
+      appendExpression(
+              likeExpression.getRightExpression(),
+              null,
+              builder,
+              indent + 1,
+              i,
+              n,
+              false,
+              BreakLine.AFTER_FIRST);
 
     } else if (expression instanceof NextValExpression) {
       NextValExpression nextValExpression = (NextValExpression) expression;
@@ -2656,6 +2654,37 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "SEPARATOR", "", " " + separator);
       }
       builder.append(" )");
+
+      // Abstract Class, call last and let the specific implementations catch first
+    } else if (expression instanceof BinaryExpression) {
+      BinaryExpression binaryExpression = (BinaryExpression) expression;
+      appendExpression(
+              binaryExpression.getLeftExpression(),
+              null,
+              builder,
+              indent + 1,
+              i,
+              n,
+              false,
+              BreakLine.NEVER);
+
+      if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
+        if (!breakLine.equals(BreakLine.NEVER)) {
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j <= indent + 1; j++) builder.append(indentString);
+        }
+      }
+      appendOperator(builder, outputFormat, binaryExpression.getStringExpression(), " ", " ");
+
+      appendExpression(
+              binaryExpression.getRightExpression(),
+              null,
+              builder,
+              indent + 1,
+              i,
+              n,
+              false,
+              BreakLine.NEVER);
 
     } else {
       LOGGER.warning(
