@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':JSQLParser')
+    implementation project(':JSqlParser')
     //implementation 'com.github.jsqlparser:jsqlparser:4.3-SNAPSHOT'
 
     implementation 'commons-cli:commons-cli:1.4'
