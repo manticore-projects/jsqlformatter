@@ -343,6 +343,7 @@ LIMIT 4
 OFFSET 5
 ;
 
+
 -- ORACLE LONGOPS
 SELECT  l.inst_id
         , l.sid

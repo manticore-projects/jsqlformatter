@@ -2315,7 +2315,7 @@ public class JSQLFormatter {
     }  else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
 
-      builder.append(equalsTo.getLeftExpression());
+      appendExpression(equalsTo.getLeftExpression(), null, builder, indent + 1, i, n, false, BreakLine.AS_NEEDED);
 
       appendOperator(builder, outputFormat, "=", " ", " ");
 
