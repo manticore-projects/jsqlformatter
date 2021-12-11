@@ -28,11 +28,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -952,20 +947,9 @@ public class JSQLFormatter {
         }
 
         try {
-          ArrayList<Exception> exceptions1 = new ArrayList<>();
-
-          ExecutorService executorService = Executors.newSingleThreadExecutor();
-          Future<Statement> future = executorService.submit(new Callable<Statement>() {
-            @Override
-            public Statement call() throws Exception {
-              return CCJSqlParserUtil.parse(
-                      statementSql,
-                      parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation));
-            }
-          });
-          executorService.shutdown();
-
-          Statement statement = future.get(2000, TimeUnit.MILLISECONDS);
+          Statement statement = CCJSqlParserUtil.parse(
+                  statementSql,
+                  parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation));
 
           if (statement instanceof Select) {
             Select select = (Select) statement;
@@ -1022,10 +1006,7 @@ public class JSQLFormatter {
                   : commentMap.insertComments(statementBuilder, outputFormat));
 
           appendNormalizedLineBreak(builder);
-        } catch (TimeoutException | InterruptedException ex1) {
-          throw new Exception("Could not parse the Statements within a reasonable time.", ex1);
         } catch (Exception ex1) {
-
           if (statementSql.trim().length() <= commentMap.getLength()) {
             LOGGER.info("Found only comments, but no SQL code.");
             builder.append(statementSql).append("\n");
