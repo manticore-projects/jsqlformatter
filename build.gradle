@@ -4,13 +4,13 @@ plugins {
     //id 'com.github.sherter.google-java-format' version '0.9'
 
     // download the RR tools which have no Maven Repository
-    id "de.undercouch.download" version "4.1.2"
+    id "de.undercouch.download" version "latest.release"
 
-    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.71.4"
+    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
 
-    id "org.jetbrains.dokka" version "1.5.0"
+    id "org.jetbrains.dokka" version "latest.release"
 
-    id "kr.motd.sphinx" version "2.10.0"
+    id "kr.motd.sphinx" version "latest.release"
 }
 
 repositories {
@@ -25,22 +25,22 @@ repositories {
 }
 
 dependencies {
-    implementation project(':JSqlParser')
+    implementation project(':JSQLParser')
     //implementation 'com.github.jsqlparser:jsqlparser:4.3-SNAPSHOT'
 
-    implementation 'commons-cli:commons-cli:1.4'
-    implementation 'com.diogonunes:JColor:5.0.1'
+    implementation 'commons-cli:commons-cli:1.+'
+    implementation 'com.diogonunes:JColor:5.+'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:21.2.0'
+    implementation 'org.graalvm.sdk:graal-sdk:21.+'
 
-    implementation 'commons-io:commons-io:2.8.0'
-    implementation 'com.github.julianthome:inmemantlr-api:1.7.0'
-    testImplementation 'junit:junit:4.12'
+    implementation 'commons-io:commons-io:2.+'
+    implementation 'com.github.julianthome:inmemantlr-api:1.+'
+    testImplementation 'junit:junit:4.+'
 }
 
 group = 'com.manticore-projects.jsqlformatter'
-version = '0.1.9'
+version = '0.1.11'
 description = 'JSQLFormatter'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -52,6 +52,7 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
+            artifactId 'jsqlformatter'
             from(components.java)
         }
     }
@@ -67,7 +68,7 @@ tasks.withType(Test)  {
 }
 
 
-task renderRR() {
+task renderRR {
     doLast {
         // these WAR files have been provided as a courtesy by Gunther Rademacher
         // and belong to the RR - Railroad Diagram Generator Project
@@ -161,7 +162,7 @@ sphinx {
     environments = [
             'artifactId': 'com.manticore-projects.jsqlformatter'
             , 'projectName': 'JSQLFormatter'
-            , 'versionName': '0.1.9'
+            , 'versionName': version
             , 'developerName': 'Andreas Reichel'
             , 'email_support': 'andreas@manticore-projects.com'
     ]
