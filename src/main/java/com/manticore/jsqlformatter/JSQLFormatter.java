@@ -28,13 +28,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -569,13 +566,12 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "NULL", " ", "");
       } else {
         if (null != limit.getOffset()) {
-          appendExpression(
-                  limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+          appendExpression(limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
           builder.append(", ");
         }
         if (null != limit.getRowCount()) {
           appendExpression(
-                  limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+              limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
         }
       }
     }
@@ -947,7 +943,8 @@ public class JSQLFormatter {
         }
 
         try {
-          Statement statement = CCJSqlParserUtil.parse(
+          Statement statement =
+              CCJSqlParserUtil.parse(
                   statementSql,
                   parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation));
 
@@ -1499,7 +1496,7 @@ public class JSQLFormatter {
 
     appendTable(table, alias, builder, indent, 0, 1);
 
-    if (update.getStartJoins()!=null) {
+    if (update.getStartJoins() != null) {
       appendJoins(update.getStartJoins(), builder, indent);
     }
 
@@ -1558,7 +1555,7 @@ public class JSQLFormatter {
       i++;
     }
 
-    if (update.getFromItem()!=null) {
+    if (update.getFromItem() != null) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j < indent; j++) builder.append(indentString);
       appendKeyWord(builder, outputFormat, "FROM", "", " ");
@@ -1683,12 +1680,12 @@ public class JSQLFormatter {
         } else {
           if (null != limit.getOffset()) {
             appendExpression(
-                    limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+                limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
             builder.append(", ");
           }
           if (null != limit.getRowCount()) {
             appendExpression(
-                    limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+                limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
           }
         }
       }
@@ -1700,20 +1697,11 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "OFFSET", "", " ");
 
         Expression offsetExpression = offset.getOffset();
-        appendExpression(
-                offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+        appendExpression(offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
 
         String offsetParam = offset.getOffsetParam();
         if (offsetParam != null)
-          appendString(
-                  offsetParam,
-                  null,
-                  builder,
-                  indent,
-                  0,
-                  1,
-                  false,
-                  BreakLine.NEVER);
+          appendString(offsetParam, null, builder, indent, 0, 1, false, BreakLine.NEVER);
       }
 
     } else if (selectBody instanceof SetOperationList) {
@@ -1769,12 +1757,12 @@ public class JSQLFormatter {
         } else {
           if (null != limit.getOffset()) {
             appendExpression(
-                    limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+                limit.getOffset(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
             builder.append(", ");
           }
           if (null != limit.getRowCount()) {
             appendExpression(
-                    limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
+                limit.getRowCount(), null, builder, indent, 0, 1, false, BreakLine.NEVER);
           }
         }
       }
@@ -1786,20 +1774,11 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "OFFSET", "", " ");
 
         Expression offsetExpression = offset.getOffset();
-        appendExpression(
-                offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+        appendExpression(offsetExpression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
 
         String offsetParam = offset.getOffsetParam();
         if (offsetParam != null)
-          appendString(
-                  offsetParam,
-                  null,
-                  builder,
-                  indent,
-                  0,
-                  1,
-                  false,
-                  BreakLine.NEVER);
+          appendString(offsetParam, null, builder, indent, 0, 1, false, BreakLine.NEVER);
       }
 
     } else if (selectBody instanceof ValuesStatement) {
@@ -2293,10 +2272,18 @@ public class JSQLFormatter {
           false,
           BreakLine.AFTER_FIRST);
 
-    }  else if (expression instanceof EqualsTo) {
+    } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
 
-      appendExpression(equalsTo.getLeftExpression(), null, builder, indent + 1, i, n, false, BreakLine.AS_NEEDED);
+      appendExpression(
+          equalsTo.getLeftExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          n,
+          false,
+          BreakLine.AS_NEEDED);
 
       appendOperator(builder, outputFormat, "=", " ", " ");
 
@@ -2398,29 +2385,28 @@ public class JSQLFormatter {
       LikeExpression likeExpression = (LikeExpression) expression;
 
       appendExpression(
-              likeExpression.getLeftExpression(),
-              null,
-              builder,
-              indent + 1,
-              i,
-              n,
-              false,
-              BreakLine.AFTER_FIRST);
+          likeExpression.getLeftExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          n,
+          false,
+          BreakLine.AFTER_FIRST);
 
-      if (likeExpression.isNot())
-        appendOperator(builder, outputFormat, "NOT", " ", "");
+      if (likeExpression.isNot()) appendOperator(builder, outputFormat, "NOT", " ", "");
 
       appendOperator(builder, outputFormat, "LIKE", " ", " ");
 
       appendExpression(
-              likeExpression.getRightExpression(),
-              null,
-              builder,
-              indent + 1,
-              i,
-              n,
-              false,
-              BreakLine.AFTER_FIRST);
+          likeExpression.getRightExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          n,
+          false,
+          BreakLine.AFTER_FIRST);
 
     } else if (expression instanceof NextValExpression) {
       NextValExpression nextValExpression = (NextValExpression) expression;
@@ -2525,15 +2511,13 @@ public class JSQLFormatter {
       if (useNot) appendOperator(builder, outputFormat, "NOT IN", " ", " ");
       else appendOperator(builder, outputFormat, "IN", " ", " ");
 
-
-        if (rightExpression == null) {
-          builder.append("( ");
-          appendItemsList(rightItemsList, builder, null, indent, BreakLine.AS_NEEDED);
-          builder.append(" )");
-        } else {
-          appendExpression(
-              rightExpression, null, builder, indent, i, n, false, BreakLine.AS_NEEDED);
-        }
+      if (rightExpression == null) {
+        builder.append("( ");
+        appendItemsList(rightItemsList, builder, null, indent, BreakLine.AS_NEEDED);
+        builder.append(" )");
+      } else {
+        appendExpression(rightExpression, null, builder, indent, i, n, false, BreakLine.AS_NEEDED);
+      }
     } else if (expression instanceof Function) {
       Function function = (Function) expression;
 
@@ -2659,14 +2643,14 @@ public class JSQLFormatter {
     } else if (expression instanceof BinaryExpression) {
       BinaryExpression binaryExpression = (BinaryExpression) expression;
       appendExpression(
-              binaryExpression.getLeftExpression(),
-              null,
-              builder,
-              indent + 1,
-              i,
-              n,
-              false,
-              BreakLine.NEVER);
+          binaryExpression.getLeftExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          n,
+          false,
+          BreakLine.NEVER);
 
       if (i > 0 || breakLine.equals(BreakLine.ALWAYS)) {
         if (!breakLine.equals(BreakLine.NEVER)) {
@@ -2677,14 +2661,14 @@ public class JSQLFormatter {
       appendOperator(builder, outputFormat, binaryExpression.getStringExpression(), " ", " ");
 
       appendExpression(
-              binaryExpression.getRightExpression(),
-              null,
-              builder,
-              indent + 1,
-              i,
-              n,
-              false,
-              BreakLine.NEVER);
+          binaryExpression.getRightExpression(),
+          null,
+          builder,
+          indent + 1,
+          i,
+          n,
+          false,
+          BreakLine.NEVER);
 
     } else {
       LOGGER.warning(
@@ -3482,7 +3466,9 @@ public class JSQLFormatter {
           }
           appendObjectName(builder, outputFormat, columnName, "", "");
 
-        } else if (operation==AlterOperation.DROP && !alterExpression.hasColumn() && alterExpression.getPkColumns()!=null) {
+        } else if (operation == AlterOperation.DROP
+            && !alterExpression.hasColumn()
+            && alterExpression.getPkColumns() != null) {
           // Oracle supports dropping multiple columns
           // we use the PKColumns List in this case instead of the Column
 
@@ -3490,15 +3476,10 @@ public class JSQLFormatter {
 
           builder.append("(");
 
-          int subIndent = getSubIndent(builder, columns.size()>3);
-          BreakLine bl = columns.size()>3 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+          int subIndent = getSubIndent(builder, columns.size() > 3);
+          BreakLine bl = columns.size() > 3 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
 
-          appendStringList(alterExpression.getPkColumns()
-          , null
-          , builder
-          , subIndent
-          , true
-          , bl);
+          appendStringList(alterExpression.getPkColumns(), null, builder, subIndent, true, bl);
           builder.append(" )");
 
         } else if (colDataTypeList != null) {

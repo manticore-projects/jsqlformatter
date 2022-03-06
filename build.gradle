@@ -8,8 +8,6 @@ plugins {
 
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
 
-    id "org.jetbrains.dokka" version "latest.release"
-
     id "kr.motd.sphinx" version "latest.release"
 }
 
@@ -51,9 +49,26 @@ java {
 
 publishing {
     publications {
-        maven(MavenPublication) {
+         mavenJava(MavenPublication) {
             artifactId 'jsqlformatter'
             from(components.java)
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('testFixturesRuntimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+    repositories {
+       
+        maven {
+            // Username and Password are defined in ~/.gradle/gradle.properties
+            name "ossrh"
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials(PasswordCredentials)
         }
     }
 }
@@ -152,11 +167,8 @@ task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 }
 
 sphinx {
-    //
     binaryUrl = "file:///usr/bin/sphinx-build"
-    // Change the source directory.
     sourceDirectory = "${projectDir}/src/site/sphinx"
-    // Change the output directorvalue2y.
     outputDirectory = "${project.buildDir}/sphinx"
     // Add environment variables.
     environments = [
@@ -166,8 +178,8 @@ sphinx {
             , 'developerName': 'Andreas Reichel'
             , 'email_support': 'andreas@manticore-projects.com'
     ]
-    env 'ENV_BAZ', 'value3'
-    // Add tags.
-    tags 'tagA', 'tagB'
+    // env 'ENV_BAZ', 'value3'
+    // tags 'tagA', 'tagB'
 }
+
 

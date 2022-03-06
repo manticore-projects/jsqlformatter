@@ -19,7 +19,6 @@
 package com.manticore.jsqlformatter;
 
 import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
-import static com.manticore.jsqlformatter.JSQLFormatter.SQUARED_BRACKET_QUOTATION_PATTERN;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
@@ -29,9 +28,6 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
