@@ -315,3 +315,61 @@ WHERE ( amortised_cost_dirty < 0
                 OR ( g2.attribute_value IS NOT NULL
                         AND g2.attribute_value IN ( '271', '7614' ) )  /*CBN*/ )
 ;
+
+
+SELECT *
+FROM schedule_info info
+WHERE ( info.employee_id, info.schedule_date ) IN ( ( 1, '2019-10-01' ), ( 1, '2019-10-02' ) )
+;
+
+
+SELECT *
+FROM table_a
+WHERE other_id IN ( (   SELECT id
+                        FROM table_b
+                        WHERE name LIKE '%aa%' ), ( SELECT id
+                                                    FROM table_b
+                                                    WHERE name LIKE '%bb%' ) )
+;
+
+
+SELECT *
+FROM table1
+UNION
+SELECT *
+FROM table2
+ORDER BY col
+LIMIT 4
+OFFSET 5
+;
+
+
+-- ORACLE LONGOPS
+SELECT  l.inst_id
+        , l.sid
+        , l.serial#
+        , l.sql_id
+        , l.opname
+        , l.username
+        , l.target
+        , l.sofar
+        , l.totalwork
+        , l.start_time
+        , l.last_update_time
+        , Round( l.time_remaining / 60, 2 ) "REMAIN MINS"
+        , Round( l.elapsed_seconds / 60, 2 ) "ELAPSED MINS"
+        , Round( ( l.time_remaining + l.elapsed_seconds ) / 60, 2 ) "TOTAL MINS"
+        , Round( l.sofar / l.totalwork * 100, 2 ) "%_COMPLETE"
+        , l.message
+        , s.sql_text
+FROM gv$session_longops l
+    LEFT OUTER JOIN v$sql s
+        ON s.hash_value = l.sql_hash_value
+            AND s.address = l.sql_address
+            AND s.child_number = 0
+WHERE l.opname NOT LIKE 'RMAN%'
+    AND l.opname NOT LIKE '%aggregate%'
+    AND l.totalwork != 0
+    AND l.sofar <> l.totalwork
+    AND l.time_remaining > 0
+;
