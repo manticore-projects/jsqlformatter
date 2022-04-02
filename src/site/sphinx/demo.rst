@@ -6,7 +6,7 @@ Enter your SQL code and beautify it. Result can be saved as SQL, HTML or RTF.
 Parser Errors will be highlighted. Please report failing valid SQL statements.
 
 
-Uses a patched :downloads:`JSQLParser Snapshot <0.1.9/jsqlparser-4.3-SNAPSHOT.jar>`.
+Uses a patched :downloads:`JSQLParser Snapshot <0.1.11/jsqlparser-4.3-SNAPSHOT.jar>`.
 
 
 .. raw:: html
