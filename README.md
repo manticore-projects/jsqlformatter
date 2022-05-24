@@ -13,44 +13,41 @@ Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit
 
 * Command Line Option (CLI) and SQL Inline Options
 
-
-```bash
-java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
-       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
-       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-       <arg>] [--squareBracketQuotation <arg>]
- -i,--inputFile <arg>               The input SQL file or folder.
- -o,--outputFile <arg>              The out SQL file for the formatted
-                                    statements.
- -f,--outputFormat <arg>            The output-format.
-                                    [PLAIN* ANSI HTML RTF]
-    --ansi                          Output ANSI annotated text.
-    --html                          Output HTML annotated text.
- -t,--indent <arg>                  The indent width.
-                                    [2 4* 8]
- -2                                 Indent with 2 characters.
- -8                                 Indent with 8 characters.
-    --keywordSpelling <arg>         Keyword spelling.
-                                    [UPPER*, LOWER, CAMEL, KEEP]
-    --functionSpelling <arg>        Function name spelling.
-                                    [UPPER, LOWER, CAMEL*, KEEP]
-    --objectSpelling <arg>          Object name spelling.
-                                    [UPPER, LOWER*, CAMEL, KEEP]
-    --separation <arg>              Position of the field separator.
-                                    [BEFORE*, AFTER]
-    --squareBracketQuotation <arg>  Position of the field separator.
-                                    [AUTO*, YES, NO]
-```
+	```bash
+	java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
+		   --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+		   [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+		   <arg>] [--squareBracketQuotation <arg>]
+	 -i,--inputFile <arg>               The input SQL file or folder.
+	 -o,--outputFile <arg>              The out SQL file for the formatted
+										statements.
+	 -f,--outputFormat <arg>            The output-format.
+										[PLAIN* ANSI HTML RTF]
+		--ansi                          Output ANSI annotated text.
+		--html                          Output HTML annotated text.
+	 -t,--indent <arg>                  The indent width.
+										[2 4* 8]
+	 -2                                 Indent with 2 characters.
+	 -8                                 Indent with 8 characters.
+		--keywordSpelling <arg>         Keyword spelling.
+										[UPPER*, LOWER, CAMEL, KEEP]
+		--functionSpelling <arg>        Function name spelling.
+										[UPPER, LOWER, CAMEL*, KEEP]
+		--objectSpelling <arg>          Object name spelling.
+										[UPPER, LOWER*, CAMEL, KEEP]
+		--separation <arg>              Position of the field separator.
+										[BEFORE*, AFTER]
+		--squareBracketQuotation <arg>  Position of the field separator.
+										[AUTO*, YES, NO]
+	```
 
 * simple usage of the Java library
-
 	
   ```java
   import com.manticore.jsqlformatter.JSqlFormatter;
   ...
   String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
   ```
-
 
   with Maven Artifact:
    
@@ -143,6 +140,7 @@ WHEN MATCHED THEN          /* Lets rock */
 ```
 
 ### Import Java String from Clipboard
+
 ```java
 String test1 = "SELECT " + columnName + " from " + tableName + ";";
 
@@ -177,6 +175,7 @@ String queryStr = new MessageFormat2(
 ```
 
 will format into the following SQL
+
 ```sql
 SELECT $columnname$
 FROM $tablename$
@@ -207,6 +206,7 @@ WHERE word != ''
 ```
 
 ### Export formatted Java String to Clipboard
+
 ```java
 String queryStr1 =   
 	  "SELECT " + columnname + "\n"
@@ -235,6 +235,7 @@ String queryStr2 =
 ```
 
 ### Export Java StringBuilder to Clipboard
+
 ```java
 StringBuilder queryStrBuilder1 = new StringBuilder()
 	.append("SELECT ").append(columnname).append("\n")
@@ -263,6 +264,7 @@ StringBuilder queryStrBuilder2 = new StringBuilder()
 ```
 
 ### Export Java MessageFormat to Clipboard
+
 ```java
 String queryStr = new MessageFormat1(
 			"SELECT {0}\n"
