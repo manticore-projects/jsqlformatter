@@ -1,5 +1,5 @@
 # manticore JSQLFormatter
-Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit our [Website](https://manticore-projects.github.io/jsqlformatter)
+Java SQL Formatter, Beautifier and Pretty Printer, for more details please visit our [Website](http://217.160.215.75:8080/jsqlformatter/demo.html)
 
 [![Java CI with Maven](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml/badge.svg)](https://github.com/manticore-projects/jsqlformatter/actions/workflows/maven.yml)
 
