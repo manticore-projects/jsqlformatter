@@ -36,3 +36,4 @@ pom.xml.versionsBackup
 /.idea
 
 
+/dependency-reduced-pom.xml
