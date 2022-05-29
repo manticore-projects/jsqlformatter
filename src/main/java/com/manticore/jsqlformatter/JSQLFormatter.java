@@ -70,6 +70,8 @@ import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
+import de.inetsoftware.jwebassembly.api.annotation.Export;
+
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
  *
@@ -855,6 +857,7 @@ public class JSQLFormatter {
     return exceptions;
   }
 
+  @Export
   public static String format(String sqlStr, String... options) throws Exception {
     ArrayList<Exception> exceptions = new ArrayList<>();
 

@@ -11,6 +11,9 @@ plugins {
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
 
     id "kr.motd.sphinx" version "latest.release"
+
+    // Web Assembly Compiler
+    id "de.inetsoftware.jwebassembly" version "latest.release"
 }
 
 repositories {
@@ -23,6 +26,8 @@ repositories {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
     mavenCentral()
+
+    maven { url = uri('https://jitpack.io') }
 }
 
 dependencies {
@@ -43,6 +48,10 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'net.sf.saxon:Saxon-HE:11.3'
 
+    // Web Assembly Compiler
+    //implementation 'com.github.i-net-software:JWebAssembly:v0.4'
+    implementation 'com.github.i-net-software:JWebAssembly:master-SNAPSHOT'
+    implementation 'com.github.i-net-software:jwebassembly-api:master-SNAPSHOT'
 }
 
 group = 'com.manticore-projects.jsqlformatter'
@@ -53,6 +62,35 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+wasm {
+    //Get more debug information if there are problems.
+    //logging.level = LogLevel.DEBUG
+    //logging.levelInternal = LogLevel.DEBUG
+
+    //Change the output format to the text format *.wat.
+    //This can be helpful to understand the problems if you see the generated code as text format.
+    //format = 'text'
+
+    //The used JWebAssembly compiler version. The default is the latest release '+'.
+    //You can set any valid Gradle version string or a full dependency string.
+    //The snapshot version is recommended until a stable release.
+    //compilerVersion = 0.2
+    compilerVersion = 'com.github.i-net-software:jwebassembly:master-SNAPSHOT'
+
+    //Write method and parameter names into the output *.wasm file.
+    //The file will be approximate 10% larger. And it generate a source map.
+    //With a source map you can see in the debugger of the browser your source code if available.
+    debugNames = true
+
+    //Set an absolute or relative path between the final wasm file location and the source files location.
+    ///This is needed for debugging in the browser. It work only if debugNames = true.
+    //sourceMapBase = '../../src/main/java/'
+    //sourceMapBase = '/src/main/java/'
+
+    //set the destination dir
+    //destinationDir = file( 'targetDir' )
 }
 
 publishing {
