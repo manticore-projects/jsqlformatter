@@ -85,6 +85,48 @@ tasks.withType(Test)  {
     forkEvery = 1
 }
 
+task gitChangelogTask(type: GitChangelogTask) {
+    fromRepo = file("$projectDir")
+    file = new File("${projectDir}/src/site/sphinx/changelog.rst")
+    templateContent ="""
+##################
+Changelog
+##################
+
+******************
+Latest Changes
+******************
+
+{{#tags}}
+{{#ifReleaseTag .}}
+******************
+Version {{name}}
+******************
+{{/ifReleaseTag}}
+
+ {{#issues}}
+  {{#hasIssue}}
+   {{#hasLink}}
+### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+   {{^hasLink}}
+### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+  {{/hasIssue}}
+
+  {{#commits}}
+**{{{messageTitle}}}** - {{authorName}} {{commitTime}}
+
+{{#messageBodyItems}}
+  * {{.}}
+{{/messageBodyItems}}
+
+  {{/commits}}
+
+ {{/issues}}
+{{/tags}}
+"""
+}
 
 task website {
     doLast {
@@ -142,40 +184,9 @@ task website {
         }
     }
 
-    dependsOn(sphinx)
+    dependsOn(gitChangelogTask, sphinx)
 }
 
-task gitChangelogTask(type: GitChangelogTask) {
-    fromRepo = file("$projectDir")
-    file = new File("${projectDir}/src/site/sphinx/CHANGELOG.md")
-    templateContent ="""
-#Changelog
-
-{{#tags}}
-## {{name}}
- {{#issues}}
-  {{#hasIssue}}
-   {{#hasLink}}
-### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-   {{^hasLink}}
-### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-  {{/hasIssue}}
-
-  {{#commits}}
-**{{{messageTitle}}}** - {{authorName}} {{commitTime}}
-
-{{#messageBodyItems}}
-    - {{.}}
-{{/messageBodyItems}}
-
-  {{/commits}}
-
- {{/issues}}
-{{/tags}}
-"""
-}
 
 sphinx {
     binaryUrl = "file:///usr/bin/sphinx-build"
@@ -192,9 +203,7 @@ sphinx {
     // env 'ENV_BAZ', 'value3'
     // tags 'tagA', 'tagB'
 
-    dependencies {
-       gitChangelogTask
-    }
+    dependsOn(gitChangelogTask)
 }
 
 

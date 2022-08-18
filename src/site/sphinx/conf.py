@@ -36,7 +36,7 @@ master_doc = 'index'
 pygments_style = 'stata'
 add_function_parentheses = True
 
-extensions = ['m2r2', 'sphinx.ext.autodoc', 'sphinx_rtd_theme', 'sphinx_git', 'sphinx.ext.githubpages', 'sphinx_tabs.tabs', 'sphinx.ext.extlinks', 'sphinx-prompt', 'sphinx_substitution_extensions']
+extensions = ['sphinx.ext.autodoc', 'sphinx_rtd_theme', 'sphinx_git', 'sphinx.ext.githubpages', 'sphinx_tabs.tabs', 'sphinx.ext.extlinks', 'sphinx-prompt', 'sphinx_substitution_extensions']
 
 issues_github_path = "manticore-projects/jsqlformatter"
 

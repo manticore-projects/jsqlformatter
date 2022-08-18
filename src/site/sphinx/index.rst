@@ -46,4 +46,4 @@ Platform
 .. toctree::
    :maxdepth: 1
 
-   CHANGELOG.md
+   changelog
