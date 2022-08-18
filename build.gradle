@@ -1,3 +1,5 @@
+import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
+
 plugins {
     id 'java'
     id 'maven-publish'
@@ -20,24 +22,26 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
+    mavenCentral()
 }
 
 dependencies {
     implementation project(':JSQLParser')
 
-    implementation 'commons-cli:commons-cli:1.+'
-    implementation 'com.diogonunes:JColor:5.+'
+    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'com.diogonunes:JColor:5.4.1'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
     implementation 'org.graalvm.sdk:graal-sdk:+'
 
-    implementation 'commons-io:commons-io:2.+'
-    implementation 'com.github.julianthome:inmemantlr-api:1.+'
-    testImplementation 'junit:junit:4.+'
+    // for the RR Tools
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'net.sf.saxon:Saxon-HE:11.3'
+
 }
 
 group = 'com.manticore-projects.jsqlformatter'
-version = '0.1.11'
+version = '0.1.12'
 description = 'JSQLFormatter'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -92,37 +96,48 @@ task website {
         // Please do not use these files without Gunther's permission
         download.run {
             src 'http://manticore-projects.com/download/convert.war'
-            dest "$buildDir/rr/convert.war"
+            dest "${project(':JSQLFormatter').buildDir}/rr/convert.war"
             overwrite false
         }
 
         download.run {
             src 'http://manticore-projects.com/download/rr.war'
-            dest "$buildDir/rr/rr.war"
+            dest "${project(':JSQLFormatter').buildDir}/rr/rr.war"
             overwrite false
         }
 
         javaexec {
-            standardOutput = new FileOutputStream("${buildDir}/rr/JSqlParserCC.ebnf")
-            main="-jar";
+            standardOutput = new FileOutputStream("${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf")
+            main="-jar"
             args = [
-                    "$buildDir/rr/convert.war",
+                    "${project(':JSQLFormatter').buildDir}/rr/convert.war",
                     "${project(':JSQLParser').buildDir}/generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj"
             ]
         }
 
         javaexec {
-            main="-jar";
+            main="-jar"
             args = [
-                    "$buildDir/rr/rr.war",
+                    "${project(':JSQLFormatter').buildDir}/rr/rr.war",
                     "-noepsilon",
                     "-color:#4D88FF",
                     "-offset:0",
                     "-width:800",
                     //"-png",
                     //"-out:${buildDir}/rr/JSqlParserCC.zip",
-                    "-out:$buildDir/sphinx/_static/JSqlParserCC.xhtml",
-                    "$buildDir/rr/JSqlParserCC.ebnf"
+                    "-out:${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml",
+                    "${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf"
+            ]
+        }
+
+        javaexec {
+            //main="-jar";
+            group = "Execution"
+            description = "Run the main class with JavaExecTask"
+            classpath = sourceSets.main.runtimeClasspath
+            mainClass = 'com.manticore.jsqlformatter.RRTools'
+            args = [
+                    "${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml"
             ]
         }
     }
@@ -130,7 +145,7 @@ task website {
     dependsOn(sphinx)
 }
 
-task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+task gitChangelogTask(type: GitChangelogTask) {
     fromRepo = file("$projectDir")
     file = new File("${projectDir}/src/site/sphinx/CHANGELOG.md")
     templateContent ="""

@@ -11,7 +11,7 @@ import sphinx_redactor_theme, rtcat_sphinx_theme
 
 artifactId = "com.manticore-projects.jsqlformatter"
 projectName = "JSQLFormatter"
-versionName = "0.1.11"
+versionName = "0.1.12"
 developerName = "Andreas Reichel"
 email_support = "andreas@manticore-projects.com"
 
