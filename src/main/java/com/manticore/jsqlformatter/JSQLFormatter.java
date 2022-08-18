@@ -24,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +45,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.ReferentialAction;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.alter.AlterExpression;
 import net.sf.jsqlparser.statement.alter.AlterOperation;
@@ -65,10 +68,13 @@ import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
+
+import javax.swing.tree.TreeNode;
 
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
@@ -1052,100 +1058,113 @@ public class JSQLFormatter {
     return builder;
   }
 
-  public static Collection<Node> getAstNodes(String sqlStr, String... options) throws Exception {
-    ArrayList<Node> nodes = new ArrayList<>();
+  public static class JavaObjectNode implements TreeNode {
+    private TreeNode parent;
+    public String fieldName;
+    public Object object;
+    private final ArrayList<TreeNode> children = new ArrayList<>();
 
-    applyFormattingOptions(options);
-
-    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
-    Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
-    ArrayList<Integer> semicolons = new ArrayList<>();
-
-    for (int i = 0; m.find(); i++) {
-      semicolons.add(m.start());
+    public JavaObjectNode(TreeNode parent, String fieldName, Object object) {
+      this.parent = parent;
+      this.fieldName = fieldName;
+      this.object = object;
+      addChildren();
     }
 
-    m = CommentMap.COMMENT_PATTERN.matcher(sqlStr);
-    while (m.find()) {
-      int start = m.start();
-      int end = m.end();
+    private void addChildren() {
+      ArrayList<Field> fields = new ArrayList<>( FieldUtils.getAllFieldsList( object.getClass() ) );
 
-      int n = semicolons.size();
-      for (int i = n - 1; i >= 0; i--) {
-        int pos = semicolons.get(i);
-        if (start <= pos && pos < end) {
-          semicolons.remove(i);
+      for (Field field: fields) try {
+        System.out.println(object.getClass().getName() + " : " + field);
+        Object child = FieldUtils.readField(field, this.object, true);
+        if (object instanceof net.sf.jsqlparser.schema.Column) {
+          // enforce Leaf
+        } else if (child.getClass().getName().startsWith("net.sf.jsqlparser")
+                && !child.getClass().getName().startsWith("net.sf.jsqlparser.parser")
+                && !child.getClass().isEnum()
+        ) {
+          JavaObjectNode childNode = new JavaObjectNode(this, field.getName(), child);
+          children.add(childNode);
+        } else if (child instanceof Collection ) {
+          Collection collection = (Collection) child;
+          if (!collection.isEmpty() && collection.toArray()[0].getClass().getName().startsWith("net.sf.jsqlparser")) {
+            JavaObjectNode childNode = new JavaObjectNode(this, field.getName(), child);
+            children.add(childNode);
+
+            for (Object element : collection) if (element.getClass().getName().startsWith("net.sf.jsqlparser") ) {
+                JavaObjectNode subChildNode = new JavaObjectNode(childNode, field.getName(), element);
+                childNode.children.add(subChildNode);
+              }
+          }
         }
+      } catch (Exception ignore) {
+
       }
     }
 
-    int pos = 0;
-    int length = sqlStr.length();
-    int n = semicolons.size();
-    for (int i = 0; i < n; i++) {
-      int semicolonPos = semicolons.get(i);
-
-      if (semicolonPos > pos) {
-        String statementSql = sqlStr.substring(pos, Integer.min(semicolonPos + 1, length));
-        pos = semicolonPos + 1;
-
-        // we are at the end and find only remaining whitespace
-        if (statementSql.trim().length() == 0) break;
-
-        StringBuilder statementBuilder = new StringBuilder();
-
-        boolean useSquareBracketQuotation;
-        switch (squaredBracketQuotation) {
-          case YES:
-            useSquareBracketQuotation = true;
-            LOGGER.log(
-                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
-            break;
-          case NO:
-            useSquareBracketQuotation = false;
-            LOGGER.log(
-                Level.FINE, "Square Bracket Quotation set as {0}.", useSquareBracketQuotation);
-            break;
-          case AUTO:
-          default:
-            useSquareBracketQuotation =
-                SQUARED_BRACKET_QUOTATION_PATTERN.matcher(statementSql).find();
-            LOGGER.log(
-                Level.FINE,
-                "Square Bracket Quotation auto-detected as {0}.",
-                useSquareBracketQuotation);
-        }
-
-        CommentMap commentMap = new CommentMap(statementSql);
-
-        Pattern DIRECTIVE_PATTERN = Pattern.compile("@JSQLFormatter\\s?\\((.*)\\)");
-        for (Comment comment : commentMap.values()) {
-          Matcher m1 = DIRECTIVE_PATTERN.matcher(comment.text);
-          if (m1.find()) {
-            String[] keyValuePairs = m1.group(1).split(",");
-            applyFormattingOptions(keyValuePairs);
-          }
-        }
-
-        /*
-         * public static Statement parse(String sql, Consumer<CCJSqlParser> consumer) throws
-         * JSQLParserException { CCJSqlParser parser = newParser(sql); if (consumer != null) {
-         * consumer.accept(parser); } return parseStatement(parser); }
-         */
-
-        try {
-          CCJSqlParser parser = newParser(statementSql);
-          Statement statement = parser.Statement();
-          Node root = parser.getASTRoot();
-
-          nodes.add(root);
-
-        } catch (Exception ex1) {
-          LOGGER.log(Level.WARNING, "Failed for format statement between \n" + statementSql, ex1);
-        }
-      } else break;
+    @Override
+    public TreeNode getChildAt(int childIndex) {
+      return children.get(childIndex);
     }
 
+    @Override
+    public int getChildCount() {
+      return children.size();
+    }
+
+    @Override
+    public TreeNode getParent() {
+      return parent;
+    }
+
+    @Override
+    public int getIndex(TreeNode node) {
+      return children.indexOf(node);
+    }
+
+    @Override
+    public boolean getAllowsChildren() {
+      return true;
+    }
+
+    @Override
+    public boolean isLeaf() {
+      return children.isEmpty();
+    }
+
+    @Override
+    public Enumeration<? extends TreeNode> children() {
+      return Collections.enumeration(children);
+    }
+
+    @Override
+    public String toString() {
+      if (object instanceof net.sf.jsqlparser.schema.Column
+          || object instanceof net.sf.jsqlparser.schema.Table
+              || object instanceof net.sf.jsqlparser.schema.Database
+              || object instanceof net.sf.jsqlparser.schema.Sequence
+              || object instanceof net.sf.jsqlparser.schema.Server
+              || object instanceof net.sf.jsqlparser.schema.Synonym
+      ) {
+        return "<html><font color='gray'>" + object.getClass().getSimpleName() + ":</font> <em>" + object.toString()  + "</em></html>";
+      } else if (object instanceof Collection) {
+        return "<html><font color='gray'>" + fieldName + " -></font> Collection&lt;" + ((Collection) object).toArray()[0].getClass().getSimpleName() + "&gt;</html>";
+      } else if (isLeaf()) {
+        return "<html><font color='gray'>" + object.getClass().getSimpleName() + ":</font> <em>" + object.toString()  + "</em></html>";
+      } else {
+        return object.getClass().getCanonicalName();
+      }
+    }
+  }
+
+  public static ArrayList<JavaObjectNode> getAstNodes(String sqlStr, String... options) throws Exception {
+    ArrayList<JavaObjectNode> nodes = new ArrayList<>();
+
+    Statements statements = CCJSqlParserUtil.parseStatements(sqlStr);
+    for (Statement statement:statements.getStatements()) {
+      JavaObjectNode node = new JavaObjectNode(null, "Statements", statement);
+      nodes.add(node);
+    }
     return nodes;
   }
 
