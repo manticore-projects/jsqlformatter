@@ -24,13 +24,12 @@ repositories {
 
 dependencies {
     implementation project(':JSQLParser')
-    //implementation 'com.github.jsqlparser:jsqlparser:4.3-SNAPSHOT'
 
     implementation 'commons-cli:commons-cli:1.+'
     implementation 'com.diogonunes:JColor:5.+'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:21.+'
+    implementation 'org.graalvm.sdk:graal-sdk:+'
 
     implementation 'commons-io:commons-io:2.+'
     implementation 'com.github.julianthome:inmemantlr-api:1.+'
@@ -83,7 +82,7 @@ tasks.withType(Test)  {
 }
 
 
-task renderRR {
+task website {
     doLast {
         // these WAR files have been provided as a courtesy by Gunther Rademacher
         // and belong to the RR - Railroad Diagram Generator Project
@@ -127,13 +126,15 @@ task renderRR {
             ]
         }
     }
+
+    dependsOn(sphinx)
 }
 
 task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
     fromRepo = file("$projectDir")
-    file = new File("CHANGELOG.md")
-    templateContent = """
- Changelog of JSQLParser.
+    file = new File("${projectDir}/src/site/sphinx/CHANGELOG.md")
+    templateContent ="""
+#Changelog
 
 {{#tags}}
 ## {{name}}
@@ -146,24 +147,19 @@ task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 ### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
    {{/hasLink}}
   {{/hasIssue}}
-  {{^hasIssue}}
-### {{name}}
-  {{/hasIssue}}
 
   {{#commits}}
-**{{{messageTitle}}}**
+**{{{messageTitle}}}** - {{authorName}} {{commitTime}}
 
 {{#messageBodyItems}}
- * {{.}}
+    - {{.}}
 {{/messageBodyItems}}
-
-[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
 
   {{/commits}}
 
  {{/issues}}
 {{/tags}}
- """;
+"""
 }
 
 sphinx {
@@ -180,6 +176,10 @@ sphinx {
     ]
     // env 'ENV_BAZ', 'value3'
     // tags 'tagA', 'tagB'
+
+    dependencies {
+       gitChangelogTask
+    }
 }
 
 
