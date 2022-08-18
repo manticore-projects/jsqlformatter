@@ -2,6 +2,24 @@
 Java SQL Formatting Library
 ***************************
 
+.. toctree::
+   :caption: Documentation
+   :maxdepth: 2
+   :hidden:
+   :numbered:
+
+   install
+   usage
+   syntax
+   samples
+   demo
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   changelog
+
 .. sidebar:: Ansi output
 
 	.. image:: _static/ansi-terminal.png
@@ -31,19 +49,3 @@ Platform
   * Java Library (JAR)
   * Native Static Binary or Dynamic Libray for Windows, Linux or MacOS
   * Netbeans Plugin (Other platforms such as Eclipse, JEdit, Squirrel SQL, DBeaver coming soon)
-
-.. toctree::
-   :caption: Documentation
-   :maxdepth: 2
-   :numbered:
-
-   install
-   usage
-   syntax
-   samples
-   demo
-
-.. toctree::
-   :maxdepth: 1
-
-   changelog

@@ -9,6 +9,11 @@ Latest Changes
 
 
 
+**Fix the Build file** - Andreas Reichel 2022-08-18 12:30:41
+
+  * Restore dependencies on INMEMANTLR
+  * Task Website depends on JAR Task
+
 **Improve the Changelog** - Andreas Reichel 2022-08-18 12:17:38
 
   * Write REST and get rid of the M2R2 extension
