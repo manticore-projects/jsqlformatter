@@ -34,6 +34,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
     implementation 'org.graalvm.sdk:graal-sdk:+'
 
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'com.github.julianthome:inmemantlr-api:1.9.2'
+    testImplementation 'junit:junit:4.13.2'
+
+    // for the RR Tools
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'net.sf.saxon:Saxon-HE:11.3'
+
     // for the RR Tools
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'net.sf.saxon:Saxon-HE:11.3'
@@ -184,7 +192,7 @@ task website {
         }
     }
 
-    dependsOn(gitChangelogTask, sphinx)
+    dependsOn(jar, gitChangelogTask, sphinx)
 }
 
 
