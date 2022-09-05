@@ -6,7 +6,6 @@ Java SQL Formatting Library
    :caption: Documentation
    :maxdepth: 2
    :hidden:
-   :numbered:
 
    install
    usage
@@ -26,7 +25,7 @@ Java SQL Formatting Library
 
 	Format SQL files in the Terminal Console.
 
-Platform independant SQL Formatter, Beautifier and Pretty Printer by Manticore Projects.
+Platform independent SQL Formatter, Beautifier and Pretty Printer by Manticore Projects.
 
 .........
 Features
@@ -47,5 +46,5 @@ Features
 Platform
 .........
   * Java Library (JAR)
-  * Native Static Binary or Dynamic Libray for Windows, Linux or MacOS
+  * Native Static Binary or Dynamic Library for Windows, Linux or MacOS
   * Netbeans Plugin (Other platforms such as Eclipse, JEdit, Squirrel SQL, DBeaver coming soon)

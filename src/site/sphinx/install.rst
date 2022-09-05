@@ -13,21 +13,21 @@ Git
 
    .. tab:: Maven
 
-	  .. code:: Bash
+     .. code:: Bash
 
-		mvn install
+      mvn install
 
    .. tab:: Gradle
 
-	  .. code:: Bash
+     .. code:: Bash
 
-		gradle build
+      gradle build
 
    .. tab:: Ant
 
-	  .. code:: Bash
+     .. code:: Bash
 
-		ant jar
+      ant jar
 
 
 Maven Repo
@@ -36,11 +36,11 @@ Maven Repo
 .. code-block:: xml
    :substitutions:
 
-	<dependency>
-		<groupId>com.manticore-projects.jsqlformatter</groupId>
-		<artifactId>jsqlformatter</artifactId>
-		<version>|VERSION|</version>
-	</dependency>
+   <dependency>
+      <groupId>com.manticore-projects.jsqlformatter</groupId>
+      <artifactId>jsqlformatter</artifactId>
+      <version>|JSQLFORMATTER_VERSION|</version>
+   </dependency>
 
 Download
 ===================
@@ -53,20 +53,23 @@ Static Binaries
    :header-rows: 1
 
    * - Operating System
-	 - File
-	 - Size
-   * - Linux x64
-	 - :downloads:`JSQLFormatter <0.1.11/JSQLFormatter>`
-	 - (3 MB)
-   * - Windows x64
-	 - :downloads:`JSQLFormatter.exe <0.1.11/JSQLFormatter.exe>`
-	 - (3 MB)
-   * - Java
-	 - :downloads:`JSQLFormatter.jar <0.1.11/JSQLFormatter-0.1.11.jar>`
-	 - (700 kB)
-   * - MacOS
-	 - :downloads:`JSQLFormatter.dmg <0.1.11/JSQLFormatter.dmg>`
-	 - (3 MB)
+     - File
+     - Size
+   * - Java Stable Release
+     - |JSQLFORMATTER_STABLE_VERSION_LINK|
+     - (700 kB)
+   * - Java Development Snapshot
+     - |JSQLFORMATTER_SNAPSHOT_VERSION_LINK|
+     - (700 kB)
+   * - Linux x64 Stable Release
+     - |JSQLFORMATTER_STABLE_LINUX_BINARY_LINK|
+     - (3 MB)
+   * - Windows x64 Stable Release
+     - |JSQLFORMATTER_STABLE_WINDOWS_BINARY_LINK|
+     - (3 MB)
+   * - MacOS Stable Release
+     - |JSQLFORMATTER_STABLE_MACOSX_BINARY_LINK|
+     - (3 MB)
 
 .. note::
 
@@ -75,7 +78,7 @@ Static Binaries
 Native Dynamic Libraries
 ---------------------------------------------
 
-	Comming soon.
+   Coming soon.
 
 Plugins
 ---------------------------------------------
@@ -85,8 +88,8 @@ Plugins
    :header-rows: 1
 
    * - Platform
-	 - File
-	 - Size
+     - File
+     - Size
    * - Netbeans 12
-	 - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.11/externalcodeformatter-sql.nbm>`
-	 - (45.2 MB)
+     - `ExternalCodeFormatter-SQL.nbm <0.1.11/externalcodeformatter-sql.nbm>`_
+     - (45.2 MB)
