@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * To change this license header, choose License Headers in Project Properties. To change this
+ * template file, choose Tools | Templates and open the template in the editor.
  */
 
 package com.manticore.jsqlformatter;
@@ -22,25 +21,22 @@ import net.sf.jsqlparser.expression.OracleHint;
 public class CommentMap extends LinkedHashMap<Integer, Comment> {
   private static final Logger LOGGER = Logger.getLogger(CommentMap.class.getName());
 
-  public static final Pattern COMMENT_PATTERN =
-      Pattern.compile(
-          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")"
-              + "|(^/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/\\s?\\n?|/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/|--.*?\\r?[\\n])",
-          Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
+  public static final Pattern COMMENT_PATTERN = Pattern.compile("(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")"
+      + "|(^/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/\\s?\\n?|/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/|--.*?\\r?[\\n])",
+      Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
   public static final Pattern LINE_END_COMMENT_PATTERN =
       Pattern.compile("(\\/\\*.*\\\\*\\/\\s?[\\,\\)]?\\n)");
 
   private static final Pattern STRING_PATTERN =
-      Pattern.compile(
-          "(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")",
+      Pattern.compile("(?:'[^']*+')|(?:\\\"[^\\\"]*+\\\")",
           Pattern.DOTALL | Pattern.MULTILINE | Pattern.UNIX_LINES);
 
   private static final AnsiFormat ANSI_FORMAT_COMMENT =
       new AnsiFormat(Attribute.CLEAR(), Attribute.BRIGHT_BLACK_TEXT(), Attribute.ITALIC());
 
-  private static StringBuilder appendComment(
-      StringBuilder builder, OutputFormat format, String keyword, String before, String after) {
+  private static StringBuilder appendComment(StringBuilder builder, OutputFormat format,
+      String keyword, String before, String after) {
     switch (format) {
       case PLAIN:
         builder.append(before).append(keyword).append(after);
@@ -66,7 +62,8 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
       int end = matcher.end(0);
 
       if (!STRING_PATTERN.matcher(group).matches()) {
-        if (OracleHint.isHintMatch(group)) LOGGER.log(Level.FINE, "Oracle hint {0}", group);
+        if (OracleHint.isHintMatch(group))
+          LOGGER.log(Level.FINE, "Oracle hint {0}", group);
         else {
           Comment comment = new Comment(start, group);
           if (start == 0 || (sqlStr.charAt(start - 1) == '\n' && sqlStr.charAt(end - 1) == '\n')) {
@@ -85,22 +82,21 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     for (Comment comment : values()) {
       while (absolutePosition < comment.absolutePosition) {
         char c = sqlStr.charAt(absolutePosition);
-        if (!Character.isWhitespace(c)) relativePosition++;
+        if (!Character.isWhitespace(c))
+          relativePosition++;
 
         absolutePosition++;
       }
       comment.relativePosition = relativePosition - totalCommentsLength;
       totalCommentsLength += comment.text.replaceAll("\\s", "").length();
 
-      LOGGER.log(
-          Level.FINE,
-          "Found comment {0} at Position {1} (absolute) {2} (relative).",
+      LOGGER.log(Level.FINE, "Found comment {0} at Position {1} (absolute) {2} (relative).",
           new Object[] {comment.text, comment.absolutePosition, comment.relativePosition});
     }
   }
 
-  public StringBuilder insertComments(
-      StringBuilder sqlStrWithoutComments, OutputFormat outputFormat) {
+  public StringBuilder insertComments(StringBuilder sqlStrWithoutComments,
+      OutputFormat outputFormat) {
 
     StringBuilder builder = new StringBuilder();
 
@@ -117,15 +113,17 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
         if (ansiStarted < 0)
           while (next.relativePosition <= relativePosition) {
-            if (next.extraNewLine) builder.append("\n");
-            else if (next.newLine
-                && builder.length() > 1
-                && builder.charAt(builder.length() - 1) != '\n') builder.append("\n");
-            else if (!c.matches("\\w")) builder.append(" ");
+            if (next.extraNewLine)
+              builder.append("\n");
+            else if (next.newLine && builder.length() > 1
+                && builder.charAt(builder.length() - 1) != '\n')
+              builder.append("\n");
+            else if (!c.matches("\\w"))
+              builder.append(" ");
 
             if (!next.newLine && next.text.startsWith("--")) {
-              appendComment(
-                  builder, outputFormat, next.text.trim().replaceFirst("--\\s?", "/* "), "", " */");
+              appendComment(builder, outputFormat, next.text.trim().replaceFirst("--\\s?", "/* "),
+                  "", " */");
             } else {
               appendComment(builder, outputFormat, next.text, "", "");
             }
@@ -144,20 +142,19 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
             int nextBreak = remaining.indexOf('\n');
             if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().length() == 0) {
               builder.append(remaining.substring(nextBreak + 1));
-            } else builder.append(remaining);
-          } else builder.append(remaining);
+            } else
+              builder.append(remaining);
+          } else
+            builder.append(remaining);
           break;
         }
 
-        if (ansiStarted < 0
-            && position + 2 <= sqlStrWithoutComments.length()
+        if (ansiStarted < 0 && position + 2 <= sqlStrWithoutComments.length()
             && sqlStrWithoutComments.substring(position, position + 2).matches("\u001B\\["))
           ansiStarted = position;
 
-        if (ansiStarted >= 0
-            && sqlStrWithoutComments
-                .substring(ansiStarted, position + 1)
-                .matches("\u001B\\[[;\\d]*[ -/]*[@-~]")) {
+        if (ansiStarted >= 0 && sqlStrWithoutComments.substring(ansiStarted, position + 1)
+            .matches("\u001B\\[[;\\d]*[ -/]*[@-~]")) {
           ansiStarted = -1;
         }
 
@@ -166,14 +163,12 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
           if (lastBreak < 0 || builder.substring(lastBreak).trim().length() > 0) {
             builder.append(c);
           }
-        } else builder.append(c);
+        } else
+          builder.append(c);
 
         if (ansiStarted < 0) {
-          relativePosition =
-              sqlStrWithoutComments
-                  .substring(0, position + 1)
-                  .replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]|\\s", "")
-                  .length();
+          relativePosition = sqlStrWithoutComments.substring(0, position + 1)
+              .replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]|\\s", "").length();
         }
       }
     }
