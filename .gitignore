@@ -26,6 +26,12 @@ hs_err_pid*
 /dist/
 /target/
 
+# Sphinx Theme related stuff, which shall be downloaded separately
+/src/site/sphinx/_themes
+
+# Exclude the Auto-generated Changelog
+/src/site/sphinx/changelog.rst
+
 release.properties
 pom.xml.releaseBackup
 pom.xml.versionsBackup
