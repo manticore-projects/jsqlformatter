@@ -8,6 +8,27 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **doc: Add link to the samples**
+    
+    Andreas Reichel, 2022-09-05
+  * **doc: Add CSS files**
+    
+    Andreas Reichel, 2022-09-05
+  * **chore: Add build config files for PMD, checkstyle**
+    
+    Andreas Reichel, 2022-09-05
+  * **chore: Exclude SPHINX theme from repo**
+    
+    Andreas Reichel, 2022-09-05
+  * **feat: AST Visualisation**
+    
+    Andreas Reichel, 2022-09-05
+  * **doc: Update the Sphinx Documentation**
+    
+    Andreas Reichel, 2022-09-05
+  * **build: Enhance the Gradle Build file**
+    
+    Andreas Reichel, 2022-09-05
   * **Sphinx Documentation**
     
     Andreas Reichel, 2022-08-18
@@ -162,7 +183,7 @@ Version 0.1.6
   * **Update documentation for 0.1.6**
     
     Andreas Reichel, 2021-05-01
-  * **Fix CREATE TABLE with Separation&#x3D;AFTER**
+  * **Fix CREATE TABLE with Separation=AFTER**
     
     Andreas Reichel, 2021-05-01
   * **Getter/Setter for the formatting options**
