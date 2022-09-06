@@ -8,6 +8,23 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **style: exclude License headers from formatter**
+    
+    Andreas Reichel, 2022-09-06
+
+Version 1.0.0
+=============================================================
+
+
+  * **fix: format Old Oracle JOINs `(+)`**
+    
+    Andreas Reichel, 2022-09-06
+  * **chore: use Gradle License plugin**
+    
+    Andreas Reichel, 2022-09-06
+  * **doc: Properly un-escape the Git Commit message**
+    
+    Andreas Reichel, 2022-09-05
   * **doc: Add link to the samples**
     
     Andreas Reichel, 2022-09-05

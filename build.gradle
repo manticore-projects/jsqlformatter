@@ -184,29 +184,32 @@ Version {{name}}
 task sphinx(type: Exec) {
     dependsOn(build, gitChangelogTask)
 
+    def versionJSQLFormatterStable = getVersion(false);
+    def versionJSQLFormatterSnapshot = getVersion(true);
+
     def String PROLOG = """
 .. |JSQLFORMATTER_EMAIL| replace:: support@manticore-projects.com
 .. |JSQLFORMATTER_VERSION| replace:: ${getVersion(false)}
 .. |JSQLFORMATTER_SNAPSHOT_VERSION| replace:: ${getVersion(true)}
 .. |JSQLFORMATTER_STABLE_VERSION_LINK| raw:: html
 
-    <a href='http://manticore-projects.com/downloads/jsqlparser-${getVersion(false)}/jsqlparser-${getVersion(false)}.jar'>jsqlparser-${getVersion(false)}.jar</a>
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.jar</a>
 
 .. |JSQLFORMATTER_STABLE_LINUX_BINARY_LINK| raw:: html
 
-    <a href='http://manticore-projects.com/downloads/jsqlparser-${getVersion(false)}/jsqlparser-${getVersion(false)}.jar'>jsqlparser-${getVersion(false)}</a>
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}</a>
 
 .. |JSQLFORMATTER_STABLE_WINDOWS_BINARY_LINK| raw:: html
 
-    <a href='http://manticore-projects.com/downloads/jsqlparser-${getVersion(false)}/jsqlparser-${getVersion(false)}.jar'>jsqlparser-${getVersion(false)}.exe</a>
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.exe</a>
 
 .. |JSQLFORMATTER_STABLE_MACOSX_BINARY_LINK| raw:: html
 
-    <a href='http://manticore-projects.com/downloads/jsqlparser-${getVersion(false)}/jsqlparser-${getVersion(false)}.jar'>jsqlparser-${getVersion(false)}.dmg</a>
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.dmg</a>
 
 .. |JSQLFORMATTER_SNAPSHOT_VERSION_LINK| raw:: html
 
-    <a href='http://manticore-projects.com/downloads/jsqlparser-${getVersion(false)}/jsqlparser-${getVersion(true)}.jar'>jsqlparser-${getVersion(true)}.jar</a>
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterSnapshot}.jar'>${project.name}-${versionJSQLFormatterSnapshot}.jar</a>
 
 """
 
