@@ -57,6 +57,7 @@ import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -2332,13 +2333,37 @@ public class JSQLFormatter {
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
 
+      /*
+      return //(isNot() ? "NOT " : "")
+                (oraclePriorPosition == ORACLE_PRIOR_START ? "PRIOR " : "")
+                + getLeftExpression()
+                + (oldOracleJoinSyntax == ORACLE_JOIN_RIGHT ? "(+)" : "") + " "
+                + getStringExpression() + " "
+                + (oraclePriorPosition == ORACLE_PRIOR_END ? "PRIOR " : "")
+                + getRightExpression()
+                + (oldOracleJoinSyntax == ORACLE_JOIN_LEFT ? "(+)" : "");
+       */
+
+
+      if (equalsTo.getOraclePriorPosition() == EqualsTo.ORACLE_PRIOR_START)
+        appendOperator(builder, outputFormat, "PRIOR", "", " ");
+
       appendExpression(equalsTo.getLeftExpression(), null, builder, indent + 1, i, n, false,
           BreakLine.AS_NEEDED);
 
+      if (equalsTo.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_RIGHT)
+        appendOperator(builder, outputFormat, "(+)", "", " ");
+
       appendOperator(builder, outputFormat, "=", " ", " ");
+
+      if (equalsTo.getOraclePriorPosition() == EqualsTo.ORACLE_PRIOR_END)
+        appendOperator(builder, outputFormat, "PRIOR", "", " ");
 
       appendExpression(equalsTo.getRightExpression(), alias, builder, indent + 1, i, n, false,
           BreakLine.AFTER_FIRST);
+
+      if (equalsTo.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT)
+        appendOperator(builder, outputFormat, "(+)", "", " ");
 
     } else if (expression instanceof Parenthesis) {
       Parenthesis parenthesis = (Parenthesis) expression;

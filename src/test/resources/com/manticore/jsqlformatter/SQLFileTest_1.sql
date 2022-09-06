@@ -373,3 +373,33 @@ WHERE l.opname NOT LIKE 'RMAN%'
     AND l.sofar <> l.totalwork
     AND l.time_remaining > 0
 ;
+
+
+-- Old Oracle Outer Joins (+)
+SELECT *
+FROM foo
+    , bar
+WHERE foo.id = bar.id(+)
+;
+
+
+SELECT *
+FROM foo
+    , bar
+WHERE foo.id(+)  = bar.id
+;
+
+
+SELECT  v.lname
+        , v.function
+        , d.name
+FROM (  SELECT  e.dept_id
+                , e.lname
+                , j.function
+        FROM employee e
+            , job j
+        WHERE e.job_id(+)  = j.job_id ) v
+    , department d
+WHERE v.dept_id(+)  = d.dept_id
+;
+
