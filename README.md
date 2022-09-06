@@ -1,5 +1,5 @@
 # manticore JSQLFormatter
-Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](http://manticore-projects.com/JSQLFormatter/index.html) and try the [ONLINE Demo](http://vbox.manticore-projects.com).
+Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](http://manticore-projects.com/JSQLFormatter/index.html) and try the [ONLINE Demo](http://jsqlformatter.manticore-projects.com).
 
 
 ![ANSI Output](./src/site/sphinx/_static/ansi-terminal.png)
