@@ -1,21 +1,20 @@
-/*
-   Manticore JSQLFormater is a SQL Beautifying and Formatting Software.
-   Copyright (C) 2021  Andreas Reichel <andreas@manticore-rpojects.com>
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
-
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
+/**
+ * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
+ * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.manticore.jsqlformatter;
 
 import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
@@ -57,7 +56,7 @@ public class SQLFileTest {
       }
       sqlMap.put("COMMENTED SQL", stringBuilder.toString().trim());
     } catch (IOException ex) {
-      //          ETLConnection.logger.log(Level.SEVERE, null, ex);
+      // ETLConnection.logger.log(Level.SEVERE, null, ex);
     }
 
     Object[][] o = new Object[sqlMap.size()][2];
@@ -86,12 +85,8 @@ public class SQLFileTest {
   public static String buildSqlString(final String originalSql, boolean laxDeparsingCheck) {
     String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
     if (laxDeparsingCheck) {
-      String s =
-          sql.replaceAll("\\s", " ")
-              .replaceAll("\\s+", " ")
-              .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1")
-              .toLowerCase()
-              .trim();
+      String s = sql.replaceAll("\\s", " ").replaceAll("\\s+", " ")
+          .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1").toLowerCase().trim();
       return s.endsWith(";") ? s.substring(0, s.length() - 1) : s;
 
     } else {
@@ -108,7 +103,8 @@ public class SQLFileTest {
   public void testFormat() throws Exception {
     String formatted = JSQLFormatter.format(expected);
 
-    // Check if the formatted statement still can be parsed and gives the same content
+    // Check if the formatted statement still can be parsed and gives the same
+    // content
     String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
     System.out.println(formatted);
 

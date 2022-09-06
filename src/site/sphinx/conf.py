@@ -1,88 +1,50 @@
 # -*- coding: utf-8 -*-
-import sys, os
-
-sys.path.append('/home/are/.local/lib/python3.9/site-packages')
-import sphinx_redactor_theme, rtcat_sphinx_theme
-
-#rst_epilog = """
-#.. |EMAIL| replace:: {0}
-#.. |VERSION| replace:: {1}
-#""".format(email_support, versionName)
-
-artifactId = "com.manticore-projects.jsqlformatter"
-projectName = "JSQLFormatter"
-versionName = "0.1.12"
-developerName = "Andreas Reichel"
-email_support = "andreas@manticore-projects.com"
-
-rst_prolog = """
-.. |EMAIL| replace:: {0}
-.. |VERSION| replace:: {1}
-""".format(email_support, versionName)
-
-extlinks = {'downloads': ('https://github.com/manticore-projects/jsqlformatter/releases/download/%s', '%s')}
-
-#rst_epilog = """
-#.. |email_support| replace:: {0}
-#""".format(email_support)
-
-project = projectName
-copyright = u'2021, ' + developerName
-release = versionName
 
 # General options
 needs_sphinx = '1.0'
-master_doc = 'index'
-pygments_style = 'colorful'
 add_function_parentheses = True
 
-extensions = ['recommonmark', 'sphinx.ext.autodoc', 'sphinx_rtd_theme', 'sphinx_git', 'sphinx.ext.githubpages', 'sphinx_tabs.tabs', 'sphinx.ext.extlinks', 'sphinx-prompt', 'sphinx_substitution_extensions', 'sphinx_issues']
+extensions = ['myst_parser', 'sphinx.ext.autodoc', 'sphinx.ext.autosectionlabel', 'sphinx.ext.extlinks', 'sphinx-prompt', 'sphinx_substitution_extensions', 'sphinx_issues', 'sphinx_tabs.tabs', 'pygments.sphinxext', ]
 
-issues_github_path = "manticore-projects/jsqlformatter"
+issues_github_path = "JSQLParser/JSqlParser"
 
-templates_path = ['templates']
-exclude_trees = ['.build']
 source_encoding = 'utf-8-sig'
+pygments_style = 'friendly'
+show_sphinx = False
+master_doc = 'index'
+exclude_patterns = ['_themes', '_static/css']
+
 
 # HTML options
-
-#html_theme = 'sphinx_redactor_theme'
-#html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
-
-html_theme = "rtcat_sphinx_theme"
-html_theme_path = [rtcat_sphinx_theme.get_html_theme_path()]
-
-#html_theme = "sphinxdoc"
-#html_theme_path = [rtcat_sphinx_theme.get_html_theme_path()]
-
-#html_theme = "sphinx_rtd_theme"
-html_theme_options = {
-    'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
-    #'analytics_anonymize_ip': False,
-    'logo_only': False,
-    'display_version': True,
-    'style_nav_header_background': '#39698a',
-    #'prev_next_buttons_location': 'bottom',
-    #'style_external_links': False,
-    #'vcs_pageview_mode': '',
-    
-
-    # Toc options
-    'collapse_navigation': False,
-    'sticky_navigation': False,
-    'navigation_depth': -1,
-    #'includehidden': True,
-    #'titles_only': False
-}
-
-
-html_short_title = artifactId
-htmlhelp_basename = artifactId + '-doc'
+html_theme = "manticore_sphinx_theme"
+html_theme_path = ["_themes"]
+html_short_title = "JSQLFormatter"
+htmlhelp_basename = "JSQLFormatter" + '-doc'
 html_use_index = True
 html_show_sourcelink = False
 html_static_path = ['_static']
 html_logo = '_static/manticore_logo.png'
+html_css_files = ["css/theme.css"]
 
-# PlantUML options
-plantuml = os.getenv('plantuml')
+
+html_theme_options = {
+    'canonical_url': '',
+    'analytics_id': 'UA-XXXXXXX-1',
+    'style_external_links': True,
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False,
+}
+
+
+html_context = {
+    'landing_page': {
+        'menu': [
+            {'title': 'Online Demo', 'url': 'http://217.160.215.75:8080/jsqlformatter/demo.html'},
+            {'title': 'Issue Tracker', 'url': 'https://github.com/JSQLParser/JSqlParser/issues'}
+        ]
+    }
+}
 

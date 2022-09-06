@@ -1,21 +1,20 @@
-/*
-   Manticore JSQLFormater is a SQL Beautifying and Formatting Software.
-   Copyright (C) 2021  Andreas Reichel <andreas@manticore-rpojects.com>
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
-
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
+/**
+ * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
+ * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.manticore.jsqlformatter;
 
 import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
@@ -60,13 +59,11 @@ public class StandardSelectTest {
       while ((line = bufferedReader.readLine()) != null) {
         if (!start && line.startsWith("--") && !line.startsWith("-- @"))
           k = line.substring(3).trim().toUpperCase();
-        start =
-            start
-                || (!start
-                    && (!line.startsWith("--") || line.startsWith("-- @"))
-                    && line.trim().length() > 0);
+        start = start || (!start && (!line.startsWith("--") || line.startsWith("-- @"))
+            && line.trim().length() > 0);
         end = start && line.trim().endsWith(";");
-        if (start) stringBuilder.append(line).append("\n");
+        if (start)
+          stringBuilder.append(line).append("\n");
         if (end) {
           sqlMap.put(k, stringBuilder.toString().trim());
           stringBuilder.setLength(0);
@@ -74,7 +71,7 @@ public class StandardSelectTest {
         }
       }
     } catch (IOException ex) {
-      //          ETLConnection.logger.log(Level.SEVERE, null, ex);
+      // ETLConnection.logger.log(Level.SEVERE, null, ex);
     }
 
     Object[][] o = new Object[sqlMap.size()][2];
@@ -103,12 +100,8 @@ public class StandardSelectTest {
   public static String buildSqlString(final String originalSql, boolean laxDeparsingCheck) {
     String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
     if (laxDeparsingCheck) {
-      String s =
-          sql.replaceAll("\\s", " ")
-              .replaceAll("\\s+", " ")
-              .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1")
-              .toLowerCase()
-              .trim();
+      String s = sql.replaceAll("\\s", " ").replaceAll("\\s+", " ")
+          .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1").toLowerCase().trim();
       return s.endsWith(";") ? s.substring(0, s.length() - 1) : s;
 
     } else {
@@ -123,26 +116,27 @@ public class StandardSelectTest {
    */
   @Test
   public void testFormat() throws Exception {
-    String formatted =
-        JSQLFormatter.format(
-            expected /*,"indentWidth=4", "keywordSpelling=UPPER", "functionSpelling=CAMEL", "objectSpelling=LOWER", "separation=BEFORE"*/);
+    String formatted = JSQLFormatter.format(expected /*
+                                                      * ,"indentWidth=4", "keywordSpelling=UPPER", "functionSpelling=CAMEL",
+                                                      * "objectSpelling=LOWER", "separation=BEFORE"
+                                                      */);
 
     System.out.println("\n-- " + input);
     System.out.println(formatted);
 
-    // Check if the formatted statement still can be parsed and gives the same content
+    // Check if the formatted statement still can be parsed and gives the same
+    // content
     String sqlStringFromStatement = buildSqlString(expected, true).toLowerCase();
 
     boolean foundSquareBracketQuotes = SQUARED_BRACKET_QUOTATION_PATTERN.matcher(expected).find();
 
-    Statement parsed =
-        CCJSqlParserUtil.parse(
-            formatted, parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
+    Statement parsed = CCJSqlParserUtil.parse(formatted,
+        parser -> parser.withSquareBracketQuotation(foundSquareBracketQuotes));
 
     String sqlStringFromDeparser = buildSqlString(parsed.toString(), true);
 
     // assertEquals(sqlStringFromStatement.trim(), sqlStringFromDeparser.trim());
-    //      Check if the formatted statement looks like the expected content
+    // Check if the formatted statement looks like the expected content
 
     assertEquals(expected.trim(), formatted.trim());
   }

@@ -5,12 +5,12 @@ Samples
 Create
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCreateTableTest.sql
+.. literalinclude:: resources/StandardCreateTableTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCreateIndexTest.sql
+.. literalinclude:: resources/StandardCreateIndexTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -18,7 +18,7 @@ Create
 Alter
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardAlterTest.sql
+.. literalinclude:: resources/StandardAlterTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -26,7 +26,7 @@ Alter
 Select
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardSelectTest.sql
+.. literalinclude:: resources/StandardSelectTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -35,7 +35,7 @@ Select
 Merge
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardMergeTest.sql
+.. literalinclude:: resources/StandardMergeTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -43,7 +43,7 @@ Merge
 Insert
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardInsertTest.sql
+.. literalinclude:: resources/StandardInsertTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -52,7 +52,7 @@ Insert
 Update
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardUpdateTest.sql
+.. literalinclude:: resources/StandardUpdateTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -61,7 +61,7 @@ Update
 Comments
 --------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/StandardCommentTest.sql
+.. literalinclude:: resources/StandardCommentTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -69,19 +69,19 @@ Comments
 MS Sql Server
 -------------------
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/BracketQuotationTest.sql
+.. literalinclude:: resources/BracketQuotationTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/MsSqlServerTest.sql
+.. literalinclude:: resources/MsSqlServerTest.sql
   :language: SQL
   :force:
   :linenos:
 
 Formatting Options
 -------------------
-.. literalinclude:: ../../../src/test/resources/com/manticore/jsqlformatter/FormattingOptionsTest.sql
+.. literalinclude:: resources/FormattingOptionsTest.sql
   :language: SQL
   :force:
   :linenos:

@@ -1,16 +1,17 @@
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
+import java.nio.charset.Charset
+
 plugins {
     id 'java'
     id 'maven-publish'
-    //id 'com.github.sherter.google-java-format' version '0.9'
+    id "com.diffplug.spotless" version "latest.release"
 
     // download the RR tools which have no Maven Repository
     id "de.undercouch.download" version "latest.release"
 
+    id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
-
-    id "kr.motd.sphinx" version "latest.release"
 }
 
 repositories {
@@ -26,38 +27,93 @@ repositories {
 }
 
 dependencies {
-    //implementation project(':JSQLParser')
-    implementation 'com.github.jsqlparser:jsqlparser:4.5-SNAPSHOT'
+    implementation project(':JSQLParser')
 
     implementation 'commons-cli:commons-cli:1.5.0'
-    implementation 'com.diogonunes:JColor:5.4.1'
+    implementation 'com.diogonunes:JColor:5.5.1'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:22.0.0.2'
+    implementation 'org.graalvm.sdk:graal-sdk:22.2.0'
 
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.github.julianthome:inmemantlr-api:1.9.2'
     testImplementation 'junit:junit:4.13.2'
 
     // for the RR Tools
-    implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'net.sf.saxon:Saxon-HE:11.3'
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'net.sf.saxon:Saxon-HE:11.4'
+
+    // for the ASCII Trees
+    implementation 'hu.webarticum:tree-printer:2.1.0'
 
 }
 
 group = 'com.manticore-projects.jsqlformatter'
-version = '0.1.12'
 description = 'JSQLFormatter'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+def getVersion = { boolean considerSnapshot ->
+    def major = 0
+    def minor = 0
+    def patch = 0
+    def build = 0
+    def commit = ""
+    def snapshot = ""
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            workingDir "$projectDir"
+            args = ["--no-pager"
+                    , "describe"
+                    , "--tags"
+                    , "--always"
+                    , "--dirty=-SNAPSHOT"]
+            executable "git"
+            standardOutput = os
+        }
+        def matcher = os.toString() =~ /(\d*)\.(\d*).(\d*)-?(\d*)-?([a-zA-Z\d]*)/
+        matcher.find()
+
+        major = matcher[0][1]
+        minor = matcher[0][2]
+        patch = matcher[0][3]
+        build = matcher[0][4]
+        commit = matcher[0][5]
+
+        if (considerSnapshot && os.toString().trim().endsWith("-SNAPSHOT")) {
+            minor++
+            snapshot = "-SNAPSHOT"
+        }
+    }
+    return "${major}.${minor}.${patch}${snapshot}"
+}
+version = getVersion(true)
 
 java {
     withSourcesJar()
     withJavadocJar()
 }
 
+license {
+    excludes(["**/*.txt", "**/*.conf", "**/*.sql",])
+    includes(["**/*.properties", "**/*.java", "**/*.xml"])
+
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'Andreas Reichel'
+    ext.email = 'andreas@manticore-projects.com'
+
+    strictCheck = false
+    ignoreFailures = true
+}
+
+spotless {
+    java {
+        eclipse().configFile('config/formatter/eclipse-java-google-style.xml')
+    }
+}
+
 publishing {
     publications {
-         mavenJava(MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId 'jsqlformatter'
             from(components.java)
             versionMapping {
@@ -71,7 +127,7 @@ publishing {
         }
     }
     repositories {
-       
+
         maven {
             // Username and Password are defined in ~/.gradle/gradle.properties
             name "ossrh"
@@ -85,15 +141,126 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-tasks.withType(Test)  {
+tasks.withType(Test) {
     maxParallelForks = 100
     forkEvery = 1
 }
 
+task gitChangelogTask(type: GitChangelogTask) {
+    fromRepo = file("$projectDir")
+    file = new File("${projectDir}/src/site/sphinx/changelog.rst")
+    //fromRef = "4.0";
+    //toRef = "1.1";
+    templateContent = """
+************************
+Changelog
+************************
 
-task renderRR {
-    dependsOn(sphinx)
 
+{{#tags}}
+{{#ifMatches name "^Unreleased.*"}}
+Latest Changes since |JSQLFORMATTER_VERSION|
+{{/ifMatches}}
+{{#ifMatches name "^(?!Unreleased).*"}}
+Version {{name}}
+{{/ifMatches}}
+=============================================================
+
+ {{#issues}}
+
+  {{#commits}}
+   {{#ifMatches messageTitle "^(?!Merge).*"}}
+  * **{{{messageTitle}}}**
+    
+    {{authorName}}, {{commitDate}}
+   {{/ifMatches}}
+  {{/commits}}
+
+ {{/issues}}
+{{/tags}}
+"""
+}
+
+task sphinx(type: Exec) {
+    dependsOn(build, gitChangelogTask)
+
+    def versionJSQLFormatterStable = getVersion(false)
+    def versionJSQLFormatterSnapshot = getVersion(true)
+
+    String PROLOG = """
+.. |JSQLFORMATTER_EMAIL| replace:: support@manticore-projects.com
+.. |JSQLFORMATTER_VERSION| replace:: ${getVersion(false)}
+.. |JSQLFORMATTER_SNAPSHOT_VERSION| replace:: ${getVersion(true)}
+.. |JSQLFORMATTER_STABLE_VERSION_LINK| raw:: html
+
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.jar</a>
+
+.. |JSQLFORMATTER_STABLE_LINUX_BINARY_LINK| raw:: html
+
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}</a>
+
+.. |JSQLFORMATTER_STABLE_WINDOWS_BINARY_LINK| raw:: html
+
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.exe</a>
+
+.. |JSQLFORMATTER_STABLE_MACOSX_BINARY_LINK| raw:: html
+
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterStable}.jar'>${project.name}-${versionJSQLFormatterStable}.dmg</a>
+
+.. |JSQLFORMATTER_SNAPSHOT_VERSION_LINK| raw:: html
+
+    <a href='http://manticore-projects.com/download/${project.name}-${versionJSQLFormatterStable}/${project.name}-${versionJSQLFormatterSnapshot}.jar'>${project.name}-${versionJSQLFormatterSnapshot}.jar</a>
+
+"""
+
+    args = ["-Dproject=JSQLFormatter"
+            , "-Dcopyright=manticore-projects Co. Ltd., 2022"
+            , "-Dauthor=Andreas Reichel"
+            , "-Drelease=${getVersion(false)}"
+            , "-Drst_prolog=$PROLOG"
+            , "${projectDir}/src/site/sphinx"
+            , "${project.buildDir}/sphinx"]
+
+    executable "sphinx-build"
+
+    //store the output instead of printing to the console:
+    standardOutput = new ByteArrayOutputStream()
+
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
+task upload(type: Exec) {
+    dependsOn(build, gitChangelogTask)
+
+    def versionJSQLFormatterStable = getVersion(false)
+    def versionJSQLFormatterSnapshot = getVersion(true)
+
+    // define the properties in ~/.gradle/gradle.properties
+    args = ["sftp://${findProperty("${project.name}.username")}@${findProperty("${project.name}.host")}/download"]
+
+    executable "sftp"
+
+    standardInput = new ByteArrayInputStream("""<<EOF
+                                                mkdir ${project.name}-${versionJSQLFormatterStable}
+                                                cd ${project.name}-${versionJSQLFormatterStable}
+                                                put build/libs/*
+                                                quit
+                                                EOF"""
+            .getBytes(Charset.defaultCharset()))
+
+    //store the output instead of printing to the console:
+    standardOutput = new ByteArrayOutputStream()
+
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
+task website {
     doLast {
         // these WAR files have been provided as a courtesy by Gunther Rademacher
         // and belong to the RR - Railroad Diagram Generator Project
@@ -115,17 +282,14 @@ task renderRR {
 
         javaexec {
             standardOutput = new FileOutputStream("${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf")
-            main="-jar"
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/rr/convert.war",
-                    "${project(':JSQLParser').buildDir}/generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj"
-            ]
+            main = "-jar"
+            args = ["${project(':JSQLFormatter').buildDir}/rr/convert.war",
+                    "${project(':JSQLParser').buildDir}/generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj"]
         }
 
         javaexec {
-            main="-jar"
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/rr/rr.war",
+            main = "-jar"
+            args = ["${project(':JSQLFormatter').buildDir}/rr/rr.war",
                     "-noepsilon",
                     "-color:#4D88FF",
                     "-offset:0",
@@ -133,8 +297,7 @@ task renderRR {
                     //"-png",
                     //"-out:${buildDir}/rr/JSqlParserCC.zip",
                     "-out:${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml",
-                    "${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf"
-            ]
+                    "${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf"]
         }
 
         javaexec {
@@ -143,64 +306,12 @@ task renderRR {
             description = "Run the main class with JavaExecTask"
             classpath = sourceSets.main.runtimeClasspath
             mainClass = 'com.manticore.jsqlformatter.RRTools'
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml"
-            ]
+            args = ["${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml"]
         }
     }
+
+    dependsOn(jar, gitChangelogTask, sphinx)
 }
 
-task gitChangelogTask(type: GitChangelogTask) {
-    fromRepo = file("$projectDir")
-    file = new File("CHANGELOG.md")
-    templateContent = """
- Changelog of JSQLParser.
-
-{{#tags}}
-## {{name}}
- {{#issues}}
-  {{#hasIssue}}
-   {{#hasLink}}
-### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-   {{^hasLink}}
-### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-  {{/hasIssue}}
-  {{^hasIssue}}
-### {{name}}
-  {{/hasIssue}}
-
-  {{#commits}}
-**{{{messageTitle}}}**
-
-{{#messageBodyItems}}
- * {{.}}
-{{/messageBodyItems}}
-
-[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
-
-  {{/commits}}
-
- {{/issues}}
-{{/tags}}
- """
-}
-
-sphinx {
-    binaryUrl = "file:///usr/bin/sphinx-build"
-    sourceDirectory = "${projectDir}/src/site/sphinx"
-    outputDirectory = "${project.buildDir}/sphinx"
-    // Add environment variables.
-    environments = [
-            'artifactId': 'com.manticore-projects.jsqlformatter'
-            , 'projectName': 'JSQLFormatter'
-            , 'versionName': version
-            , 'developerName': 'Andreas Reichel'
-            , 'email_support': 'andreas@manticore-projects.com'
-    ]
-    // env 'ENV_BAZ', 'value3'
-    // tags 'tagA', 'tagB'
-}
 
 

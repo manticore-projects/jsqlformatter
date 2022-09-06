@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.manticore-projects.jsqlformatter</groupId>
     <artifactId>jsqlformatter</artifactId>
-    <version>0.1.12</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>JSQLFormatter</name>
     <description>Java SQL Formatter, Beautifier and Pretty Printer based on JSQLParser.</description>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.6-SNAPSHOT</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
@@ -61,14 +61,14 @@
         <dependency>
             <groupId>com.diogonunes</groupId>
             <artifactId>JColor</artifactId>
-            <version>5.2.0</version>
+            <version>5.5.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk -->
         <dependency>
             <groupId>org.graalvm.sdk</groupId>
             <artifactId>graal-sdk</artifactId>
-            <version>21.2.0</version>
+            <version>22.2.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
@@ -89,7 +89,7 @@
             <!-- jsoup HTML parser library @ https://jsoup.org/ -->
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.14.3</version>
+            <version>1.15.3</version>
         </dependency>
 
         <dependency>
@@ -247,7 +247,7 @@
                         </includes>
                         <googleJavaFormat>
                             <version>1.9</version>
-                            <style>GOOGLE</style>
+                            <style>ECLIPSE</style>
                         </googleJavaFormat>
                     </java>
                 </configuration>
@@ -356,7 +356,6 @@
         </repository>
         <site>
             <id>gh_pages</id>
-            <!--<url>scm:git:ssh://git@github.com/manticore-projects/manticore-projects.github.io.git</url> -->
             <url>scm:git:ssh://git@github.com/manticore-projects/jsqlformatter.git</url>
         </site>
     </distributionManagement>

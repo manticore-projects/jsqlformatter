@@ -1,33 +1,33 @@
-************
-Installation
-************
+*****************************
+Installation of JSQLFormatter
+*****************************
 
 Git
 ===================
 .. code:: Bash
-    
+
    git clone https://github.com/manticore-projects/jsqlformatter.git
    cd jsqlformatter
-   
+
 .. tabs::
 
-   .. tab:: Maven 
+   .. tab:: Maven
 
-      .. code:: Bash
-      
-        mvn install
+     .. code:: Bash
+
+      mvn install
 
    .. tab:: Gradle
 
-      .. code:: Bash
+     .. code:: Bash
 
-        gradle build
+      gradle build
 
    .. tab:: Ant
 
-      .. code:: Bash
+     .. code:: Bash
 
-        ant jar
+      ant jar
 
 
 Maven Repo
@@ -35,12 +35,12 @@ Maven Repo
 
 .. code-block:: xml
    :substitutions:
-     
-    <dependency>
-        <groupId>com.manticore-projects.jsqlformatter</groupId>
-        <artifactId>jsqlformatter</artifactId>
-        <version>|VERSION|</version>
-    </dependency>
+
+   <dependency>
+      <groupId>com.manticore-projects.jsqlformatter</groupId>
+      <artifactId>jsqlformatter</artifactId>
+      <version>|JSQLFORMATTER_VERSION|</version>
+   </dependency>
 
 Download
 ===================
@@ -55,19 +55,22 @@ Static Binaries
    * - Operating System
      - File
      - Size
-   * - Linux x64
-     - :downloads:`JSQLFormatter <0.1.12/JSQLFormatter>`
-     - (3 MB) 
-   * - Windows x64
-     - :downloads:`JSQLFormatter.exe <0.1.12/JSQLFormatter.exe>`
-     - (3 MB) 
-   * - Java
-     - :downloads:`JSQLFormatter.jar <0.1.12/JSQLFormatter-0.1.12.jar>`
-     - (700 kB) 
-   * - MacOS
-     - :downloads:`JSQLFormatter.dmg <0.1.12/JSQLFormatter.dmg>`
-     - (3 MB) 
-     
+   * - Java Stable Release
+     - |JSQLFORMATTER_STABLE_VERSION_LINK|
+     - (700 kB)
+   * - Java Development Snapshot
+     - |JSQLFORMATTER_SNAPSHOT_VERSION_LINK|
+     - (700 kB)
+   * - Linux x64 Stable Release
+     - |JSQLFORMATTER_STABLE_LINUX_BINARY_LINK|
+     - (3 MB)
+   * - Windows x64 Stable Release
+     - |JSQLFORMATTER_STABLE_WINDOWS_BINARY_LINK|
+     - (3 MB)
+   * - MacOS Stable Release
+     - |JSQLFORMATTER_STABLE_MACOSX_BINARY_LINK|
+     - (3 MB)
+
 .. note::
 
   On MacOS, grant an exception for a blocked app by clicking the Open Anyway button in the General pane of Security & Privacy preferences.
@@ -75,8 +78,8 @@ Static Binaries
 Native Dynamic Libraries
 ---------------------------------------------
 
-    Comming soon.
-      
+   Coming soon.
+
 Plugins
 ---------------------------------------------
 
@@ -88,5 +91,5 @@ Plugins
      - File
      - Size
    * - Netbeans 12
-     - :downloads:`ExternalCodeFormatter-SQL.nbm <0.1.12/externalcodeformatter-sql.nbm>`
-     - (45.2 MB) 
+     - `ExternalCodeFormatter-SQL.nbm <0.1.11/externalcodeformatter-sql.nbm>`_
+     - (45.2 MB)
