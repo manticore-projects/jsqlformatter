@@ -12,83 +12,55 @@ Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](ht
 * Formatting Options for Indent Width, Comma Before or After, Upper/Lower/Camel Case spelling
 * Import from Java String or StringBuilder, while preserving variables
 * Export to Java String, StringBuilder or MessageFormat, while handling parameters
-
 * Command Line Option (CLI) and SQL Inline Options
 
-```shell
-java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
-       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
-       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-       <arg>] [--squareBracketQuotation <arg>]
-
- -i,--inputFile <arg>               The input SQL file or folder.
- -o,--outputFile <arg>              The out SQL file for the formatted
-                                    statements.
- -f,--outputFormat <arg>            The output-format.
-                                    [PLAIN* ANSI HTML RTF]
-    --ansi                          Output ANSI annotated text.
-    --html                          Output HTML annotated text.
- -t,--indent <arg>                  The indent width.
-                                    [2 4* 8]
- -2                                 Indent with 2 characters.
- -8                                 Indent with 8 characters.
-    --keywordSpelling <arg>         Keyword spelling.
-                                    [UPPER*, LOWER, CAMEL, KEEP]
-    --functionSpelling <arg>        Function name spelling.
-                                    [UPPER, LOWER, CAMEL*, KEEP]
-    --objectSpelling <arg>          Object name spelling.
-                                    [UPPER, LOWER*, CAMEL, KEEP]
-    --separation <arg>              Position of the field separator.
-                                    [BEFORE*, AFTER]
-    --squareBracketQuotation <arg>  Position of the field separator.
-                                    [AUTO*, YES, NO]
-```
-
-	```bash
+	```shell
 	java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
-		   --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
-		   [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-		   <arg>] [--squareBracketQuotation <arg>]
+	       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+	       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+	       <arg>] [--squareBracketQuotation <arg>]
+
 	 -i,--inputFile <arg>               The input SQL file or folder.
 	 -o,--outputFile <arg>              The out SQL file for the formatted
-										statements.
+					    statements.
 	 -f,--outputFormat <arg>            The output-format.
-										[PLAIN* ANSI HTML RTF]
-		--ansi                          Output ANSI annotated text.
-		--html                          Output HTML annotated text.
+					    [PLAIN* ANSI HTML RTF]
+	    --ansi                          Output ANSI annotated text.
+	    --html                          Output HTML annotated text.
 	 -t,--indent <arg>                  The indent width.
-										[2 4* 8]
+					    [2 4* 8]
 	 -2                                 Indent with 2 characters.
 	 -8                                 Indent with 8 characters.
-		--keywordSpelling <arg>         Keyword spelling.
-										[UPPER*, LOWER, CAMEL, KEEP]
-		--functionSpelling <arg>        Function name spelling.
-										[UPPER, LOWER, CAMEL*, KEEP]
-		--objectSpelling <arg>          Object name spelling.
-										[UPPER, LOWER*, CAMEL, KEEP]
-		--separation <arg>              Position of the field separator.
-										[BEFORE*, AFTER]
-		--squareBracketQuotation <arg>  Position of the field separator.
-										[AUTO*, YES, NO]
+	    --keywordSpelling <arg>         Keyword spelling.
+					    [UPPER*, LOWER, CAMEL, KEEP]
+	    --functionSpelling <arg>        Function name spelling.
+					    [UPPER, LOWER, CAMEL*, KEEP]
+	    --objectSpelling <arg>          Object name spelling.
+					    [UPPER, LOWER*, CAMEL, KEEP]
+	    --separation <arg>              Position of the field separator.
+					    [BEFORE*, AFTER]
+	    --squareBracketQuotation <arg>  Position of the field separator.
+					    [AUTO*, YES, NO]
 	```
 
-* simple usage of the Java library
-	
-  ```java
-  import com.manticore.jsqlformatter.JSqlFormatter;
-  ...
-  String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
-  ```
 
-  with Maven Artifact:
-   
-  ```xml
-  <dependency>
-    <groupId>com.manticore-projects.jsqlformatter</groupId>
-    <artifactId>jsqlformatter</artifactId>
-    <version>1.0.0</version>
-  </dependency>
-  ```
+* simple usage of the Java library
+
+	```java
+	import com.manticore.jsqlformatter.JSqlFormatter;
+	...
+	String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
+	```
+
+	with Maven Artifact:
+
+	```xml
+	<dependency>
+	    <groupId>com.manticore-projects.jsqlformatter</groupId>
+	    <artifactId>jsqlformatter</artifactId>
+	    <version>1.0.0</version>
+	</dependency>
+	```
 
 
 ## Samples
