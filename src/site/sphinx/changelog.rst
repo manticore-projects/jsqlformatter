@@ -8,6 +8,9 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **doc: fix the download links**
+    
+    Andreas Reichel, 2022-09-06
   * **style: exclude License headers from formatter**
     
     Andreas Reichel, 2022-09-06

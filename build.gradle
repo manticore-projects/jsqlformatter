@@ -1,5 +1,7 @@
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
+import java.nio.charset.Charset
+
 plugins {
     id 'java'
     id 'maven-publish'
@@ -56,17 +58,15 @@ def getVersion = { boolean considerSnapshot ->
     def patch = 0
     def build = 0
     def commit = ""
-    def snapshot =""
+    def snapshot = ""
     new ByteArrayOutputStream().withStream { os ->
         def result = exec {
             workingDir "$projectDir"
-            args = [
-                    "--no-pager"
+            args = ["--no-pager"
                     , "describe"
                     , "--tags"
                     , "--always"
-                    , "--dirty=-SNAPSHOT"
-            ]
+                    , "--dirty=-SNAPSHOT"]
             executable "git"
             standardOutput = os
         }
@@ -81,10 +81,10 @@ def getVersion = { boolean considerSnapshot ->
 
         if (considerSnapshot && os.toString().trim().endsWith("-SNAPSHOT")) {
             minor++
-            snapshot =  "-SNAPSHOT"
+            snapshot = "-SNAPSHOT"
         }
     }
-    return "${major}.${minor}.${patch}${snapshot}";
+    return "${major}.${minor}.${patch}${snapshot}"
 }
 version = getVersion(true)
 
@@ -94,7 +94,7 @@ java {
 }
 
 license {
-    excludes(["**/*.txt", "**/*.conf",  "**/*.sql",])
+    excludes(["**/*.txt", "**/*.conf", "**/*.sql",])
     includes(["**/*.properties", "**/*.java", "**/*.xml"])
 
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
@@ -113,7 +113,7 @@ spotless {
 
 publishing {
     publications {
-         mavenJava(MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId 'jsqlformatter'
             from(components.java)
             versionMapping {
@@ -127,7 +127,7 @@ publishing {
         }
     }
     repositories {
-       
+
         maven {
             // Username and Password are defined in ~/.gradle/gradle.properties
             name "ossrh"
@@ -141,7 +141,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-tasks.withType(Test)  {
+tasks.withType(Test) {
     maxParallelForks = 100
     forkEvery = 1
 }
@@ -151,7 +151,7 @@ task gitChangelogTask(type: GitChangelogTask) {
     file = new File("${projectDir}/src/site/sphinx/changelog.rst")
     //fromRef = "4.0";
     //toRef = "1.1";
-    templateContent ="""
+    templateContent = """
 ************************
 Changelog
 ************************
@@ -184,10 +184,10 @@ Version {{name}}
 task sphinx(type: Exec) {
     dependsOn(build, gitChangelogTask)
 
-    def versionJSQLFormatterStable = getVersion(false);
-    def versionJSQLFormatterSnapshot = getVersion(true);
+    def versionJSQLFormatterStable = getVersion(false)
+    def versionJSQLFormatterSnapshot = getVersion(true)
 
-    def String PROLOG = """
+    String PROLOG = """
 .. |JSQLFORMATTER_EMAIL| replace:: support@manticore-projects.com
 .. |JSQLFORMATTER_VERSION| replace:: ${getVersion(false)}
 .. |JSQLFORMATTER_SNAPSHOT_VERSION| replace:: ${getVersion(true)}
@@ -213,17 +213,43 @@ task sphinx(type: Exec) {
 
 """
 
-    args = [
-            "-Dproject=JSQLFormatter"
+    args = ["-Dproject=JSQLFormatter"
             , "-Dcopyright=manticore-projects Co. Ltd., 2022"
             , "-Dauthor=Andreas Reichel"
             , "-Drelease=${getVersion(false)}"
             , "-Drst_prolog=$PROLOG"
             , "${projectDir}/src/site/sphinx"
-            , "${project.buildDir}/sphinx"
-    ]
+            , "${project.buildDir}/sphinx"]
 
     executable "sphinx-build"
+
+    //store the output instead of printing to the console:
+    standardOutput = new ByteArrayOutputStream()
+
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
+task upload(type: Exec) {
+    dependsOn(build, gitChangelogTask)
+
+    def versionJSQLFormatterStable = getVersion(false)
+    def versionJSQLFormatterSnapshot = getVersion(true)
+
+    // define the properties in ~/.gradle/gradle.properties
+    args = ["sftp://${findProperty("${project.name}.username")}@${findProperty("${project.name}.host")}/download"]
+
+    executable "sftp"
+
+    standardInput = new ByteArrayInputStream("""<<EOF
+                                                mkdir ${project.name}-${versionJSQLFormatterStable}
+                                                cd ${project.name}-${versionJSQLFormatterStable}
+                                                put build/libs/*
+                                                quit
+                                                EOF"""
+            .getBytes(Charset.defaultCharset()))
 
     //store the output instead of printing to the console:
     standardOutput = new ByteArrayOutputStream()
@@ -256,17 +282,14 @@ task website {
 
         javaexec {
             standardOutput = new FileOutputStream("${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf")
-            main="-jar"
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/rr/convert.war",
-                    "${project(':JSQLParser').buildDir}/generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj"
-            ]
+            main = "-jar"
+            args = ["${project(':JSQLFormatter').buildDir}/rr/convert.war",
+                    "${project(':JSQLParser').buildDir}/generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj"]
         }
 
         javaexec {
-            main="-jar"
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/rr/rr.war",
+            main = "-jar"
+            args = ["${project(':JSQLFormatter').buildDir}/rr/rr.war",
                     "-noepsilon",
                     "-color:#4D88FF",
                     "-offset:0",
@@ -274,8 +297,7 @@ task website {
                     //"-png",
                     //"-out:${buildDir}/rr/JSqlParserCC.zip",
                     "-out:${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml",
-                    "${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf"
-            ]
+                    "${project(':JSQLFormatter').buildDir}/rr/JSqlParserCC.ebnf"]
         }
 
         javaexec {
@@ -284,9 +306,7 @@ task website {
             description = "Run the main class with JavaExecTask"
             classpath = sourceSets.main.runtimeClasspath
             mainClass = 'com.manticore.jsqlformatter.RRTools'
-            args = [
-                    "${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml"
-            ]
+            args = ["${project(':JSQLFormatter').buildDir}/sphinx/_static/JSqlParserCC.xhtml"]
         }
     }
 
