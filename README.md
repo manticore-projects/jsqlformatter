@@ -1,6 +1,7 @@
 # manticore JSQLFormatter
 Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](http://manticore-projects.com/JSQLFormatter/index.html) and try the [ONLINE Demo](http://vbox.manticore-projects.com).
 
+
 ![ANSI Output](./src/site/sphinx/_static/ansi-terminal.png)
 
 ## Features
@@ -13,6 +14,7 @@ Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](ht
 * Export to Java String, StringBuilder or MessageFormat, while handling parameters
 
 * Command Line Option (CLI) and SQL Inline Options
+
 ```shell
 java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
        --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
@@ -42,15 +44,41 @@ java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
                                     [AUTO*, YES, NO]
 ```
 
-* simple usage of the Java library
+	```bash
+	java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
+		   --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+		   [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+		   <arg>] [--squareBracketQuotation <arg>]
+	 -i,--inputFile <arg>               The input SQL file or folder.
+	 -o,--outputFile <arg>              The out SQL file for the formatted
+										statements.
+	 -f,--outputFormat <arg>            The output-format.
+										[PLAIN* ANSI HTML RTF]
+		--ansi                          Output ANSI annotated text.
+		--html                          Output HTML annotated text.
+	 -t,--indent <arg>                  The indent width.
+										[2 4* 8]
+	 -2                                 Indent with 2 characters.
+	 -8                                 Indent with 8 characters.
+		--keywordSpelling <arg>         Keyword spelling.
+										[UPPER*, LOWER, CAMEL, KEEP]
+		--functionSpelling <arg>        Function name spelling.
+										[UPPER, LOWER, CAMEL*, KEEP]
+		--objectSpelling <arg>          Object name spelling.
+										[UPPER, LOWER*, CAMEL, KEEP]
+		--separation <arg>              Position of the field separator.
+										[BEFORE*, AFTER]
+		--squareBracketQuotation <arg>  Position of the field separator.
+										[AUTO*, YES, NO]
+	```
 
+* simple usage of the Java library
 	
   ```java
   import com.manticore.jsqlformatter.JSqlFormatter;
   ...
   String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
   ```
-
 
   with Maven Artifact:
    
@@ -61,6 +89,7 @@ java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
     <version>1.0.0</version>
   </dependency>
   ```
+
 
 ## Samples
 
@@ -118,3 +147,4 @@ WHEN MATCHED THEN          /* Lets rock */
 ```
 
 [More Samples](http://manticore-projects.com/JSQLFormatter/samples.html) 
+
