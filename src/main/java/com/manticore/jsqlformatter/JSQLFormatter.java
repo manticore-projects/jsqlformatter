@@ -2333,18 +2333,6 @@ public class JSQLFormatter {
     } else if (expression instanceof EqualsTo) {
       EqualsTo equalsTo = (EqualsTo) expression;
 
-      /*
-      return //(isNot() ? "NOT " : "")
-                (oraclePriorPosition == ORACLE_PRIOR_START ? "PRIOR " : "")
-                + getLeftExpression()
-                + (oldOracleJoinSyntax == ORACLE_JOIN_RIGHT ? "(+)" : "") + " "
-                + getStringExpression() + " "
-                + (oraclePriorPosition == ORACLE_PRIOR_END ? "PRIOR " : "")
-                + getRightExpression()
-                + (oldOracleJoinSyntax == ORACLE_JOIN_LEFT ? "(+)" : "");
-       */
-
-
       if (equalsTo.getOraclePriorPosition() == EqualsTo.ORACLE_PRIOR_START)
         appendOperator(builder, outputFormat, "PRIOR", "", " ");
 
