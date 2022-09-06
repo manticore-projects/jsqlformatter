@@ -8,6 +8,7 @@ plugins {
     // download the RR tools which have no Maven Repository
     id "de.undercouch.download" version "latest.release"
 
+    id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
 }
 
@@ -90,6 +91,17 @@ version = getVersion(true)
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+license {
+    excludes(["**/*.txt", "**/*.conf",  "**/*.sql",])
+    includes(["**/*.properties", "**/*.java", "**/*.xml"])
+
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'Andreas Reichel'
+    ext.email = 'andreas@manticore-projects.com'
+
+    strictCheck false
 }
 
 spotless {
