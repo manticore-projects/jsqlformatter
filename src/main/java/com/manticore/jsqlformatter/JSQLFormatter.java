@@ -57,7 +57,6 @@ import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -1124,17 +1123,14 @@ public class JSQLFormatter {
             JavaObjectNode childNode = new JavaObjectNode(this, field.getName(), child);
             children.add(childNode);
           } else if (child instanceof Collection) {
-            Collection collection = (Collection) child;
+            Collection<?> collection = (Collection<?>) child;
             if (!collection.isEmpty()
                 && collection.toArray()[0].getClass().getName().startsWith("net.sf.jsqlparser")) {
-              JavaObjectNode childNode = new JavaObjectNode(this, field.getName(), child);
-              children.add(childNode);
-
               for (Object element : collection)
                 if (element.getClass().getName().startsWith("net.sf.jsqlparser")) {
                   JavaObjectNode subChildNode =
-                      new JavaObjectNode(childNode, field.getName(), element);
-                  childNode.children.add(subChildNode);
+                      new JavaObjectNode(this, field.getName(), element);
+                  this.children.add(subChildNode);
                 }
             }
           }

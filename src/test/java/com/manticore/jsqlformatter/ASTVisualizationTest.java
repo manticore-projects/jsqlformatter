@@ -17,7 +17,8 @@
  */
 package com.manticore.jsqlformatter;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class ASTVisualizationTest {
 

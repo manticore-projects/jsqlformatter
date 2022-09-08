@@ -23,6 +23,7 @@ where ID_CALENDAR = ?
 
 
 -- 3 MERGE DELETE WHERE
+-- @JSQLFormatter(indentWidth=2, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 merge into EMPL_CURRENT TAR
   using ( select  EMPNO,
                   ENAME,

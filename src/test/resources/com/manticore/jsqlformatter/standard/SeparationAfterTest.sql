@@ -76,6 +76,7 @@ from (  select *
 ;
 
 -- INSERT INTO LEDGER BRANCH BALANCE
+-- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 with SCOPE as (
         select *
         from CFE.ACCOUNTING_SCOPE
@@ -152,6 +153,7 @@ from EX,
 ;
 
 -- INSERT COUNTERPARTY COUNTERPARTY RELATIONSHIP
+-- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 insert into RISK.COUNTERPARTY_COUNTERPARTY
 values (    :id_counterparty_ref, :id_counterparty_beneficiary, :id_instrument_guarantee,
             :priority, :type, :description,
@@ -159,11 +161,13 @@ values (    :id_counterparty_ref, :id_counterparty_beneficiary, :id_instrument_g
 ;
 
 -- INSERT RATIO COLLECTION RATIOS
+-- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 insert into RISK.COUNTERPARTY_RATIO
 values ( ?, ?, ? )
 ;
 
 -- INSERT TMP_CCF
+-- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 insert into RISK.TMP_CCF (
     "ID_INSTRUMENT",
     "TENOR",
@@ -185,6 +189,7 @@ from DUAL
 ;
 
 -- APPEND ATTRIBUTE VALUE REF
+-- @JSQLFormatter(indentWidth=4, keywordSpelling=LOWER, functionSpelling=KEEP, objectSpelling=UPPER, separation=AFTER)
 insert into CFE.ATTRIBUTE_VALUE_REF
 select  CFE.ID_ATTRIBUTE_VALUE_REF.NEXTVAL,
         ATTRIBUTE_VALUE
