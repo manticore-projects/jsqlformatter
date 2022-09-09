@@ -147,11 +147,12 @@ publishing {
         }
     }
     repositories {
-
         maven {
             // Username and Password are defined in ~/.gradle/gradle.properties
             name "ossrh"
-            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            url version.toString().endsWith('-SNAPSHOT')
+                    ? "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                    : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials(PasswordCredentials)
         }
     }
