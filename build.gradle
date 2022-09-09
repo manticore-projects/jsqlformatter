@@ -4,6 +4,7 @@ import java.nio.charset.Charset
 
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version 'latest.release'
     id 'maven-publish'
     id "com.diffplug.spotless" version "latest.release"
 
@@ -95,6 +96,16 @@ java {
     withJavadocJar()
 }
 
+jar {
+    manifest {
+        attributes('Main-Class': 'com.manticore.jsqlformatter.JSQLFormatter')
+    }
+}
+
+shadowJar {
+    minimize()
+}
+
 
 test {
     useJUnitPlatform()
@@ -103,11 +114,9 @@ test {
     minHeapSize = "128m"
     maxHeapSize = "1G"
 
-    jvmArgs << [
-            '-Djunit.jupiter.execution.parallel.enabled=false',
-            '-Djunit.jupiter.execution.parallel.config.strategy=dynamic',
-            '-Djunit.jupiter.execution.parallel.mode.default=concurrent'
-    ]
+    jvmArgs << ['-Djunit.jupiter.execution.parallel.enabled=false',
+                '-Djunit.jupiter.execution.parallel.config.strategy=dynamic',
+                '-Djunit.jupiter.execution.parallel.mode.default=concurrent']
 
     //finalizedBy jacocoTestReport // report is always generated after tests run
     //finalizedBy jacocoTestCoverageVerification
