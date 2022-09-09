@@ -19,8 +19,8 @@ package com.manticore.jsqlformatter;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DebugStatementTest {
   @Test
@@ -46,6 +46,6 @@ public class DebugStatementTest {
     System.out.println(formatteredSqlStr);
     Statement statement2 = CCJSqlParserUtil.parse(formatteredSqlStr);
 
-    Assert.assertEquals(statement1.toString().toLowerCase(), statement2.toString().toLowerCase());
+    Assertions.assertEquals(statement1.toString().toLowerCase(), statement2.toString().toLowerCase());
   }
 }

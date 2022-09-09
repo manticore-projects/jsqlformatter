@@ -37,11 +37,13 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.github.julianthome:inmemantlr-api:1.9.2'
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
 
     // for the RR Tools
-    implementation 'org.jsoup:jsoup:1.15.3'
-    implementation 'net.sf.saxon:Saxon-HE:11.4'
+    compileOnly 'org.jsoup:jsoup:1.15.3'
+    compileOnly 'net.sf.saxon:Saxon-HE:11.4'
 
     // for the ASCII Trees
     implementation 'hu.webarticum:tree-printer:2.1.0'
@@ -93,6 +95,24 @@ java {
     withJavadocJar()
 }
 
+
+test {
+    useJUnitPlatform()
+
+    // set heap size for the test JVM(s)
+    minHeapSize = "128m"
+    maxHeapSize = "1G"
+
+    jvmArgs << [
+            '-Djunit.jupiter.execution.parallel.enabled=false',
+            '-Djunit.jupiter.execution.parallel.config.strategy=dynamic',
+            '-Djunit.jupiter.execution.parallel.mode.default=concurrent'
+    ]
+
+    //finalizedBy jacocoTestReport // report is always generated after tests run
+    //finalizedBy jacocoTestCoverageVerification
+}
+
 license {
     excludes(["**/*.txt", "**/*.conf", "**/*.sql",])
     includes(["**/*.properties", "**/*.java", "**/*.xml"])
@@ -127,11 +147,12 @@ publishing {
         }
     }
     repositories {
-
         maven {
             // Username and Password are defined in ~/.gradle/gradle.properties
             name "ossrh"
-            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            url version.toString().endsWith('-SNAPSHOT')
+                    ? "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                    : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials(PasswordCredentials)
         }
     }

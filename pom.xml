@@ -92,10 +92,17 @@
             <version>1.15.3</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/hu.webarticum/tree-printer -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>hu.webarticum</groupId>
+            <artifactId>tree-printer</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -241,7 +248,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -253,7 +259,6 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -282,15 +287,6 @@
                         <reports/>
                     </reportSet>
                 </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>sphinx-maven-plugin</artifactId>
-                <version>2.10.0</version>
-                <configuration>
-                    <binaryUrl>file:///usr/bin/sphinx-build</binaryUrl>
-                    <builder>html</builder>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>
