@@ -31,4 +31,23 @@ public class ASTVisualizationTest {
     System.out.println(JSQLFormatter.formatToTree(sqlString, "outputFormat=ANSI"));
 
   }
+
+  @Test
+  public void testCollections() throws Exception {
+    String sqlString = "select 1,2,3 from dual where a=b and b=c;";
+
+    System.out.println(JSQLFormatter.formatToTree(sqlString));
+
+    System.out.println(JSQLFormatter.formatToTree(sqlString, "outputFormat=ANSI"));
+
+  }
+
+  @Test
+  public void testXML() throws Exception {
+    String sqlString = "select 1 as b, 2, 3 from dual as tablename where a=b and b=c;";
+
+    System.out.println(JSQLFormatter.formatToXML(sqlString));
+
+
+  }
 }

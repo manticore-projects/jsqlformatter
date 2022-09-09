@@ -122,6 +122,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
@@ -1266,6 +1267,52 @@ public class JSQLFormatter {
     }
 
     return new ListingTreePrinter().stringify(rootNode);
+  }
+
+  private static StringBuilder appendToXML(StringBuilder builder, JavaObjectNode node, int indent) {
+
+    if (node.isLeaf()) {
+      builder
+              .append(StringUtils.leftPad("", indent * 4))
+              .append("<").append(node.object.getClass().getSimpleName()).append(">")
+              .append(node.object).append("</")
+              .append(node.object.getClass().getSimpleName())
+              .append(">\n");
+//    } else if (node.object instanceof net.sf.jsqlparser.schema.Column
+//               || node.object instanceof net.sf.jsqlparser.schema.Table
+//               || node.object instanceof net.sf.jsqlparser.schema.Database
+//               || node.object instanceof net.sf.jsqlparser.schema.Sequence
+//               || node.object instanceof net.sf.jsqlparser.schema.Server
+//               || node.object instanceof net.sf.jsqlparser.schema.Synonym) {
+//      return formatClassName(object);
+//    } else if (node.object instanceof Collection) {
+//      return formatCollection((Collection) object);
+    } else {
+      builder.append(StringUtils.leftPad("", indent * 4)).append("<").append(node.fieldName).append(" class='").append(node.object.getClass().getSimpleName()).append("'").append(">\n");
+
+      Enumeration<? extends TreeNode> children = node.children();
+      while (children.hasMoreElements()) {
+        appendToXML(builder, (JavaObjectNode) children.nextElement(), indent + 1);
+      }
+
+      builder.append(StringUtils.leftPad("", indent * 4)).append("</").append(node.fieldName).append(">\n");
+
+    }
+    return builder;
+  }
+
+  public static String formatToXML (String sqlStr, String... options) throws Exception {
+    applyFormattingOptions(options);
+
+    StringBuilder builder=new StringBuilder("");
+    JSQLFormatter.JavaObjectNode[] nodes =
+            JSQLFormatter.getAstNodes(sqlStr).toArray(new JSQLFormatter.JavaObjectNode[0]);
+
+    for (JSQLFormatter.JavaObjectNode node : nodes) {
+      appendToXML(builder, node, 0);
+    }
+
+    return builder.toString();
   }
 
   public static void applyFormattingOptions(String[] options) {
