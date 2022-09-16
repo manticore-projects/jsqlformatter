@@ -17,6 +17,7 @@
  */
 package com.manticore.jsqlformatter;
 
+import blazing.chain.LZSEncoding;
 import com.diogonunes.jcolor.AnsiFormat;
 import com.diogonunes.jcolor.Attribute;
 import hu.webarticum.treeprinter.SimpleTreeNode;
@@ -128,21 +129,37 @@ import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 
 import javax.swing.tree.TreeNode;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -1253,6 +1270,18 @@ public class JSQLFormatter {
     return simpleTreeNode;
   }
 
+
+  public static String encodeObject(Object object) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    ObjectOutput objectOutput= new ObjectOutputStream(byteArrayOutputStream);
+    objectOutput.writeObject(object);
+    objectOutput.flush();
+    objectOutput.close();
+    byteArrayOutputStream.flush();
+
+    return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+  }
+
   public static String formatToTree(String sqlStr, String... options) throws Exception {
     TreeNode rootTreeNode = null;
     applyFormattingOptions(options);
@@ -1269,12 +1298,17 @@ public class JSQLFormatter {
     return new ListingTreePrinter().stringify(rootNode);
   }
 
-  private static StringBuilder appendToXML(StringBuilder builder, JavaObjectNode node, int indent) {
+  private static StringBuilder appendToXML(StringBuilder builder, JavaObjectNode node, int indent) throws IOException {
 
     if (node.isLeaf()) {
       builder
               .append(StringUtils.leftPad("", indent * 4))
-              .append("<").append(node.object.getClass().getSimpleName()).append(">")
+              .append("<")
+              .append(node.object.getClass().getSimpleName())
+              .append(" type='").append(node.object.getClass().getSimpleName()).append("'")
+              .append(" class='").append(node.object.getClass().getName()).append("'")
+              .append(" object='").append(encodeObject(node.object)).append("'")
+              .append(">")
               .append(node.object).append("</")
               .append(node.object.getClass().getSimpleName())
               .append(">\n");
@@ -1288,7 +1322,13 @@ public class JSQLFormatter {
 //    } else if (node.object instanceof Collection) {
 //      return formatCollection((Collection) object);
     } else {
-      builder.append(StringUtils.leftPad("", indent * 4)).append("<").append(node.fieldName).append(" class='").append(node.object.getClass().getSimpleName()).append("'").append(">\n");
+      builder
+              .append(StringUtils.leftPad("", indent * 4))
+              .append("<").append(node.fieldName)
+              .append(" type='").append(node.object.getClass().getSimpleName()).append("'")
+              .append(" class='").append(node.object.getClass().getName()).append("'")
+              .append(" object='").append(encodeObject(node.object)).append("'")
+              .append(">\n");
 
       Enumeration<? extends TreeNode> children = node.children();
       while (children.hasMoreElements()) {
@@ -1304,7 +1344,7 @@ public class JSQLFormatter {
   public static String formatToXML (String sqlStr, String... options) throws Exception {
     applyFormattingOptions(options);
 
-    StringBuilder builder=new StringBuilder("");
+    StringBuilder builder=new StringBuilder();
     JSQLFormatter.JavaObjectNode[] nodes =
             JSQLFormatter.getAstNodes(sqlStr).toArray(new JSQLFormatter.JavaObjectNode[0]);
 
@@ -1313,6 +1353,34 @@ public class JSQLFormatter {
     }
 
     return builder.toString();
+  }
+
+  public static <T> Collection<T> extract(String sql, Class<T> clazz, String xpath) throws Exception {
+    ArrayList<T> objects = new ArrayList<>();
+
+    String xmlStr = formatToXML(sql);
+    Document doc = Jsoup.parse(xmlStr, "", Parser.xmlParser());
+    Elements elements = doc.selectXpath(xpath);
+    for (Element element:elements) {
+      String className = element.attr("class");
+      String attrStr = element.attr( "object");
+
+      if (clazz.getName().equals(className)) {
+        byte[] bytes = Base64.getDecoder().decode(attrStr);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        Object o = objectInputStream.readObject();
+        objectInputStream.close();
+
+        try {
+          objects.add( (T) o);
+        } catch (Exception ex) {
+          //@ todo: this should be ignored as we test for equal class names already
+          LOGGER.log(Level.WARNING, "Failed to translate a " + o.getClass().getName() + " into a " + clazz.getName() );
+        }
+      }
+    }
+    return objects;
   }
 
   public static void applyFormattingOptions(String[] options) {

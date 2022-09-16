@@ -43,11 +43,12 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
 
     // for the RR Tools
-    compileOnly 'org.jsoup:jsoup:1.15.3'
+    implementation 'org.jsoup:jsoup:1.15.3'
     compileOnly 'net.sf.saxon:Saxon-HE:11.4'
 
     // for the ASCII Trees
     implementation 'hu.webarticum:tree-printer:2.1.0'
+    implementation 'com.github.tommyettinger:blazingchain:1.4.4.4'
 
 }
 
