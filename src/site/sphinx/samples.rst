@@ -5,12 +5,12 @@ Samples
 Create
 --------------
 
-.. literalinclude:: resources/StandardCreateTableTest.sql
+.. literalinclude:: resources/standard/StandardCreateTableTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: resources/StandardCreateIndexTest.sql
+.. literalinclude:: resources/standard/StandardCreateIndexTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -18,7 +18,7 @@ Create
 Alter
 --------------
 
-.. literalinclude:: resources/StandardAlterTest.sql
+.. literalinclude:: resources/standard/StandardAlterTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -26,7 +26,7 @@ Alter
 Select
 --------------
 
-.. literalinclude:: resources/StandardSelectTest.sql
+.. literalinclude:: resources/standard/StandardSelectTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -35,7 +35,7 @@ Select
 Merge
 --------------
 
-.. literalinclude:: resources/StandardMergeTest.sql
+.. literalinclude:: resources/standard/StandardMergeTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -43,7 +43,7 @@ Merge
 Insert
 --------------
 
-.. literalinclude:: resources/StandardInsertTest.sql
+.. literalinclude:: resources/standard/StandardInsertTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -52,7 +52,7 @@ Insert
 Update
 --------------
 
-.. literalinclude:: resources/StandardUpdateTest.sql
+.. literalinclude:: resources/standard/StandardUpdateTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -61,7 +61,7 @@ Update
 Comments
 --------------
 
-.. literalinclude:: resources/StandardCommentTest.sql
+.. literalinclude:: resources/standard/StandardCommentTest.sql
   :language: SQL
   :force:
   :linenos:
@@ -69,19 +69,19 @@ Comments
 MS Sql Server
 -------------------
 
-.. literalinclude:: resources/BracketQuotationTest.sql
+.. literalinclude:: resources/standard/BracketQuotationTest.sql
   :language: SQL
   :force:
   :linenos:
 
-.. literalinclude:: resources/MsSqlServerTest.sql
+.. literalinclude:: resources/standard/MsSqlServerTest.sql
   :language: SQL
   :force:
   :linenos:
 
 Formatting Options
 -------------------
-.. literalinclude:: resources/FormattingOptionsTest.sql
+.. literalinclude:: resources/standard/FormattingOptionsTest.sql
   :language: SQL
   :force:
   :linenos:
