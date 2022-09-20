@@ -32,28 +32,28 @@ import java.util.stream.Stream;
  */
 public class SimpleFileTest extends StandardFileTest {
 
-    public final static String TEST_FOLDER_STR = "build/resources/test/com/manticore/jsqlformatter/simple";
+  public final static String TEST_FOLDER_STR =
+      "build/resources/test/com/manticore/jsqlformatter/simple";
 
-    public static Stream<Entry<SQLKeyEntry, String>> getSqlMap() {
-        LinkedHashMap<SQLKeyEntry, String> sqlMap = new LinkedHashMap<>();
+  public static Stream<Entry<SQLKeyEntry, String>> getSqlMap() {
+    LinkedHashMap<SQLKeyEntry, String> sqlMap = new LinkedHashMap<>();
 
-        for (File file : Objects.requireNonNull(new File(TEST_FOLDER_STR).listFiles(FILENAME_FILTER))) {
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            String k = "";
+    for (File file : Objects.requireNonNull(new File(TEST_FOLDER_STR).listFiles(FILENAME_FILTER))) {
+      StringBuilder stringBuilder = new StringBuilder();
+      String line;
+      String k = "";
 
-            try (FileReader fileReader = new FileReader(file);
-                 BufferedReader bufferedReader = new BufferedReader(fileReader)
-            ) {
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-                sqlMap.put(new SQLKeyEntry(file, k), stringBuilder.toString().trim());
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, "Failed to read " + file.getAbsolutePath(), ex);
-            }
+      try (FileReader fileReader = new FileReader(file);
+          BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+        while ((line = bufferedReader.readLine()) != null) {
+          stringBuilder.append(line).append("\n");
         }
-
-        return sqlMap.entrySet().stream();
+        sqlMap.put(new SQLKeyEntry(file, k), stringBuilder.toString().trim());
+      } catch (IOException ex) {
+        LOGGER.log(Level.SEVERE, "Failed to read " + file.getAbsolutePath(), ex);
+      }
     }
+
+    return sqlMap.entrySet().stream();
+  }
 }

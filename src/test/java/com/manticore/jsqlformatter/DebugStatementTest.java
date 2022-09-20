@@ -46,6 +46,7 @@ public class DebugStatementTest {
     System.out.println(formatteredSqlStr);
     Statement statement2 = CCJSqlParserUtil.parse(formatteredSqlStr);
 
-    Assertions.assertEquals(statement1.toString().toLowerCase(), statement2.toString().toLowerCase());
+    Assertions.assertEquals(statement1.toString().toLowerCase(),
+        statement2.toString().toLowerCase());
   }
 }

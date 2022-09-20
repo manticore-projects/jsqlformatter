@@ -1146,8 +1146,7 @@ public class JSQLFormatter {
                 && collection.toArray()[0].getClass().getName().startsWith("net.sf.jsqlparser")) {
               for (Object element : collection)
                 if (element.getClass().getName().startsWith("net.sf.jsqlparser")) {
-                  JavaObjectNode subChildNode =
-                      new JavaObjectNode(this, field.getName(), element);
+                  JavaObjectNode subChildNode = new JavaObjectNode(this, field.getName(), element);
                   this.children.add(subChildNode);
                 }
             }
@@ -1273,7 +1272,7 @@ public class JSQLFormatter {
 
   public static String encodeObject(Object object) throws IOException {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    ObjectOutput objectOutput= new ObjectOutputStream(byteArrayOutputStream);
+    ObjectOutput objectOutput = new ObjectOutputStream(byteArrayOutputStream);
     objectOutput.writeObject(object);
     objectOutput.flush();
     objectOutput.close();
@@ -1298,55 +1297,49 @@ public class JSQLFormatter {
     return new ListingTreePrinter().stringify(rootNode);
   }
 
-  private static StringBuilder appendToXML(StringBuilder builder, JavaObjectNode node, int indent) throws IOException {
+  private static StringBuilder appendToXML(StringBuilder builder, JavaObjectNode node, int indent)
+      throws IOException {
 
     if (node.isLeaf()) {
-      builder
-              .append(StringUtils.leftPad("", indent * 4))
-              .append("<")
-              .append(node.object.getClass().getSimpleName())
-              .append(" type='").append(node.object.getClass().getSimpleName()).append("'")
-              .append(" class='").append(node.object.getClass().getName()).append("'")
-              .append(" object='").append(encodeObject(node.object)).append("'")
-              .append(">")
-              .append(node.object).append("</")
-              .append(node.object.getClass().getSimpleName())
-              .append(">\n");
-//    } else if (node.object instanceof net.sf.jsqlparser.schema.Column
-//               || node.object instanceof net.sf.jsqlparser.schema.Table
-//               || node.object instanceof net.sf.jsqlparser.schema.Database
-//               || node.object instanceof net.sf.jsqlparser.schema.Sequence
-//               || node.object instanceof net.sf.jsqlparser.schema.Server
-//               || node.object instanceof net.sf.jsqlparser.schema.Synonym) {
-//      return formatClassName(object);
-//    } else if (node.object instanceof Collection) {
-//      return formatCollection((Collection) object);
+      builder.append(StringUtils.leftPad("", indent * 4)).append("<")
+          .append(node.object.getClass().getSimpleName()).append(" type='")
+          .append(node.object.getClass().getSimpleName()).append("'").append(" class='")
+          .append(node.object.getClass().getName()).append("'").append(" object='")
+          .append(encodeObject(node.object)).append("'").append(">").append(node.object)
+          .append("</").append(node.object.getClass().getSimpleName()).append(">\n");
+      // } else if (node.object instanceof net.sf.jsqlparser.schema.Column
+      // || node.object instanceof net.sf.jsqlparser.schema.Table
+      // || node.object instanceof net.sf.jsqlparser.schema.Database
+      // || node.object instanceof net.sf.jsqlparser.schema.Sequence
+      // || node.object instanceof net.sf.jsqlparser.schema.Server
+      // || node.object instanceof net.sf.jsqlparser.schema.Synonym) {
+      // return formatClassName(object);
+      // } else if (node.object instanceof Collection) {
+      // return formatCollection((Collection) object);
     } else {
-      builder
-              .append(StringUtils.leftPad("", indent * 4))
-              .append("<").append(node.fieldName)
-              .append(" type='").append(node.object.getClass().getSimpleName()).append("'")
-              .append(" class='").append(node.object.getClass().getName()).append("'")
-              .append(" object='").append(encodeObject(node.object)).append("'")
-              .append(">\n");
+      builder.append(StringUtils.leftPad("", indent * 4)).append("<").append(node.fieldName)
+          .append(" type='").append(node.object.getClass().getSimpleName()).append("'")
+          .append(" class='").append(node.object.getClass().getName()).append("'")
+          .append(" object='").append(encodeObject(node.object)).append("'").append(">\n");
 
       Enumeration<? extends TreeNode> children = node.children();
       while (children.hasMoreElements()) {
         appendToXML(builder, (JavaObjectNode) children.nextElement(), indent + 1);
       }
 
-      builder.append(StringUtils.leftPad("", indent * 4)).append("</").append(node.fieldName).append(">\n");
+      builder.append(StringUtils.leftPad("", indent * 4)).append("</").append(node.fieldName)
+          .append(">\n");
 
     }
     return builder;
   }
 
-  public static String formatToXML (String sqlStr, String... options) throws Exception {
+  public static String formatToXML(String sqlStr, String... options) throws Exception {
     applyFormattingOptions(options);
 
-    StringBuilder builder=new StringBuilder();
+    StringBuilder builder = new StringBuilder();
     JSQLFormatter.JavaObjectNode[] nodes =
-            JSQLFormatter.getAstNodes(sqlStr).toArray(new JSQLFormatter.JavaObjectNode[0]);
+        JSQLFormatter.getAstNodes(sqlStr).toArray(new JSQLFormatter.JavaObjectNode[0]);
 
     for (JSQLFormatter.JavaObjectNode node : nodes) {
       appendToXML(builder, node, 0);
@@ -1355,15 +1348,16 @@ public class JSQLFormatter {
     return builder.toString();
   }
 
-  public static <T> Collection<T> extract(String sql, Class<T> clazz, String xpath) throws Exception {
+  public static <T> Collection<T> extract(String sql, Class<T> clazz, String xpath)
+      throws Exception {
     ArrayList<T> objects = new ArrayList<>();
 
     String xmlStr = formatToXML(sql);
     Document doc = Jsoup.parse(xmlStr, "", Parser.xmlParser());
     Elements elements = doc.selectXpath(xpath);
-    for (Element element:elements) {
+    for (Element element : elements) {
       String className = element.attr("class");
-      String attrStr = element.attr( "object");
+      String attrStr = element.attr("object");
 
       if (clazz.getName().equals(className)) {
         byte[] bytes = Base64.getDecoder().decode(attrStr);
@@ -1373,10 +1367,11 @@ public class JSQLFormatter {
         objectInputStream.close();
 
         try {
-          objects.add( (T) o);
+          objects.add((T) o);
         } catch (Exception ex) {
-          //@ todo: this should be ignored as we test for equal class names already
-          LOGGER.log(Level.WARNING, "Failed to translate a " + o.getClass().getName() + " into a " + clazz.getName() );
+          // @ todo: this should be ignored as we test for equal class names already
+          LOGGER.log(Level.WARNING,
+              "Failed to translate a " + o.getClass().getName() + " into a " + clazz.getName());
         }
       }
     }

@@ -71,7 +71,7 @@ public class ASTVisualizationTest {
     String sqlString = "select 1 as b, 2, 3 from dual as tablename where a=b and b=c;";
     String xmlStr = JSQLFormatter.formatToXML(sqlString);
     System.out.println(xmlStr);
-    System.out.println(FragmentContentHandler.getXPath( xmlStr, null));
+    System.out.println(FragmentContentHandler.getXPath(xmlStr, null));
 
 
   }
@@ -82,19 +82,20 @@ public class ASTVisualizationTest {
 
     // return ANY column of the SELECT statement
     Collection<Column> columns = JSQLFormatter.extract(sqlString, Column.class, "//Column");
-    for (Column column: columns) {
+    for (Column column : columns) {
       System.out.println("Found ALL column: " + column);
     }
 
     // return only columns part of the WHERE clause on the Left side of the EQUALSTO
     columns = JSQLFormatter.extract(sqlString, Column.class, "//where/leftExpression/Column");
-    for (Column column: columns) {
+    for (Column column : columns) {
       System.out.println("Found WHERE column: " + column);
     }
 
     // return only the C column based on the complete XPath
-    columns = JSQLFormatter.extract(sqlString, Column.class, "/Statements/selectBody/where/rightExpression/Column[2]");
-    for (Column column: columns) {
+    columns = JSQLFormatter.extract(sqlString, Column.class,
+        "/Statements/selectBody/where/rightExpression/Column[2]");
+    for (Column column : columns) {
       System.out.println("Found specific column by complete XPath: " + column);
     }
   }
@@ -104,20 +105,19 @@ public class ASTVisualizationTest {
     Object object = new BigDecimal("2345.287272");
 
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    ObjectOutput objectOutput= new ObjectOutputStream(byteArrayOutputStream);
+    ObjectOutput objectOutput = new ObjectOutputStream(byteArrayOutputStream);
     objectOutput.writeObject(object);
     objectOutput.flush();
     objectOutput.close();
     byteArrayOutputStream.flush();
 
-    String serializedObjectStr = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.ISO_8859_1);
+    String serializedObjectStr =
+        new String(byteArrayOutputStream.toByteArray(), StandardCharsets.ISO_8859_1);
 
-    String lzsEncodedBase64 = LZSEncoding.compressToBase64( serializedObjectStr );
+    String lzsEncodedBase64 = LZSEncoding.compressToBase64(serializedObjectStr);
     String base64Encoded = Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
 
-    System.out.println(serializedObjectStr + "\n"
-                       + lzsEncodedBase64 + "\n"
-                       + base64Encoded);
+    System.out.println(serializedObjectStr + "\n" + lzsEncodedBase64 + "\n" + base64Encoded);
 
     // verify Base64 Encoder
     byte[] bytes = serializedObjectStr.getBytes(StandardCharsets.ISO_8859_1);
@@ -128,7 +128,8 @@ public class ASTVisualizationTest {
     byteArrayInputStream.close();
 
     // verify LZSEncoder
-    bytes = LZSEncoding.decompressFromBase64(lzsEncodedBase64).getBytes(StandardCharsets.ISO_8859_1);
+    bytes =
+        LZSEncoding.decompressFromBase64(lzsEncodedBase64).getBytes(StandardCharsets.ISO_8859_1);
     byteArrayInputStream = new ByteArrayInputStream(bytes);
     objectInputStream = new ObjectInputStream(byteArrayInputStream);
     Assertions.assertEquals(object, objectInputStream.readObject());
