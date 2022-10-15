@@ -2542,6 +2542,13 @@ public class JSQLFormatter {
       appendExpression(likeExpression.getRightExpression(), null, builder, indent + 1, i, n, false,
           BreakLine.AFTER_FIRST);
 
+      Expression escapeExpression = likeExpression.getEscape();
+      if (escapeExpression!=null) {
+        appendOperator(builder, outputFormat, "ESCAPE", " ", " ");
+        appendExpression(escapeExpression, null, builder, indent + 1, i, n, false,
+                         BreakLine.AS_NEEDED);
+      }
+
     } else if (expression instanceof NextValExpression) {
       NextValExpression nextValExpression = (NextValExpression) expression;
       if (nextValExpression.isUsingNextValueFor())
