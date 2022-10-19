@@ -18,6 +18,7 @@
 package com.manticore.jsqlformatter;
 
 import blazing.chain.LZSEncoding;
+import com.diogonunes.jcolor.Ansi;
 import com.diogonunes.jcolor.AnsiFormat;
 import com.diogonunes.jcolor.Attribute;
 import hu.webarticum.treeprinter.SimpleTreeNode;
@@ -178,6 +179,8 @@ public class JSQLFormatter {
   public static final Pattern SQUARED_BRACKET_QUOTATION_PATTERN = Pattern.compile(
       "(((?!\\[\\d+\\])\\[.*\\]\\.\\.?)|(\\.\\[\\w+( +\\w+)*\\])|((?!\\s\\[\\d+\\])\\s\\[\\w+( +\\w+)*\\]))");
   private static final Logger LOGGER = Logger.getLogger(JSQLFormatter.class.getName());
+  private static final AnsiFormat ANSI_FORMAT_LINE_NUMBER =
+          new AnsiFormat(Attribute.BRIGHT_BLACK_BACK(), Attribute.DESATURATED());
   private static final AnsiFormat ANSI_FORMAT_KEYWORD =
       new AnsiFormat(Attribute.BLUE_TEXT(), Attribute.BOLD());
   private static final AnsiFormat ANSI_FORMAT_HINT = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT());
@@ -196,8 +199,10 @@ public class JSQLFormatter {
   private static Spelling functionSpelling = Spelling.CAMEL;
   private static Spelling objectSpelling = Spelling.LOWER;
   private static OutputFormat outputFormat = OutputFormat.PLAIN;
+  private static ShowLineNumbers showLineNumbers = ShowLineNumbers.NO;
   private static int indentWidth = 4;
   private static String indentString = "    ";
+  private static int lineCount = 0;
 
   public static SquaredBracketQuotation getSquaredBracketQuotation() {
     return squaredBracketQuotation;
@@ -339,7 +344,7 @@ public class JSQLFormatter {
 
   private static StringBuilder appendNormalizingTrailingWhiteSpace(StringBuilder builder,
       String s) {
-    if (builder.length() > 0) {
+    if ( builder.length() > 0) {
       int pos = builder.length() - 1;
       char lastChar = builder.charAt(pos);
       if (lastChar == ' ') {
@@ -355,7 +360,32 @@ public class JSQLFormatter {
   }
 
   private static StringBuilder appendNormalizedLineBreak(StringBuilder builder) {
-    return appendNormalizingTrailingWhiteSpace(builder, "\n");
+    switch (showLineNumbers) {
+      case YES:
+        lineCount++;
+
+        String lineCountStr = "0000" + lineCount;
+        lineCountStr = lineCountStr.substring(lineCountStr.length()-5, lineCountStr.length());
+        lineCountStr += " | ";
+
+        String fillerStr="";
+        int adjust = getIndentWidth() - lineCountStr.length() % getIndentWidth();
+        for (int i = 0; i<adjust; i++) {
+          fillerStr+=" ";
+        }
+
+
+        switch (outputFormat) {
+          case PLAIN:
+            return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr);
+          case ANSI:
+            return appendNormalizingTrailingWhiteSpace(builder, Ansi.RESET + ANSI_FORMAT_LINE_NUMBER.format("\n" + lineCountStr) + Ansi.RESET + fillerStr);
+          default:
+            return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr );
+        }
+      default:
+        return appendNormalizingTrailingWhiteSpace(builder, "\n");
+    }
   }
 
   private static StringBuilder appendNormalizedSpace(StringBuilder builder) {
@@ -736,6 +766,10 @@ public class JSQLFormatter {
         .longOpt(FormattingOption.SQUARE_BRACKET_QUOTATION.toString()).hasArg()
         .desc("Interpret Square Brackets as Quotes instead of Arrays.\n[AUTO*, YES, NO]").build());
 
+    options.addOption(Option.builder(null)
+                            .longOpt(FormattingOption.SHOW_LINE_NUMBERS.toString()).hasArg()
+                            .desc("Show Line Numbers.\n[YES, NO*]").build());
+
     // create the parser
     CommandLineParser parser = new DefaultParser();
     try {
@@ -764,6 +798,7 @@ public class JSQLFormatter {
       FormattingOption.OBJECT_SPELLING.addFormatterOption(line, formatterOptions);
       FormattingOption.SEPARATION.addFormatterOption(line, formatterOptions);
       FormattingOption.SQUARE_BRACKET_QUOTATION.addFormatterOption(line, formatterOptions);
+      FormattingOption.SHOW_LINE_NUMBERS.addFormatterOption(line, formatterOptions);
 
       if (line.hasOption("help") || (line.getOptions().length == 0 && line.getArgs().length == 0)) {
         HelpFormatter formatter = new HelpFormatter();
@@ -940,6 +975,7 @@ public class JSQLFormatter {
     // UseStatement, ValuesStatement
 
     int indent = 0;
+    lineCount = 0;
 
     Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
     Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
@@ -1427,6 +1463,13 @@ public class JSQLFormatter {
           } else if (key.equalsIgnoreCase(FormattingOption.SQUARE_BRACKET_QUOTATION.toString())) {
             try {
               squaredBracketQuotation = SquaredBracketQuotation.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.SHOW_LINE_NUMBERS.toString())) {
+            try {
+              showLineNumbers = ShowLineNumbers.valueOf(value.toUpperCase());
             } catch (Exception ex) {
               LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
             }
@@ -3780,7 +3823,7 @@ public class JSQLFormatter {
   }
 
   public enum OutputFormat {
-    PLAIN, ANSI, HTML, RTF
+    PLAIN, ANSI, HTML, RTF, XSLFO
   }
 
   public enum Spelling {
@@ -3802,11 +3845,15 @@ public class JSQLFormatter {
     AUTO, YES, NO
   }
 
+  public enum ShowLineNumbers {
+    YES, NO
+  }
+
   public enum FormattingOption {
     SQUARE_BRACKET_QUOTATION("squareBracketQuotation"), OUTPUT_FORMAT(
         "outputFormat"), KEYWORD_SPELLING("keywordSpelling"), FUNCTION_SPELLING(
             "functionSpelling"), OBJECT_SPELLING(
-                "objectSpelling"), SEPARATION("separation"), INDENT_WIDTH("indentWidth");
+                "objectSpelling"), SEPARATION("separation"), INDENT_WIDTH("indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
 
     private final String optionName;
 

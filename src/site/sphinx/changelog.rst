@@ -8,6 +8,50 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **doc: Fix the samples' links**
+    
+    Andreas Reichel, 2022-09-20
+  * **style: Reformat Java Code**
+    
+    Andreas Reichel, 2022-09-20
+  * **feat: query Statement Objects using XPath**
+    
+    Andreas Reichel, 2022-09-16
+  * **build: build Shadow Jar**
+    
+    Andreas Reichel, 2022-09-09
+  * **build: set version to 1.0.1**
+    
+    Andreas Reichel, 2022-09-09
+  * **feat: Format to XML Object Tree**
+    
+    Andreas Reichel, 2022-09-09
+  * **build: fix SNAPSHOT publishing**
+    
+    Andreas Reichel, 2022-09-09
+  * **test: Migrate to JUnit 5**
+    
+    Andreas Reichel, 2022-09-08
+
+Version 1.0.1
+=============================================================
+
+
+  * **build: Remove MAVEN Spotless plugin**
+    
+    Andreas Reichel, 2022-09-09
+  * **build: Add missing MAVEN dependency**
+    
+    Andreas Reichel, 2022-09-09
+  * **Update README.md**
+    
+    manticore-projects, 2022-09-06
+  * **Update README.md**
+    
+    manticore-projects, 2022-09-06
+  * **doc: Update the README for GitHub**
+    
+    Andreas Reichel, 2022-09-06
   * **build: upload the built files via Excec/SFTP**
     
     Andreas Reichel, 2022-09-06
@@ -17,6 +61,72 @@ Latest Changes since |JSQLFORMATTER_VERSION|
   * **style: exclude License headers from formatter**
     
     Andreas Reichel, 2022-09-06
+  * **Update Documentation**
+    
+    Andreas Reichel, 2022-05-24
+  * **Update Documentation**
+    
+    Andreas Reichel, 2022-05-24
+  * **Switch to GitHub CodeQL**
+    
+    Andreas Reichel, 2022-05-24
+  * **Update Documentation**
+    
+    Andreas Reichel, 2022-05-24
+  * **Version Maintenance**
+    
+    Andreas Reichel, 2022-05-24
+  * **Create codeql-analysis.yml**
+    
+    manticore-projects, 2022-05-17
+  * **Updates**
+    
+    Andreas Reichel, 2022-04-02
+  * **Release 0.11.1**
+    
+    Andreas Reichel, 2022-03-06
+  * **Bump version to 4.4-SNAPSHOT**
+    
+    Andreas Reichel, 2021-12-30
+  * **Rework the Parsing Timeout**
+    
+    Andreas Reichel, 2021-12-11
+  * **fix the CI**
+    
+    Andreas Reichel, 2021-09-11
+  * **fix the CI**
+    
+    Andreas Reichel, 2021-09-11
+  * **Fix the Maven Build**
+    
+    Andreas Reichel, 2021-09-11
+  * **Use only published dependencies**
+    
+    Andreas Reichel, 2021-09-11
+  * **Update Documentation**
+    
+    Andreas Reichel, 2021-09-11
+  * **reformat source code**
+    
+    Andreas Reichel, 2021-09-11
+  * **JSQL Parser 4.2**
+    
+    Andreas Reichel, 2021-09-11
+  * **Run each test in its own instance**
+    
+    Andreas Reichel, 2021-09-11
+  * **JSQLParser 4.2 Compatibility**
+    
+    Andreas Reichel, 2021-09-11
+  * **Improve the Gradle Build**
+    
+    Andreas Reichel, 2021-09-11
+  * **Organize the Unit Tests**
+    
+    Andreas Reichel, 2021-09-11
+  * **Gradle**
+    
+    Andreas Reichel, 2021-09-05
 
 Version 1.0.0
 =============================================================
@@ -67,24 +177,6 @@ Version 1.0.0
   * **Improve Documentation**
     
     Andreas Reichel, 2022-08-18
-  * **Update Documentation**
-    
-    Andreas Reichel, 2022-05-24
-  * **Version Maintenance**
-    
-    Andreas Reichel, 2022-05-24
-  * **Updates**
-    
-    Andreas Reichel, 2022-04-02
-  * **Release 0.11.1**
-    
-    Andreas Reichel, 2022-03-06
-  * **Bump version to 4.4-SNAPSHOT**
-    
-    Andreas Reichel, 2021-12-30
-  * **Rework the Parsing Timeout**
-    
-    Andreas Reichel, 2021-12-11
 
 Version 0.1.11
 =============================================================
@@ -116,42 +208,6 @@ Version 0.1.10
   * **LIMIT/OFFSET with Expressions**
     
     Andreas Reichel, 2021-10-19
-  * **fix the CI**
-    
-    Andreas Reichel, 2021-09-11
-  * **fix the CI**
-    
-    Andreas Reichel, 2021-09-11
-  * **Fix the Maven Build**
-    
-    Andreas Reichel, 2021-09-11
-  * **Use only published dependencies**
-    
-    Andreas Reichel, 2021-09-11
-  * **Update Documentation**
-    
-    Andreas Reichel, 2021-09-11
-  * **reformat source code**
-    
-    Andreas Reichel, 2021-09-11
-  * **JSQL Parser 4.2**
-    
-    Andreas Reichel, 2021-09-11
-  * **Run each test in its own instance**
-    
-    Andreas Reichel, 2021-09-11
-  * **JSQLParser 4.2 Compatibility**
-    
-    Andreas Reichel, 2021-09-11
-  * **Improve the Gradle Build**
-    
-    Andreas Reichel, 2021-09-11
-  * **Organize the Unit Tests**
-    
-    Andreas Reichel, 2021-09-11
-  * **Gradle**
-    
-    Andreas Reichel, 2021-09-05
 
 Version 0.1.9
 =============================================================

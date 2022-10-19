@@ -35,12 +35,15 @@ import java.util.TreeSet;
 public class RRTools {
   public static void main(String[] args) throws IOException {
     if (args.length < 1) {
-      throw new IllegalArgumentException("No filename provided as parameters ARGS[0]");
+      // throw new IllegalArgumentException("No filename provided as parameters ARGS[0]");
+      args = new String[] {
+          "/home/are/Documents/src/JSQLFormatter/JSQLFormatter/src/site/sphinx/_static/railroad_diagram.xhtml"};
     }
 
     File file = new File(args[0]);
     if (file.exists() && file.canRead()) {
-      insertTOC(file);
+      // insertTOC(file);
+      extractSVG(file);
     } else {
       throw new FileNotFoundException("Can't read file " + args[0]);
     }
@@ -91,5 +94,18 @@ public class RRTools {
     }
 
     FileUtils.writeStringToFile(file, doc.outerHtml(), StandardCharsets.UTF_8);
+  }
+
+  /*
+  @throws Exception
+   */
+  public static void extractSVG(File file) throws IOException {
+    System.setProperty(W3CDom.XPathFactoryProperty, "net.sf.saxon.xpath.XPathFactoryImpl");
+
+    Document doc = Jsoup.parse(file, "UTF-8", "", Parser.xmlParser());
+    Elements elements = doc.selectXpath("//svg");
+    for (Element svgElement : elements) {
+      System.out.println(svgElement.text());
+    }
   }
 }
