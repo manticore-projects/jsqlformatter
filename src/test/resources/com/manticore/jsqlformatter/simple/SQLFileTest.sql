@@ -81,7 +81,6 @@ FROM v$sqlarea
 WHERE sql_id LIKE '9z1ufprvt2pk2'
 ;
 
-
 -- Test Escape
 SELECT CASE
                 WHEN id_portfolio LIKE '%\_1' ESCAPE '\\'
