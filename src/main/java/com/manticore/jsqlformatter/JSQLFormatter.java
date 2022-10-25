@@ -180,7 +180,7 @@ public class JSQLFormatter {
       "(((?!\\[\\d+\\])\\[.*\\]\\.\\.?)|(\\.\\[\\w+( +\\w+)*\\])|((?!\\s\\[\\d+\\])\\s\\[\\w+( +\\w+)*\\]))");
   private static final Logger LOGGER = Logger.getLogger(JSQLFormatter.class.getName());
   private static final AnsiFormat ANSI_FORMAT_LINE_NUMBER =
-          new AnsiFormat(Attribute.BRIGHT_BLACK_BACK(), Attribute.DESATURATED());
+      new AnsiFormat(Attribute.BRIGHT_BLACK_BACK(), Attribute.DESATURATED());
   private static final AnsiFormat ANSI_FORMAT_KEYWORD =
       new AnsiFormat(Attribute.BLUE_TEXT(), Attribute.BOLD());
   private static final AnsiFormat ANSI_FORMAT_HINT = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT());
@@ -344,7 +344,7 @@ public class JSQLFormatter {
 
   private static StringBuilder appendNormalizingTrailingWhiteSpace(StringBuilder builder,
       String s) {
-    if ( builder.length() > 0) {
+    if (builder.length() > 0) {
       int pos = builder.length() - 1;
       char lastChar = builder.charAt(pos);
       if (lastChar == ' ') {
@@ -365,13 +365,13 @@ public class JSQLFormatter {
         lineCount++;
 
         String lineCountStr = "0000" + lineCount;
-        lineCountStr = lineCountStr.substring(lineCountStr.length()-5, lineCountStr.length());
+        lineCountStr = lineCountStr.substring(lineCountStr.length() - 5, lineCountStr.length());
         lineCountStr += " | ";
 
-        String fillerStr="";
+        String fillerStr = "";
         int adjust = getIndentWidth() - lineCountStr.length() % getIndentWidth();
-        for (int i = 0; i<adjust; i++) {
-          fillerStr+=" ";
+        for (int i = 0; i < adjust; i++) {
+          fillerStr += " ";
         }
 
 
@@ -379,9 +379,10 @@ public class JSQLFormatter {
           case PLAIN:
             return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr);
           case ANSI:
-            return appendNormalizingTrailingWhiteSpace(builder, Ansi.RESET + ANSI_FORMAT_LINE_NUMBER.format("\n" + lineCountStr) + Ansi.RESET + fillerStr);
+            return appendNormalizingTrailingWhiteSpace(builder, Ansi.RESET
+                + ANSI_FORMAT_LINE_NUMBER.format("\n" + lineCountStr) + Ansi.RESET + fillerStr);
           default:
-            return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr );
+            return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr);
         }
       default:
         return appendNormalizingTrailingWhiteSpace(builder, "\n");
@@ -766,9 +767,8 @@ public class JSQLFormatter {
         .longOpt(FormattingOption.SQUARE_BRACKET_QUOTATION.toString()).hasArg()
         .desc("Interpret Square Brackets as Quotes instead of Arrays.\n[AUTO*, YES, NO]").build());
 
-    options.addOption(Option.builder(null)
-                            .longOpt(FormattingOption.SHOW_LINE_NUMBERS.toString()).hasArg()
-                            .desc("Show Line Numbers.\n[YES, NO*]").build());
+    options.addOption(Option.builder(null).longOpt(FormattingOption.SHOW_LINE_NUMBERS.toString())
+        .hasArg().desc("Show Line Numbers.\n[YES, NO*]").build());
 
     // create the parser
     CommandLineParser parser = new DefaultParser();
@@ -2586,10 +2586,10 @@ public class JSQLFormatter {
           BreakLine.AFTER_FIRST);
 
       Expression escapeExpression = likeExpression.getEscape();
-      if (escapeExpression!=null) {
+      if (escapeExpression != null) {
         appendOperator(builder, outputFormat, "ESCAPE", " ", " ");
         appendExpression(escapeExpression, null, builder, indent + 1, i, n, false,
-                         BreakLine.AS_NEEDED);
+            BreakLine.AS_NEEDED);
       }
 
     } else if (expression instanceof NextValExpression) {
@@ -3852,8 +3852,8 @@ public class JSQLFormatter {
   public enum FormattingOption {
     SQUARE_BRACKET_QUOTATION("squareBracketQuotation"), OUTPUT_FORMAT(
         "outputFormat"), KEYWORD_SPELLING("keywordSpelling"), FUNCTION_SPELLING(
-            "functionSpelling"), OBJECT_SPELLING(
-                "objectSpelling"), SEPARATION("separation"), INDENT_WIDTH("indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
+            "functionSpelling"), OBJECT_SPELLING("objectSpelling"), SEPARATION(
+                "separation"), INDENT_WIDTH("indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
 
     private final String optionName;
 
