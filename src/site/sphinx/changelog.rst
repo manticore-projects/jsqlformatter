@@ -8,6 +8,24 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **test: Remove failing test**
+    
+    Andreas Reichel, 2022-11-06
+  * **feat: add line count to output**
+    
+    Andreas Reichel, 2022-10-25
+  * **feat: add line count to output**
+    
+    Andreas Reichel, 2022-10-19
+  * **fix: Support ESCAPE clause of LIKE expression**
+    
+    Andreas Reichel, 2022-10-15
+  * **fix: Support ESCAPE clause of LIKE expression**
+    
+    Andreas Reichel, 2022-10-15
+  * **doc: Add especially challenging Examples**
+    
+    Andreas Reichel, 2022-10-14
   * **doc: Fix the samples' links**
     
     Andreas Reichel, 2022-09-20
