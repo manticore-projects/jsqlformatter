@@ -13,6 +13,8 @@ plugins {
 
     id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
+
+    id "com.nwalsh.gradle.saxon.saxon-gradle" version "0.9.6"
 }
 
 repositories {
@@ -166,6 +168,15 @@ publishing {
             credentials(PasswordCredentials)
         }
     }
+}
+
+xslt {
+    stylesheet 'src/site/sphinx/_static/railroad_diagram.xsl'
+
+    // Transform every .xml file in the "input" directory.
+    input 'src/site/sphinx/_static/railroad_diagram.xhtml'
+
+    output 'src/site/sphinx/railroad_diagram.rst'
 }
 
 tasks.withType(JavaCompile) {

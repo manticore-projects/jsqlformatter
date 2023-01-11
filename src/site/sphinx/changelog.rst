@@ -8,6 +8,9 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **doc: changelog**
+    
+    Andreas Reichel, 2022-11-23
   * **test: Remove failing test**
     
     Andreas Reichel, 2022-11-06
