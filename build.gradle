@@ -376,7 +376,7 @@ xslt {
     output "src/site/sphinx/syntax.rst"
 }
 
-task("sphinx") {
+tasks.register('sphinx') {
     dependsOn(upload, gitChangelogTask, xmldoc, xslt)
 }
 
