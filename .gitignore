@@ -31,15 +31,15 @@ hs_err_pid*
 
 # Exclude the Auto-generated Changelog
 /src/site/sphinx/changelog.rst
+/src/site/sphinx/api.rst
 
 release.properties
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 /nbproject/private/
-/.github
-/gradle
+.github
 /.gradle
 /.idea
 
-
+/pom.xml
 /dependency-reduced-pom.xml

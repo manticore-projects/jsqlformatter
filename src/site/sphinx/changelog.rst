@@ -8,6 +8,15 @@ Latest Changes since |JSQLFORMATTER_VERSION|
 =============================================================
 
 
+  * **refactor: UpdateSets for `Update` and `InsertConflictTarget`**
+    
+    Andreas Reichel, 2023-05-03
+  * **feat: integrated RR Diagrams**
+    
+    Andreas Reichel, 2023-01-21
+  * **refactor: Merge REPLACE into UPSERT**
+    
+    Andreas Reichel, 2023-01-11
   * **doc: changelog**
     
     Andreas Reichel, 2022-11-23
@@ -112,42 +121,6 @@ Version 1.0.1
   * **Rework the Parsing Timeout**
     
     Andreas Reichel, 2021-12-11
-  * **fix the CI**
-    
-    Andreas Reichel, 2021-09-11
-  * **fix the CI**
-    
-    Andreas Reichel, 2021-09-11
-  * **Fix the Maven Build**
-    
-    Andreas Reichel, 2021-09-11
-  * **Use only published dependencies**
-    
-    Andreas Reichel, 2021-09-11
-  * **Update Documentation**
-    
-    Andreas Reichel, 2021-09-11
-  * **reformat source code**
-    
-    Andreas Reichel, 2021-09-11
-  * **JSQL Parser 4.2**
-    
-    Andreas Reichel, 2021-09-11
-  * **Run each test in its own instance**
-    
-    Andreas Reichel, 2021-09-11
-  * **JSQLParser 4.2 Compatibility**
-    
-    Andreas Reichel, 2021-09-11
-  * **Improve the Gradle Build**
-    
-    Andreas Reichel, 2021-09-11
-  * **Organize the Unit Tests**
-    
-    Andreas Reichel, 2021-09-11
-  * **Gradle**
-    
-    Andreas Reichel, 2021-09-05
 
 Version 1.0.0
 =============================================================
@@ -229,6 +202,42 @@ Version 0.1.10
   * **LIMIT/OFFSET with Expressions**
     
     Andreas Reichel, 2021-10-19
+  * **fix the CI**
+    
+    Andreas Reichel, 2021-09-11
+  * **fix the CI**
+    
+    Andreas Reichel, 2021-09-11
+  * **Fix the Maven Build**
+    
+    Andreas Reichel, 2021-09-11
+  * **Use only published dependencies**
+    
+    Andreas Reichel, 2021-09-11
+  * **Update Documentation**
+    
+    Andreas Reichel, 2021-09-11
+  * **reformat source code**
+    
+    Andreas Reichel, 2021-09-11
+  * **JSQL Parser 4.2**
+    
+    Andreas Reichel, 2021-09-11
+  * **Run each test in its own instance**
+    
+    Andreas Reichel, 2021-09-11
+  * **JSQLParser 4.2 Compatibility**
+    
+    Andreas Reichel, 2021-09-11
+  * **Improve the Gradle Build**
+    
+    Andreas Reichel, 2021-09-11
+  * **Organize the Unit Tests**
+    
+    Andreas Reichel, 2021-09-11
+  * **Gradle**
+    
+    Andreas Reichel, 2021-09-05
 
 Version 0.1.9
 =============================================================

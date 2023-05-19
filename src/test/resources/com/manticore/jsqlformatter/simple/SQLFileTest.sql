@@ -33,14 +33,11 @@ CREATE VIEW sys.running_sql
         WHERE time_remaining > 0
 ;
 
-
 SET pagesize 55
 ;
 
-
 SET linesize 170
 ;
-
 
 /*
 something crazy;
@@ -48,7 +45,6 @@ something crazy;
 something crazy;
 something crazy;
 */
-
 
 -- something crazy;
 SELECT  Substr( v$session.username, 1, 8 ) username
@@ -74,7 +70,6 @@ WHERE v$session.sql_address = v$sqlarea.address
 ORDER BY    v$session.lockwait ASC
             , v$session.username
 ;
-
 
 SELECT 'exec DBMS_SHARED_POOL.PURGE (''' || address || ',' || hash_value || ''', ''C'');'
 FROM v$sqlarea

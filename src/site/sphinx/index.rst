@@ -12,6 +12,7 @@ Java SQL Formatting Library
    syntax
    samples
    demo
+   javadoc
 
 .. toctree::
    :maxdepth: 1
