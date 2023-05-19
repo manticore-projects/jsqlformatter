@@ -2,6 +2,7 @@ import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
 plugins {
     id 'java'
+    id 'java-library'
     id 'com.github.johnrengelman.shadow' version 'latest.release'
     id 'maven-publish'
     id 'signing'
@@ -41,29 +42,29 @@ configurations {
 }
 
 dependencies {
-    implementation 'com.github.jsqlparser:jsqlparser:4.6'
+    api 'com.github.jsqlparser:jsqlparser:4.6'
     // Java Doc in XML Format
     xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
 
-    implementation 'commons-cli:commons-cli:1.5.0'
-    implementation 'com.diogonunes:JColor:5.5.1'
+    api 'commons-cli:commons-cli:+'
+    api 'com.diogonunes:JColor:+'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:22.2.0'
+    implementation 'org.graalvm.sdk:graal-sdk:+'
 
-    implementation 'commons-io:commons-io:2.11.0'
-    implementation 'com.github.julianthome:inmemantlr-api:1.9.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+    api 'commons-io:commons-io:+'
+    implementation 'com.github.julianthome:inmemantlr-api:+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.+'
 
     // for the RR Tools
-    implementation 'org.jsoup:jsoup:1.15.3'
-    compileOnly 'net.sf.saxon:Saxon-HE:11.4'
+    implementation 'org.jsoup:jsoup:+'
+    compileOnly 'net.sf.saxon:Saxon-HE:+'
 
     // for the ASCII Trees
-    implementation 'hu.webarticum:tree-printer:2.1.0'
-    implementation 'com.github.tommyettinger:blazingchain:1.4.4.4'
+    implementation 'hu.webarticum:tree-printer:2.+'
+    implementation 'com.github.tommyettinger:blazingchain:1.+'
 
 }
 

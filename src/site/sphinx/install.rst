@@ -8,39 +8,72 @@ Git
 
    git clone https://github.com/manticore-projects/jsqlformatter.git
    cd jsqlformatter
-
-.. tabs::
-
-   .. tab:: Maven
-
-     .. code:: Bash
-
-      mvn install
-
-   .. tab:: Gradle
-
-     .. code:: Bash
-
-      gradle build
-
-   .. tab:: Ant
-
-     .. code:: Bash
-
-      ant jar
+   ./gradlew publishToMavenLocal
 
 
 Maven Repo
 ===================
 
-.. code-block:: xml
-   :substitutions:
+.. tab:: Maven Release
 
-   <dependency>
-      <groupId>com.manticore-projects.jsqlformatter</groupId>
-      <artifactId>jsqlformatter</artifactId>
-      <version>|JSQLFORMATTER_VERSION|</version>
-   </dependency>
+    .. code-block:: xml
+        :substitutions:
+
+        <dependency>
+            <groupId>com.manticore-projects.jsqlformatter</groupId>
+            <artifactId>jsqlformatter</artifactId>
+            <version>|JSQLFORMATTER_VERSION|</version>
+        </dependency>
+
+.. tab:: Maven Snapshot
+
+    .. code-block:: xml
+        :substitutions:
+
+        <repositories>
+            <repository>
+                <id>jsqlformatter-snapshots</id>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+                <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+            </repository>
+        </repositories>
+        <dependency>
+            <groupId>com.manticore-projects.jsqlformatter</groupId>
+            <artifactId>jsqlformatter</artifactId>
+            <version>|JSQLFORMATTER_SNAPSHOT_VERSION|</version>
+        </dependency>
+
+.. tab:: Gradle Stable
+
+    .. code-block:: groovy
+        :substitutions:
+
+        repositories {
+            mavenCentral()
+        }
+
+        dependencies {
+            implementation 'com.manticore-projects.jsqlformatter:jsqlformatter:|JSQLFORMATTER_VERSION|'
+        }
+
+.. tab:: Gradle Snapshot
+
+    .. code-block:: groovy
+        :substitutions:
+
+        repositories {
+            maven {
+                url = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
+            }
+        }
+
+        dependencies {
+            implementation 'com.manticore-projects.jsqlformatter:jsqlformatter:|JSQLFORMATTER_SNAPSHOT_VERSION|'
+        }
+
+
 
 Download
 ===================
@@ -57,19 +90,13 @@ Static Binaries
      - Size
    * - Java Stable Release
      - |JSQLFORMATTER_STABLE_VERSION_LINK|
-     - (700 kB)
+     - (80 kB)
    * - Java Development Snapshot
      - |JSQLFORMATTER_SNAPSHOT_VERSION_LINK|
-     - (700 kB)
-   * - Linux x64 Stable Release
-     - |JSQLFORMATTER_STABLE_LINUX_BINARY_LINK|
-     - (3 MB)
-   * - Windows x64 Stable Release
-     - |JSQLFORMATTER_STABLE_WINDOWS_BINARY_LINK|
-     - (3 MB)
-   * - MacOS Stable Release
-     - |JSQLFORMATTER_STABLE_MACOSX_BINARY_LINK|
-     - (3 MB)
+     - (80 kB)
+   * - Java Fat JAR Devel. Snapshot
+     - |JSQLFORMATTER_FAT_SNAPSHOT_VERSION_LINK|
+     - (15 MR)
 
 .. note::
 
@@ -79,17 +106,3 @@ Native Dynamic Libraries
 ---------------------------------------------
 
    Coming soon.
-
-Plugins
----------------------------------------------
-
-.. list-table:: Plugins Direct Download Links
-   :widths: 25 25 25
-   :header-rows: 1
-
-   * - Platform
-     - File
-     - Size
-   * - Netbeans 12
-     - `ExternalCodeFormatter-SQL.nbm <0.1.11/externalcodeformatter-sql.nbm>`_
-     - (45.2 MB)
