@@ -242,14 +242,6 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-xslt {
-    stylesheet 'src/site/sphinx/_static/railroad_diagram.xsl'
-
-    // Transform every .xml file in the "input" directory.
-    input 'src/site/sphinx/_static/railroad_diagram.xhtml'
-    output 'src/site/sphinx/railroad_diagram.rst'
-}
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 8
@@ -304,6 +296,7 @@ remotes {
 }
 
 tasks.register('upload') {
+    dependsOn(jar)
     doFirst {
         if (findProperty("${project.name}.host") == null) {
             println(
@@ -371,13 +364,20 @@ tasks.register('renderRR') {
                     "${buildDir}/rr/JSqlParserCC.ebnf"
             ]
         }
-
-        //@todo: a Java based solution may be more appropriate here
-        exec {
-            commandLine "sh", "-c", "xsltproc src/main/resources/rr/xhtml2rst.xsl $buildDir/rr/JSqlParserCC.xhtml > src/site/sphinx/syntax.rst"
-        }
     }
 }
 
+xslt {
+    dependsOn(renderRR)
+    stylesheet 'src/main/resources/rr/xhtml2rst.xsl'
+
+    // Transform every .xml file in the "input" directory.
+    input "$buildDir/rr/JSqlParserCC.xhtml"
+    output "src/site/sphinx/syntax.rst"
+}
+
+task("sphinx") {
+    dependsOn(upload, gitChangelogTask, xmldoc, xslt)
+}
 
 
