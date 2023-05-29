@@ -138,6 +138,7 @@ tasks.register('xmldoc', Javadoc) {
     options.doclet = "com.github.markusbernhardt.xmldoclet.XmlDoclet"
 
     options.addBooleanOption("rst", true)
+    options.addBooleanOption("withFloatingToc", true)
     options.addStringOption("basePackage", "com.manticore.jsqlformatter")
 
     dependsOn(compileJava)
@@ -292,6 +293,10 @@ remotes {
         user = findProperty("${project.name}.username")
         identity = new File("${System.properties['user.home']}/.ssh/id_rsa")
     }
+}
+
+ssh.settings {
+    timeoutSec = 6000
 }
 
 tasks.register('upload') {

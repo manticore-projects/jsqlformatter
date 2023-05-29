@@ -153,6 +153,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -190,6 +191,8 @@ public class JSQLFormatter {
   private static Spelling objectSpelling = Spelling.LOWER;
   private static OutputFormat outputFormat = OutputFormat.PLAIN;
   private static ShowLineNumbers showLineNumbers = ShowLineNumbers.NO;
+
+  private static BackSlashQuoting backSlashQuoting = BackSlashQuoting.NO;
   private static int indentWidth = 4;
   private static String indentString = "    ";
   private static int lineCount = 0;
@@ -200,6 +203,14 @@ public class JSQLFormatter {
 
   public static void setSquaredBracketQuotation(SquaredBracketQuotation squaredBracketQuotation) {
     JSQLFormatter.squaredBracketQuotation = squaredBracketQuotation;
+  }
+
+  public static BackSlashQuoting getBackSlashQuoting() {
+    return backSlashQuoting;
+  }
+
+  public static void setBackSlashQuoting(BackSlashQuoting backSlashQuoting) {
+    JSQLFormatter.backSlashQuoting = backSlashQuoting;
   }
 
   public static Separation getSeparation() {
@@ -728,6 +739,9 @@ public class JSQLFormatter {
     options.addOption(Option.builder(null).longOpt(FormattingOption.SHOW_LINE_NUMBERS.toString())
         .hasArg().desc("Show Line Numbers.\n[YES, NO*]").build());
 
+    options.addOption(Option.builder(null).longOpt(FormattingOption.BACKSLASH_QUOTING.toString())
+                            .hasArg().desc("Allow Back Slash '\\' for escaping.\n[YES, NO*]").build());
+
     // create the parser
     CommandLineParser parser = new DefaultParser();
     try {
@@ -756,6 +770,7 @@ public class JSQLFormatter {
       FormattingOption.OBJECT_SPELLING.addFormatterOption(line, formatterOptions);
       FormattingOption.SEPARATION.addFormatterOption(line, formatterOptions);
       FormattingOption.SQUARE_BRACKET_QUOTATION.addFormatterOption(line, formatterOptions);
+      FormattingOption.BACKSLASH_QUOTING.addFormatterOption(line, formatterOptions);
       FormattingOption.SHOW_LINE_NUMBERS.addFormatterOption(line, formatterOptions);
 
       if (line.hasOption("help") || (line.getOptions().length == 0 && line.getArgs().length == 0)) {
@@ -982,6 +997,19 @@ public class JSQLFormatter {
                 useSquareBracketQuotation);
         }
 
+        boolean useBackSlashQuoting;
+        if (Objects.requireNonNull(backSlashQuoting) == BackSlashQuoting.YES) {
+          useBackSlashQuoting = true;
+          LOGGER.log(Level.FINE, "Back Slash Quoting set as {0}.",
+                     true
+          );
+        } else {
+          useBackSlashQuoting = false;
+          LOGGER.log(Level.FINE, "Back Slash Quoting set as {0}.",
+                     false
+          );
+        }
+
         CommentMap commentMap = new CommentMap(statementSql);
 
         Pattern DIRECTIVE_PATTERN = Pattern.compile("@JSQLFormatter\\s?\\((.*)\\)");
@@ -995,7 +1023,7 @@ public class JSQLFormatter {
 
         try {
           Statement statement = CCJSqlParserUtil.parse(statementSql,
-              parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation));
+              parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation).withBackslashEscapeCharacter(useBackSlashQuoting));
 
           if (statement instanceof Select) {
             Select select = (Select) statement;
@@ -1237,7 +1265,7 @@ public class JSQLFormatter {
     ArrayList<JavaObjectNode> nodes = new ArrayList<>();
 
     Statements statements = CCJSqlParserUtil.parseStatements(sqlStr);
-    for (Statement statement : statements.getStatements()) {
+    for (Statement statement : statements) {
       JavaObjectNode node = new JavaObjectNode(null, "Statements", statement);
       nodes.add(node);
     }
@@ -1412,6 +1440,13 @@ public class JSQLFormatter {
           } else if (key.equalsIgnoreCase(FormattingOption.SQUARE_BRACKET_QUOTATION.toString())) {
             try {
               squaredBracketQuotation = SquaredBracketQuotation.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
+          } else if (key.equalsIgnoreCase(FormattingOption.BACKSLASH_QUOTING.toString())) {
+            try {
+              backSlashQuoting = BackSlashQuoting.valueOf(value.toUpperCase());
             } catch (Exception ex) {
               LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
             }
@@ -3490,11 +3525,20 @@ public class JSQLFormatter {
     YES, NO
   }
 
+  public enum BackSlashQuoting {
+    YES, NO
+  }
+
   public enum FormattingOption {
-    SQUARE_BRACKET_QUOTATION("squareBracketQuotation"), OUTPUT_FORMAT(
-        "outputFormat"), KEYWORD_SPELLING("keywordSpelling"), FUNCTION_SPELLING(
-            "functionSpelling"), OBJECT_SPELLING("objectSpelling"), SEPARATION(
-                "separation"), INDENT_WIDTH("indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
+    SQUARE_BRACKET_QUOTATION("squareBracketQuotation")
+    , BACKSLASH_QUOTING("backSlashQuoting")
+    , OUTPUT_FORMAT("outputFormat")
+    , KEYWORD_SPELLING("keywordSpelling")
+    , FUNCTION_SPELLING("functionSpelling")
+    , OBJECT_SPELLING("objectSpelling")
+    , SEPARATION("separation")
+    , INDENT_WIDTH("indentWidth")
+    , SHOW_LINE_NUMBERS("showLineNumbers");
 
     private final String optionName;
 
