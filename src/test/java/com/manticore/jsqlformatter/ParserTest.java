@@ -27,7 +27,6 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import org.junit.jupiter.api.Test;
 
@@ -44,10 +43,9 @@ public class ParserTest {
 
     if (statement instanceof Select) {
       Select select = (Select) statement;
-      SelectBody selectBody = select.getSelectBody();
 
-      if (selectBody instanceof PlainSelect) {
-        PlainSelect plainSelect = (PlainSelect) selectBody;
+      if (select instanceof PlainSelect) {
+        PlainSelect plainSelect = (PlainSelect) select;
         Expression whereExpression = plainSelect.getWhere();
 
         if (whereExpression instanceof AndExpression) {

@@ -67,19 +67,19 @@ CREATE TABLE employees (
 
 -- CREATE TABLE CFE.RECONCILIATION_NOMINAL_HST 2
 CREATE TABLE cfe.reconciliation_nominal_hst PARALLEL COMPRESS NOLOGGING
-    AS ( SELECT /*+ PARALLEL */
-            (   SELECT id_execution_ref
-                FROM cfe.execution_ref c
-                    INNER JOIN cfe.execution_v d
-                        ON c.value_date = d.value_date
-                            AND c.posting_date = d.posting_date
-                            AND d.flag = 'L' ) id_execution_ref
-            , b.id_instrument_ref
-            , a.value_date
-            , a.nominal_balance
-        FROM cfe.reconciliation_nominal a
-            INNER JOIN cfe.instrument_ref b
-                ON a.id_instrument = b.id_instrument )
+    AS (    SELECT /*+ PARALLEL */
+                (   SELECT id_execution_ref
+                    FROM cfe.execution_ref c
+                        INNER JOIN cfe.execution_v d
+                            ON c.value_date = d.value_date
+                                AND c.posting_date = d.posting_date
+                                AND d.flag = 'L' ) id_execution_ref
+                , b.id_instrument_ref
+                , a.value_date
+                , a.nominal_balance
+            FROM cfe.reconciliation_nominal a
+                INNER JOIN cfe.instrument_ref b
+                    ON a.id_instrument = b.id_instrument )
 ;
 
 -- Z COMPLEX WITH MANY REFERENCES

@@ -62,7 +62,8 @@ ORDER BY 1
 ;
 
 INSERT INTO cfe.ext_eab
-SELECT /*+ PARALLEL DRIVING_SITE(A) */ a.*
+SELECT /*+ PARALLEL DRIVING_SITE(A) */
+    a.*
 FROM tbaadm.eod_acct_bal_table@finnacle a
 WHERE end_eod_date >= Add_Months( To_Date( :VALUE_DATE, 'mm/dd/yy' ), - 4 )
 ;
@@ -316,12 +317,10 @@ WHERE ( amortised_cost_dirty < 0
                         AND g2.attribute_value IN ( '271', '7614' ) )  /*CBN*/ )
 ;
 
-
 SELECT *
 FROM schedule_info info
 WHERE ( info.employee_id, info.schedule_date ) IN ( ( 1, '2019-10-01' ), ( 1, '2019-10-02' ) )
 ;
-
 
 SELECT *
 FROM table_a
@@ -332,7 +331,6 @@ WHERE other_id IN ( (   SELECT id
                                                     WHERE name LIKE '%bb%' ) )
 ;
 
-
 SELECT *
 FROM table1
 UNION
@@ -342,7 +340,6 @@ ORDER BY col
 LIMIT 4
 OFFSET 5
 ;
-
 
 -- ORACLE LONGOPS
 SELECT  l.inst_id
@@ -374,7 +371,6 @@ WHERE l.opname NOT LIKE 'RMAN%'
     AND l.time_remaining > 0
 ;
 
-
 -- Old Oracle Outer Joins (+)
 SELECT *
 FROM foo
@@ -382,13 +378,11 @@ FROM foo
 WHERE foo.id = bar.id(+)
 ;
 
-
 SELECT *
 FROM foo
     , bar
 WHERE foo.id(+)  = bar.id
 ;
-
 
 SELECT  v.lname
         , v.function
@@ -402,4 +396,3 @@ FROM (  SELECT  e.dept_id
     , department d
 WHERE v.dept_id(+)  = d.dept_id
 ;
-

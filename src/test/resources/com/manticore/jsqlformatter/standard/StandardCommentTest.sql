@@ -12,7 +12,6 @@ SET year_offset = ?            /* year offset */
 WHERE id_calendar = ?
 ;
 
-
 -- BOTH CLAUSES PRESENT 'with a string' AND "a field"
 MERGE /*+ PARALLEL */ INTO test1 /*the target table*/ a
     USING all_objects      /*the source table*/

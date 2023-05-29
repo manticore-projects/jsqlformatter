@@ -1,3 +1,7 @@
+.. meta::
+   :description: Java Software Library for formatting and pretty printing SQL Statements
+   :keywords: java sql statement format pretty printing
+
 ***************************
 Java SQL Formatting Library
 ***************************
@@ -9,10 +13,11 @@ Java SQL Formatting Library
 
    install
    usage
-   syntax
+   Syntax   <syntax.rst>
+   Java API <javadoc.rst>
    samples
    demo
-   javadoc
+
 
 .. toctree::
    :maxdepth: 1

@@ -24,7 +24,8 @@ MERGE INTO cfe.impairment imp
                                 AND ( c.attribute_value LIKE t.product_code
                                         OR ( c.attribute_value IS NULL
                                                 AND t.product_code = '%' ) ) )
-SELECT /*+ PARALLEL */ *
+            SELECT /*+ PARALLEL */
+                *
             FROM x x1
             WHERE x1.valid_date = ( SELECT max
                                     FROM x
@@ -59,14 +60,15 @@ MERGE INTO cfe.instrument_import_measure imp
                                 AND ( c.attribute_value LIKE t.product_code
                                         OR ( c.attribute_value IS NULL
                                                 AND t.product_code = '%' ) ) )
-SELECT /*+ PARALLEL */ *
+            SELECT /*+ PARALLEL */
+                *
             FROM x x1
             WHERE x1.valid_date = ( SELECT max
                                     FROM x
                                     WHERE id_instrument = x1.id_instrument
                                         AND valid_date <= to_date ) ) s
         ON ( imp.id_instrument = s.id_instrument
-                    AND imp.measure = 'YIELD' )
+                AND imp.measure = 'YIELD' )
 WHEN MATCHED THEN
     UPDATE SET  imp.value = s.yield
 ;
@@ -75,9 +77,9 @@ WHEN MATCHED THEN
 MERGE INTO cfe.instrument_import_measure imp
     USING s
         ON ( imp.id_instrument = s.id_instrument
-                    AND imp.measure = 'YIELD_P'
-                    AND imp.id_instrument = s.id_instrument
-                    AND imp.measure = 'YIELD_P' )
+                AND imp.measure = 'YIELD_P'
+                AND imp.id_instrument = s.id_instrument
+                AND imp.measure = 'YIELD_P' )
 WHEN MATCHED THEN
     UPDATE SET  imp.value = s.yield
 ;
@@ -107,14 +109,15 @@ MERGE INTO cfe.instrument_import_measure imp
                                 AND ( c.attribute_value LIKE t.product_code
                                         OR ( c.attribute_value IS NULL
                                                 AND t.product_code = '%' ) ) )
-SELECT /*+ PARALLEL */ *
+            SELECT /*+ PARALLEL */
+                *
             FROM x x1
             WHERE x1.valid_date = ( SELECT max
                                     FROM x
                                     WHERE id_instrument = x1.id_instrument
                                         AND valid_date <= to_date ) ) s
         ON ( imp.id_instrument = s.id_instrument
-                    AND imp.measure = 'YIELD_PP' )
+                AND imp.measure = 'YIELD_PP' )
 WHEN MATCHED THEN
     UPDATE SET  imp.value = s.yield
 ;
@@ -172,7 +175,8 @@ WHEN MATCHED THEN
 
 -- INSERT WITHOUT COLUMNS
 MERGE /*+ PARALLEL */ INTO cfe.tmp_eab a
-    USING ( SELECT /*+ PARALLEL DRIVING_SITE(C) */ c.*
+    USING ( SELECT /*+ PARALLEL DRIVING_SITE(C) */
+                c.*
             FROM tbaadm.eab@finnacle c
                 INNER JOIN (    SELECT  acid
                                         , eod_date
@@ -184,7 +188,7 @@ MERGE /*+ PARALLEL */ INTO cfe.tmp_eab a
                     ON c.acid = d.acid
                         AND c.eod_date >= d.eod_date ) b
         ON ( a.acid = b.acid
-                    AND a.eod_date = b.eod_date )
+                AND a.eod_date = b.eod_date )
 WHEN MATCHED THEN
     UPDATE SET  a.tran_date_bal = b.tran_date_bal
                 , a.tran_date_tot_tran = b.tran_date_tot_tran

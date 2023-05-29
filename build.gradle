@@ -2,7 +2,6 @@ import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
 plugins {
     id 'java'
-    id 'java-library'
     id 'com.github.johnrengelman.shadow' version 'latest.release'
     id 'maven-publish'
     id 'signing'
@@ -42,17 +41,17 @@ configurations {
 }
 
 dependencies {
-    api 'com.github.jsqlparser:jsqlparser:4.6'
+    implementation 'com.github.jsqlparser:jsqlparser:4.7-SNAPSHOT'
     // Java Doc in XML Format
     xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
 
-    api 'commons-cli:commons-cli:+'
-    api 'com.diogonunes:JColor:+'
+    implementation 'commons-cli:commons-cli:+'
+    implementation 'com.diogonunes:JColor:+'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
     implementation 'org.graalvm.sdk:graal-sdk:+'
 
-    api 'commons-io:commons-io:+'
+    implementation 'commons-io:commons-io:+'
     implementation 'com.github.julianthome:inmemantlr-api:+'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.+'
@@ -76,7 +75,7 @@ def getVersion = { boolean considerSnapshot ->
     def commit = null
     def snapshot = ""
     new ByteArrayOutputStream().withStream { os ->
-        def result = exec {
+        exec {
             args = [
                     "--no-pager"
                     , "describe"
@@ -135,7 +134,7 @@ javadoc {
 tasks.register('xmldoc', Javadoc) {
     source = sourceSets.main.allJava
     destinationDir = reporting.file("xmlDoclet")
-    options.docletpath = configurations.xmlDoclet.files.asType(List)
+    options.docletpath = configurations.xmlDoclet.files as List
     options.doclet = "com.github.markusbernhardt.xmldoclet.XmlDoclet"
 
     options.addBooleanOption("rst", true)
@@ -376,7 +375,7 @@ xslt {
     output "src/site/sphinx/syntax.rst"
 }
 
-tasks.register('sphinx') {
+publish {
     dependsOn(upload, gitChangelogTask, xmldoc, xslt)
 }
 

@@ -20,6 +20,8 @@ package com.manticore.jsqlformatter;
 import com.diogonunes.jcolor.AnsiFormat;
 import com.diogonunes.jcolor.Attribute;
 import com.manticore.jsqlformatter.JSQLFormatter.OutputFormat;
+import net.sf.jsqlparser.expression.OracleHint;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.sf.jsqlparser.expression.OracleHint;
 
 /** @author are */
 public class CommentMap extends LinkedHashMap<Integer, Comment> {
@@ -112,9 +113,9 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
     StringBuilder builder = new StringBuilder();
 
-    Iterator<Comment> commentIteraror = values().iterator();
-    if (commentIteraror.hasNext()) {
-      Comment next = commentIteraror.next();
+    Iterator<Comment> commentIterator = values().iterator();
+    if (commentIterator.hasNext()) {
+      Comment next = commentIterator.next();
 
       int relativePosition = 0;
       int ansiStarted = -1;
@@ -125,12 +126,12 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
 
         if (ansiStarted < 0)
           while (next.relativePosition <= relativePosition) {
-            if (next.extraNewLine)
+            if (next.extraNewLine) {
               builder.append("\n");
-            else if (next.newLine && builder.length() > 1
-                && builder.charAt(builder.length() - 1) != '\n')
+            } else if (next.newLine && builder.length() > 1
+                && builder.charAt(builder.length() - 1) != '\n') {
               builder.append("\n");
-            else if (!c.matches("\\w"))
+            } else if (!c.matches("\\w"))
               builder.append(" ");
 
             if (!next.newLine && next.text.startsWith("--")) {
@@ -140,8 +141,8 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
               appendComment(builder, outputFormat, next.text, "", "");
             }
 
-            if (commentIteraror.hasNext()) {
-              next = commentIteraror.next();
+            if (commentIterator.hasNext()) {
+              next = commentIterator.next();
             } else {
               wasLastComment = true;
               break;

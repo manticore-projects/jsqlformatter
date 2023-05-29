@@ -5,25 +5,24 @@ How to use it
 -----------------
 Static Binaries
 -----------------
-.. tabs::
 
-   .. tab:: JVM 
+.. tab:: JVM
 
-      .. code:: Bash
-      
-         java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+  .. code:: Bash
 
-   .. tab:: Linux Shell
+     java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
-      .. code:: Bash
+.. tab:: Linux Shell
 
-         ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
-		    
-   .. tab:: Windows Power Shell
+  .. code:: Bash
 
-      .. code:: Bash
+     ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
-         JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+.. tab:: Windows Power Shell
+
+  .. code:: Bash
+
+     JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
 ..........................
 Command Line Options (CLI)
@@ -74,45 +73,43 @@ Command Line Options (CLI)
 Dynamic Libraries
 -----------------
 
-.. tabs::
+.. tab:: Java
 
-   .. tab:: Java
+  .. code:: Java
 
-      .. code:: Java
-      
-        import com.manticore.jsqlformatter.JSqlFormatter;
-        
-        class Sample {
-            public static void main(String[] args) {
-                String formattedSql = JSqlFormatter.format("select * fromd dual;");
-            }
+    import com.manticore.jsqlformatter.JSqlFormatter;
+
+    class Sample {
+        public static void main(String[] args) {
+            String formattedSql = JSqlFormatter.format("select * fromd dual;");
+        }
+    }
+
+.. tab:: C++
+
+  .. code:: python
+
+    #include <stdlib.h>
+    #include <stdio.h>
+
+    #include <libSQLFormatter.h>
+
+    int main(int argc, char **argv) {
+        graal_isolate_t *isolate = NULL;
+        graal_isolatethread_t *thread = NULL;
+
+        if (graal_create_isolate(NULL, &isolate, &thread) != 0) {
+            fprintf(stderr, "graal_create_isolate error\n");
+            return 1;
         }
 
-   .. tab:: C++
+        printf("%s", format(thread, "select * from dual;"));
 
-      .. code:: python
+        if (graal_detach_thread(thread) != 0) {
+            fprintf(stderr, "graal_detach_thread error\n");
+            return 1;
+        }
 
-		#include <stdlib.h>
-		#include <stdio.h>
-
-		#include <libSQLFormatter.h>
-
-		int main(int argc, char **argv) {
-		    graal_isolate_t *isolate = NULL;
-		    graal_isolatethread_t *thread = NULL;
-		    
-		    if (graal_create_isolate(NULL, &isolate, &thread) != 0) {
-			    fprintf(stderr, "graal_create_isolate error\n");
-			    return 1;
-		    }
-		
-		    printf("%s", format(thread, "select * from dual;"));
-
-		    if (graal_detach_thread(thread) != 0) {
-		        fprintf(stderr, "graal_detach_thread error\n");
-			    return 1;
-		    }
-		    
-		    return 0;
-		}
+        return 0;
+    }
 

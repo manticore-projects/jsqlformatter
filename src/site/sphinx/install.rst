@@ -82,7 +82,7 @@ Static Binaries
 ---------------------------------------------
 
 .. list-table:: Static Binaries Direct Download Links
-   :widths: 25 25 25
+   :widths: 35 50 15
    :header-rows: 1
 
    * - Operating System
@@ -96,7 +96,7 @@ Static Binaries
      - (80 kB)
    * - Java Fat JAR Devel. Snapshot
      - |JSQLFORMATTER_FAT_SNAPSHOT_VERSION_LINK|
-     - (15 MR)
+     - (15 MB)
 
 .. note::
 

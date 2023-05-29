@@ -75,7 +75,7 @@ public class StandardFileTest {
 
           start = start
               || (!line.startsWith("--") || line.startsWith("-- @")) && line.trim().length() > 0;
-          end = start && line.trim().endsWith(";");
+          end = start && !line.startsWith("--") && line.trim().endsWith(";");
 
           if (start)
             stringBuilder.append(line).append("\n");
