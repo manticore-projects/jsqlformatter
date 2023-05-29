@@ -1175,6 +1175,7 @@ public class JSQLFormatter {
       return Collections.enumeration(children);
     }
 
+
     private String formatClassName(Object o) {
       if (outputFormat.equals(OutputFormat.HTML)) {
         return "<html><font color='gray'>" + object.getClass().getSimpleName() + ":</font> <em>"
@@ -1193,9 +1194,9 @@ public class JSQLFormatter {
             + o.getClass().getCanonicalName() + "</em></html>";
       } else if (outputFormat.equals(OutputFormat.ANSI)) {
         return ANSI_FORMAT_KEYWORD.format(fieldName) + ": "
-            + ANSI_FORMAT_PARAMETER.format(o.getClass().getCanonicalName());
+            + ANSI_FORMAT_PARAMETER.format(o.getClass().getCanonicalName().replace("net.sf.jsqlparser.", ""));
       } else {
-        return fieldName + ": " + object.getClass().getCanonicalName();
+        return fieldName + ": " + object.getClass().getCanonicalName().replace("net.sf.jsqlparser.", "");
       }
     }
 
