@@ -2,6 +2,7 @@
 Interactive Demo
 ****************
 
+Using latest JSQLParser version: |JSQLPARSER_SNAPSHOT_VERSION_LINK|
 
 .. raw:: html
 
