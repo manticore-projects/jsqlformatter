@@ -296,7 +296,7 @@ remotes {
 }
 
 ssh.settings {
-    timeoutSec = 6000
+    timeoutSec = 60000
 }
 
 tasks.register('upload') {
@@ -381,7 +381,7 @@ xslt {
 }
 
 publish {
-    dependsOn(upload, gitChangelogTask, xmldoc, xslt)
+    dependsOn(gitChangelogTask, xmldoc, xslt, upload)
 }
 
 

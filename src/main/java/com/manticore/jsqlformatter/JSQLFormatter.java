@@ -31,6 +31,7 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExtractExpression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.IntervalExpression;
 import net.sf.jsqlparser.expression.JdbcNamedParameter;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.KeepExpression;
@@ -331,6 +332,12 @@ public class JSQLFormatter {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_KEYWORD.format(s)).append(after);
         break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:blue; font-style:bold;\">").append(s).append("</span>")
+                .append(after);
+        break;
       default:
         builder.append(before).append(s).append(after);
         break;
@@ -375,6 +382,11 @@ public class JSQLFormatter {
           case ANSI:
             return appendNormalizingTrailingWhiteSpace(builder, Ansi.RESET
                 + ANSI_FORMAT_LINE_NUMBER.format("\n" + lineCountStr) + Ansi.RESET + fillerStr);
+          case HTML:
+            return builder
+                    .append("\n")
+                    .append("<span style=\"color:light-grey; font-size:8pt; font-style:normal;\">").append(lineCountStr).append("</span>")
+                    .append(fillerStr);
           default:
             return appendNormalizingTrailingWhiteSpace(builder, "\n" + lineCountStr + fillerStr);
         }
@@ -409,6 +421,12 @@ public class JSQLFormatter {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_HINT.format(s)).append(after);
         break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:light-blue; font-style:thin\">").append(s).append("</span>")
+                .append(after);
+        break;
       default:
         builder.append(before).append(s).append(after);
         break;
@@ -438,6 +456,12 @@ public class JSQLFormatter {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_OPERATOR.format(s)).append(after);
         break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:blue; font-style:normal;\">").append(s).append("</span>")
+                .append(after);
+        break;
       default:
         builder.append(before).append(s).append(after);
         break;
@@ -450,6 +474,12 @@ public class JSQLFormatter {
     switch (format) {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_PARAMETER.format(value)).append(after);
+        break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:yellow; font-style:normal;\">").append(value).append("</span>")
+                .append(after);
         break;
       default:
         builder.append(before).append(value).append(after);
@@ -483,6 +513,12 @@ public class JSQLFormatter {
     switch (format) {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_ALIAS.format(s)).append(after);
+        break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:red; font-style:bold;\">").append(s).append("</span>")
+                .append(after);
         break;
       default:
         builder.append(before).append(s).append(after);
@@ -549,6 +585,12 @@ public class JSQLFormatter {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_FUNCTION.format(s)).append(after);
         break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:light-red; font-style:italic;\">").append(s).append("</span>")
+                .append(after);
+        break;
       default:
         builder.append(before).append(s).append(after);
         break;
@@ -577,6 +619,12 @@ public class JSQLFormatter {
     switch (format) {
       case ANSI:
         builder.append(before).append(ANSI_FORMAT_TYPE.format(s)).append(after);
+        break;
+      case HTML:
+        builder
+                .append(before)
+                .append("<span style=\"color:yellow; font-style:normal;\">").append(s).append("</span>")
+                .append(after);
         break;
       default:
         builder.append(before).append(s).append(after);
@@ -939,7 +987,7 @@ public class JSQLFormatter {
     lineCount = 0;
 
     //Pattern SEMICOLON_PATTERN = Pattern.compile("((?:(?:'[^']*+')|(?:\"[^\"]*+\")|(?:--.*)|(?:\\/\\*[^\\*\\/]*+\\*\\/)|[^;])*+);");
-    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$");
+    Pattern SEMICOLON_PATTERN = Pattern.compile(";|$|\\n\\n\\n");
     Matcher m = SEMICOLON_PATTERN.matcher(sqlStr);
     ArrayList<Integer> semicolons = new ArrayList<>();
 
@@ -972,8 +1020,13 @@ public class JSQLFormatter {
         pos = semicolonPos + 1;
 
         // we are at the end and find only remaining whitespace
-        if (statementSql.trim().length() == 0)
+        // or comments
+        if (statementSql.trim().length() == 0
+          || ( i==n-1 && statementSql.trim().startsWith("--") )
+          || ( i==n-1 && statementSql.trim().startsWith("/*") )
+        ) {
           break;
+        }
 
         StringBuilder statementBuilder = new StringBuilder();
 
@@ -1095,6 +1148,20 @@ public class JSQLFormatter {
         }
       } else
         break;
+    }
+
+    if (outputFormat == OutputFormat.HTML) {
+      builder = new StringBuilder()
+                  .append("<html>\n")
+                  .append("<head>\n")
+                  .append("<title>SQL Statement's Java Object Tree</title>\n")
+                  .append("</head>\n")
+                  .append("<body>\n")
+                  .append("<pre style=\"font-size:-2;background-color:#EFEFEF;\">\n")
+                  .append(builder)
+                  .append("\n</pre>\n")
+                  .append("</body>\n")
+                  .append("</html>");
     }
 
     return builder.toString().trim();
@@ -2470,7 +2537,7 @@ public class JSQLFormatter {
 
     } else if (expression instanceof NullValue) {
       NullValue nullValue = (NullValue) expression;
-      appendValue(builder, outputFormat, nullValue.toString(), "", "");
+      appendKeyWord(builder, outputFormat, nullValue.toString(), "", "");
 
     } else if (expression instanceof TimeKeyExpression) {
       TimeKeyExpression timeKeyExpression = (TimeKeyExpression) expression;
@@ -2511,9 +2578,9 @@ public class JSQLFormatter {
       if (parameters != null || namedParameters != null) {
         if (parameters != null) {
           if (distinct) {
-            builder.append("( DISTINCT ");
+            appendKeyWord(builder, outputFormat, "DISTINCT", "( ", " ");
           } else if (allColumns) {
-            builder.append("( ALL ");
+            appendKeyWord(builder, outputFormat, "ALL", "( ", " ");
           } else {
             builder.append("( ");
           }
@@ -2611,7 +2678,21 @@ public class JSQLFormatter {
     } else if (expression instanceof AllTableColumns) {
       AllTableColumns allTableColumns = (AllTableColumns) expression;
       appendAllTableColumns(allTableColumns, builder, indent, i, n);
-    } else {
+    } else if (expression instanceof IntervalExpression) {
+      IntervalExpression intervalExpression = (IntervalExpression) expression;
+      if (intervalExpression.isUsingIntervalKeyword()) {
+        appendKeyWord(builder, outputFormat, "INTERVAL", "", " ");
+      }
+      if (intervalExpression.getExpression()!=null) {
+        appendExpression(intervalExpression.getExpression(), null, builder, indent, i, n, false, breakLine);
+      } else {
+        appendValue(builder, outputFormat, intervalExpression.getParameter(), "", "");
+      }
+      if (intervalExpression.getIntervalType()!=null) {
+        appendKeyWord(builder, outputFormat, intervalExpression.getIntervalType(), " ", "");
+      }
+    }
+    else {
       LOGGER
           .warning("Unhandled expression: " + expression.getClass().getName() + " = " + expression);
       builder.append(expression);

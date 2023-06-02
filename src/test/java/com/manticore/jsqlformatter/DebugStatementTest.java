@@ -25,22 +25,16 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "-- BOTH CLAUSES PRESENT 'with a string' AND \"a field\"\n"
-                    + "MERGE /*+ PARALLEL */ INTO test1 /*the target table*/ a\n"
-                    + "    USING all_objects      /*the source table*/\n"
-                    + "        ON ( /*joins in()!;*/ a.object_id = b.object_id )\n"
-                    + "-- INSERT CLAUSE;\n"
-                    + "WHEN /*comments between keywords!;*/ NOT MATCHED THEN\n"
-                    + "    INSERT ( object_id     /*ID Column*/\n"
-                    + "                , status   /*Status Column*/ )\n"
-                    + "    VALUES ( b.object_id\n"
-                    + "                , b.status )\n"
-                    + "/* UPDATE CLAUSE\n"
-                    + "WITH A WHERE CONDITION */ \n"
-                    + "WHEN MATCHED THEN          /* Lets rock */\n"
-                    + "    UPDATE SET  a.status = '/*this is no comment!*/ and -- this ain''t either;'\n"
-                    + "    WHERE   b.\"--status;\" != 'VALID'\n"
-                    + ";";
+    String sqlStr = "-- Leading or Trailing comments\n"
+                    + "\n"
+                    + "/* leading comment */\n"
+                    + "\n"
+                    + "-- another one\n"
+                    + "\n"
+                    + "-- comment for the statement\n"
+                    + "select 1 from dual; -- where a = b\n"
+                    + "\n"
+                    + "-- trailing comment;";
     Statement statement1 = CCJSqlParserUtil.parse(sqlStr);
 
     String formatteredSqlStr = JSQLFormatter.format(sqlStr);
