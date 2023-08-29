@@ -49,7 +49,7 @@ dependencies {
     implementation 'com.diogonunes:JColor:+'
 
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:+'
+    implementation 'org.graalvm.sdk:graal-sdk:22.+'
 
     implementation 'commons-io:commons-io:+'
     implementation 'com.github.julianthome:inmemantlr-api:+'
@@ -105,7 +105,7 @@ def getVersion = { boolean considerSnapshot ->
     }
     return patch!=null
             ? "${major}.${minor}.${patch}${snapshot}"
-            :  "${major}.${minor}${snapshot}";
+            :  "${major}.${minor}${snapshot}"
 }
 version = getVersion(true)
 group = 'com.manticore-projects.jsqlformatter'
@@ -119,7 +119,7 @@ java {
 
     // needed for XML-Doclet to work (since Doclet changed again with Java 13)
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
