@@ -2523,7 +2523,9 @@ public class JSQLFormatter {
       appendExpression(isNullExpression.getLeftExpression(), null, builder, indent + 1, i, n, false,
           BreakLine.AFTER_FIRST);
 
-      if (isNullExpression.isUseIsNull()) {
+      if (isNullExpression.isUseNotNull()) {
+        appendOperator(builder, outputFormat, "NOTNULL", " ", "");
+      } else if (isNullExpression.isUseIsNull()) {
         if (isNullExpression.isNot())
           appendOperator(builder, outputFormat, "NOT ISNULL", " ", "");
         else
