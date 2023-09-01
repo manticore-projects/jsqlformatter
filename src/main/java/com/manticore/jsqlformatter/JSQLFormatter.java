@@ -2674,13 +2674,13 @@ public class JSQLFormatter {
     } else if (expression instanceof ExpressionList) {
       ExpressionList<?> expressions = (ExpressionList<?>) expression;
       appendExpressionList(expressions, builder, indent, BreakLine.AS_NEEDED);
-    } else if (expression instanceof AllColumns) {
-      AllColumns allColumns = (AllColumns) expression;
-      appendAllColumns(allColumns, builder, indent, i , n);
     } else if (expression instanceof AllTableColumns) {
       AllTableColumns allTableColumns = (AllTableColumns) expression;
       appendAllTableColumns(allTableColumns, builder, indent, i, n);
-    } else if (expression instanceof IntervalExpression) {
+    } else if (expression instanceof AllColumns) {
+      AllColumns allColumns = (AllColumns) expression;
+      appendAllColumns(allColumns, builder, indent, i , n);
+    }  else if (expression instanceof IntervalExpression) {
       IntervalExpression intervalExpression = (IntervalExpression) expression;
       if (intervalExpression.isUsingIntervalKeyword()) {
         appendKeyWord(builder, outputFormat, "INTERVAL", "", " ");
