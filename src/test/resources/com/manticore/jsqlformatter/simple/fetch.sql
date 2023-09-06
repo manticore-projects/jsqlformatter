@@ -1,0 +1,11 @@
+SELECT *
+FROM mytable
+WHERE mytable.col = 9
+ORDER BY mytable.id
+FETCH NEXT 5 ROWS ONLY
+;
+
+SELECT 1
+FROM test.dual
+FETCH FIRST ROW ONLY
+;

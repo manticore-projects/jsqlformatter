@@ -89,6 +89,7 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.Distinct;
 import net.sf.jsqlparser.statement.select.ExceptOp;
+import net.sf.jsqlparser.statement.select.Fetch;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.IntersectOp;
@@ -1929,6 +1930,31 @@ public class JSQLFormatter {
         String offsetParam = offset.getOffsetParam();
         if (offsetParam != null)
           appendString(offsetParam, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+      }
+
+      Fetch fetch = plainSelect.getFetch();
+      if (fetch!=null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++)
+          builder.append(indentString);
+        appendKeyWord(builder, outputFormat, "FETCH", "", "");
+
+        if (fetch.isFetchParamFirst()) {
+          appendKeyWord(builder, outputFormat, "FIRST", " ", "");
+        } else {
+          appendKeyWord(builder, outputFormat, "NEXT", " ", "");
+        }
+
+        Expression expression = fetch.getExpression();
+        if (expression!=null) {
+          appendNormalizingTrailingWhiteSpace(builder, " ");
+          appendExpression(expression, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+        }
+
+        for (String s: fetch.getFetchParameters()) {
+          appendKeyWord(builder, outputFormat, s, " ", "");
+        }
+
       }
 
     } else if (select instanceof SetOperationList) {
