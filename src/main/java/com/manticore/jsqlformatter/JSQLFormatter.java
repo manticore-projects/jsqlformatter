@@ -3242,6 +3242,9 @@ public class JSQLFormatter {
     }
 
     appendKeyWord(builder, outputFormat, "INDEX", "", " ");
+    if (createIndex.isUsingIfNotExists()) {
+      appendKeyWord(builder, outputFormat, "IF NOT EXISTS", "", " ");
+    }
     appendAlias(builder, outputFormat, index.getName(), "", "");
 
     appendNormalizedLineBreak(builder);
