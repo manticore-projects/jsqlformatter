@@ -2580,6 +2580,10 @@ public class JSQLFormatter {
 
       appendExpression(leftExpression, null, builder, indent, i, n, false, BreakLine.AS_NEEDED);
 
+      if (inExpression.isGlobal()) {
+        appendKeyWord(builder, outputFormat, "GLOBAL", " ", "");
+      }
+
       if (useNot)
         appendOperator(builder, outputFormat, "NOT IN", " ", " ");
       else
