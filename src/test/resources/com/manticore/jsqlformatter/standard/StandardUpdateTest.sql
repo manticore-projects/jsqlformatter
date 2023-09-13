@@ -115,3 +115,55 @@ FROM table1
     LEFT JOIN table2
         ON col1 = col2
 ;
+
+-- UPDATE WITH
+WITH s AS (
+        SELECT  a.priority
+                , a.type
+                , a.description
+                , a.limit_amout
+                , a.id_currency
+                , a.end_date
+        FROM risk.imp_counterparty_instrument a
+            INNER JOIN risk.counterparty b
+                ON a.id_counterparty = b.id_counterparty
+                    AND b.id_status = 'C'
+            INNER JOIN risk.instrument c
+                ON a.id_instrument_beneficiary = c.id_instrument
+                    AND c.id_status = 'C'
+            INNER JOIN risk.counterparty_instrument e
+                ON b.id_counterparty_ref = e.id_counterparty_ref
+                    AND e.id_instrument_beneficiary = a.id_instrument_beneficiary
+                    AND e.id_instrument_guarantee = a.id_instrument_guarantee
+        WHERE e.id_counterparty_ref = a1.id_counterparty_ref
+            AND e.id_instrument_beneficiary = a1.id_instrument_beneficiary
+            AND e.id_instrument_guarantee = a1.id_instrument_guarantee )
+UPDATE risk.counterparty_instrument a1
+SET (   priority
+        , type
+        , description
+        , limit_amout
+        , id_currency
+        , end_date ) = (    SELECT *
+                            FROM s )
+WHERE EXISTS (  SELECT  a.priority
+                        , a.type
+                        , a.description
+                        , a.limit_amout
+                        , a.id_currency
+                        , a.end_date
+                FROM risk.imp_counterparty_instrument a
+                    INNER JOIN risk.counterparty b
+                        ON a.id_counterparty = b.id_counterparty
+                            AND b.id_status = 'C'
+                    INNER JOIN risk.instrument c
+                        ON a.id_instrument_beneficiary = c.id_instrument
+                            AND c.id_status = 'C'
+                    INNER JOIN risk.counterparty_instrument e
+                        ON b.id_counterparty_ref = e.id_counterparty_ref
+                            AND e.id_instrument_beneficiary = a.id_instrument_beneficiary
+                            AND e.id_instrument_guarantee = a.id_instrument_guarantee
+                WHERE e.id_counterparty_ref = a1.id_counterparty_ref
+                    AND e.id_instrument_beneficiary = a1.id_instrument_beneficiary
+                    AND e.id_instrument_guarantee = a1.id_instrument_guarantee )
+;

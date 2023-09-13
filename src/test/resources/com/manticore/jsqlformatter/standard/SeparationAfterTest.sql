@@ -6,13 +6,13 @@ select /*+ parallel */
     A."id_currency",
     A.ID_FEE_TYPE,
     current_date,
-    NULL,
+    null,
     ID_ACCOUNTING_SCOPE_CODE
 from (  select *
         from (  select distinct
                     C.CODE CODE,
                     D.ID_CURRENCY,
-                    NULL ID_FEE_TYPE,
+                    null ID_FEE_TYPE,
                     C1.ID_ACCOUNTING_SCOPE_CODE
                 from CFE.LEDGER_BRANCH C
                     inner join CFE.ACCOUNTING_SCOPE C1
@@ -23,7 +23,7 @@ from (  select *
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
-                    NULL ID_FEE_TYPE,
+                    null ID_FEE_TYPE,
                     C.ID_ACCOUNTING_SCOPE_CODE
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D
@@ -33,7 +33,7 @@ from (  select *
         from (  select distinct
                     C.CODE,
                     D.ID_CURRENCY,
-                    NULL ID_FEE_TYPE,
+                    null ID_FEE_TYPE,
                     C1.ID_ACCOUNTING_SCOPE_CODE
                 from CFE.LEDGER_BRANCH C
                     inner join CFE.ACCOUNTING_SCOPE C1
@@ -44,7 +44,7 @@ from (  select *
                 select distinct
                     C.CODE,
                     D.ID_CURRENCY,
-                    NULL ID_FEE_TYPE,
+                    null ID_FEE_TYPE,
                     C.ID_ACCOUNTING_SCOPE_CODE
                 from CFE.LEDGER_ACCOUNT C
                     inner join COMMON.LEDGER_CURRENCY D

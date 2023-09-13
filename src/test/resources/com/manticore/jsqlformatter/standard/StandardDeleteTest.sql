@@ -88,3 +88,14 @@ WHERE posting_date IN ( SELECT posting_date
                                         AND value_date <= :value_date_p ) IS NULL )
     AND reversed = '0'
 ;
+
+-- DELETE WITH
+WITH scope AS (
+        SELECT *
+        FROM cfe.accounting_scope
+        WHERE id_status = 'C'
+            AND id_accounting_scope_code = :SCOPE )
+DELETE FROM cfe.accounting_scope a
+WHERE NOT EXISTS (  SELECT 1
+                    FROM scope )
+;

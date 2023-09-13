@@ -60,6 +60,7 @@ import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionLi
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.OutputClause;
 import net.sf.jsqlparser.statement.ReferentialAction;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
@@ -653,7 +654,18 @@ public class JSQLFormatter {
   }
 
   private static void appendDelete(StringBuilder builder, Delete delete, int indent) {
-    int i = 0;
+    List<WithItem> withItems = delete.getWithItemsList();
+    if (withItems != null && withItems.size() > 0) {
+      int i = 0;
+      appendKeyWord(builder, outputFormat, "WITH", "", " ");
+
+      for (WithItem withItem : withItems) {
+        appendWithItem(withItem, withItem.getAlias(), builder, indent, i, withItems.size());
+        i++;
+      }
+
+      appendNormalizedLineBreak(builder);
+    }
     appendKeyWord(builder, outputFormat, "DELETE", "", " ");
 
     OracleHint oracleHint = delete.getOracleHint();
@@ -1548,8 +1560,20 @@ public class JSQLFormatter {
   }
 
   private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
-    int i = 0;
-    appendNormalizedLineBreak(builder);
+
+    List<WithItem> withItems = merge.getWithItemsList();
+    if (withItems != null && withItems.size() > 0) {
+      int i = 0;
+      appendKeyWord(builder, outputFormat, "WITH", "", " ");
+
+      for (WithItem withItem : withItems) {
+        appendWithItem(withItem, withItem.getAlias(), builder, indent, i, withItems.size());
+        i++;
+      }
+
+      appendNormalizedLineBreak(builder);
+    }
+
     appendKeyWord(builder, outputFormat, "MERGE", "", " ");
     OracleHint oracleHint = merge.getOracleHint();
     if (oracleHint != null)
@@ -1589,11 +1613,41 @@ public class JSQLFormatter {
     MergeInsert insert = merge.getMergeInsert();
     MergeUpdate update = merge.getMergeUpdate();
     if (merge.isInsertFirst()) {
-      appendMergeInsert(insert, builder, indent, i);
-      appendMergeUpdate(update, builder, indent, i);
+      appendMergeInsert(insert, builder, indent, 0);
+      appendMergeUpdate(update, builder, indent, 0);
     } else {
-      appendMergeUpdate(update, builder, indent, i);
-      appendMergeInsert(insert, builder, indent, i);
+      appendMergeUpdate(update, builder, indent, 0);
+      appendMergeInsert(insert, builder, indent, 0);
+    }
+
+    appendOutputClaus(merge.getOutputClause(), builder, indent);
+  }
+
+  private static void appendOutputClaus(OutputClause outputClause, StringBuilder builder, int indent) {
+    if (outputClause!=null) {
+      appendNormalizedLineBreak(builder);
+      for (int j = 0; j < indent; j++) {
+        builder.append(indentString);
+      }
+      appendKeyWord(builder, outputFormat, "OUTPUT", "", " ");
+      int i=0;
+      int subIndent = getSubIndent(builder, outputClause.getSelectItemList().size()>3);
+      appendSelectItemList(outputClause.getSelectItemList(), builder, subIndent, i, BreakLine.AS_NEEDED, indent);
+
+      appendNormalizedLineBreak(builder);
+      for (int j = 0; j < indent + 1; j++) {
+        builder.append(indentString);
+      }
+      appendKeyWord(builder, outputFormat, "INTO", "", " ");
+
+      if (outputClause.getOutputTable()!=null) {
+        Table table = outputClause.getOutputTable();
+        appendTable(table, table.getAlias(), builder, indent + 1, 0, 1);
+
+        appendStringList( outputClause.getColumnList(), null, builder, indent + 1, true, BreakLine.AS_NEEDED);
+      } else if (outputClause.getTableVariable()!=null) {
+        appendObjectName(builder, outputFormat,outputClause.getTableVariable().toString(), " ", "");
+      }
     }
   }
 
@@ -1709,7 +1763,19 @@ public class JSQLFormatter {
   }
 
   private static void appendInsert(StringBuilder builder, Insert insert, int indent) {
-    int i = 0;
+    List<WithItem> withItems = insert.getWithItemsList();
+    if (withItems != null && withItems.size() > 0) {
+      int i = 0;
+      appendKeyWord(builder, outputFormat, "WITH", "", " ");
+
+      for (WithItem withItem : withItems) {
+        appendWithItem(withItem, withItem.getAlias(), builder, indent, i, withItems.size());
+        i++;
+      }
+
+      appendNormalizedLineBreak(builder);
+    }
+
     appendKeyWord(builder, outputFormat, "INSERT", "", " ");
     OracleHint oracleHint = insert.getOracleHint();
     if (oracleHint != null)
@@ -1723,6 +1789,7 @@ public class JSQLFormatter {
 
     List<Column> columns = insert.getColumns();
     if (columns != null) {
+      int i = 0;
       builder.append(" (");
       for (Column column : columns) {
         appendExpression(column, null, builder, indent + 1, i, columns.size(), true,
@@ -1737,6 +1804,19 @@ public class JSQLFormatter {
   }
 
   private static void appendUpdate(StringBuilder builder, Update update, int indent) {
+    List<WithItem> withItems = update.getWithItemsList();
+    if (withItems != null && withItems.size() > 0) {
+      int i = 0;
+      appendKeyWord(builder, outputFormat, "WITH", "", " ");
+
+      for (WithItem withItem : withItems) {
+        appendWithItem(withItem, withItem.getAlias(), builder, indent, i, withItems.size());
+        i++;
+      }
+
+      appendNormalizedLineBreak(builder);
+    }
+
     appendKeyWord(builder, outputFormat, "UPDATE", "", " ");
 
     OracleHint oracleHint = update.getOracleHint();
@@ -2310,9 +2390,11 @@ public class JSQLFormatter {
   private static void appendStringList(Collection<String> strings, Alias alias,
       StringBuilder builder, int indent, boolean commaSeparated, BreakLine breakLine) {
     int i = 0;
-    for (String s : strings) {
-      appendString(s, alias, builder, indent, i, strings.size(), commaSeparated, breakLine);
-      i++;
+    if (strings!=null) {
+      for (String s : strings) {
+        appendString(s, alias, builder, indent, i, strings.size(), commaSeparated, breakLine);
+        i++;
+      }
     }
   }
 

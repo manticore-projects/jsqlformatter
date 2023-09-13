@@ -218,3 +218,42 @@ WHEN NOT MATCHED THEN
                     , b.eab_crncy_code
                     , b.bank_id )
 ;
+
+-- MERGE WITH
+WITH wmachine AS (
+        SELECT DISTINCT
+            projcode
+            , plantcode
+            , buildingcode
+            , floorcode
+            , room
+        FROM tab_machinelocation
+        WHERE Trim( Room ) <> ''
+            AND Trim( Room ) <> '-' )
+MERGE INTO tab_roomlocation AS troom
+    USING wmachine
+        ON ( troom.projcode = wmachine.projcode
+                AND troom.plantcode = wmachine.plantcode
+                AND troom.buildingcode = wmachine.buildingcode
+                AND troom.floorcode = wmachine.floorcode
+                AND troom.room = wmachine.room )
+WHEN NOT MATCHED /* BY TARGET */ THEN
+    INSERT ( projcode
+                , plantcode
+                , buildingcode
+                , floorcode
+                , room )
+    VALUES ( wmachine.projcode
+                , wmachine.plantcode
+                , wmachine.buildingcode
+                , wmachine.floorcode
+                , wmachine.room )
+OUTPUT  Getdate() AS timeaction
+        , $action AS action
+        , inserted.projcode
+        , inserted.plantcode
+        , inserted.buildingcode
+        , inserted.floorcode
+        , inserted.room
+    INTO tab_mergeactions_roomlocation
+;

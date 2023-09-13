@@ -43,3 +43,14 @@ FROM (  SELECT DISTINCT
                 ON a.attribute_value = b.attribute_value
         WHERE b.attribute_value IS NULL ) a
 ;
+
+-- INSERT WITH
+WITH scope AS (
+        SELECT *
+        FROM cfe.accounting_scope
+        WHERE id_status = 'C'
+            AND id_accounting_scope_code = :SCOPE )
+INSERT INTO cfe.accounting_scope a
+SELECT *
+FROM scope
+;
