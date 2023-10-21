@@ -25,16 +25,8 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "-- Leading or Trailing comments\n"
-                    + "\n"
-                    + "/* leading comment */\n"
-                    + "\n"
-                    + "-- another one\n"
-                    + "\n"
-                    + "-- comment for the statement\n"
-                    + "select 1 from dual; -- where a = b\n"
-                    + "\n"
-                    + "-- trailing comment;";
+    String sqlStr = "select *,a.*, b.*, c.*\n" +
+            "from a, b, c;";
     Statement statement1 = CCJSqlParserUtil.parse(sqlStr);
 
     String formatteredSqlStr = JSQLFormatter.format(sqlStr);

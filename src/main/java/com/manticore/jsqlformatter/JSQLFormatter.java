@@ -26,6 +26,7 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllValue;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
+import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
@@ -155,6 +156,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -2788,10 +2790,37 @@ public class JSQLFormatter {
       appendExpressionList(expressions, builder, indent, BreakLine.AS_NEEDED);
     } else if (expression instanceof AllTableColumns) {
       AllTableColumns allTableColumns = (AllTableColumns) expression;
-      appendAllTableColumns(allTableColumns, builder, indent, i, n);
+      appendObjectName(builder, outputFormat, allTableColumns.getTable().getFullyQualifiedName(), "", ".*");
+
+      if (allTableColumns.getExceptColumns() != null && !allTableColumns.getExceptColumns().isEmpty()) {
+        appendKeyWord(builder, outputFormat, "EXCEPT", " ", "( ");
+        appendExpressionsList(allTableColumns.getExceptColumns(), builder, indent, BreakLine.AS_NEEDED);
+        builder.append(" )");
+      }
+
+      if (allTableColumns.getReplaceExpressions() != null && !allTableColumns.getReplaceExpressions().isEmpty()) {
+        appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
+        int subIndent = getSubIndent(builder, allTableColumns.getReplaceExpressions().size()>3);
+        appendSelectItemList(allTableColumns.getReplaceExpressions(), builder, subIndent, i, BreakLine.AS_NEEDED, indent);
+        builder.append(" )");
+      }
     } else if (expression instanceof AllColumns) {
       AllColumns allColumns = (AllColumns) expression;
-      appendAllColumns(allColumns, builder, indent, i , n);
+      appendObjectName(builder, outputFormat, "*", "", "");
+
+      if (allColumns.getExceptColumns() != null && !allColumns.getExceptColumns().isEmpty()) {
+        appendKeyWord(builder, outputFormat, "EXCEPT", " ", "( ");
+        appendExpressionsList(allColumns.getExceptColumns(), builder, indent, BreakLine.AS_NEEDED);
+        builder.append(" )");
+      }
+
+      if (allColumns.getReplaceExpressions() != null && !allColumns.getReplaceExpressions().isEmpty()) {
+        appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
+        int subIndent = getSubIndent(builder, allColumns.getReplaceExpressions().size()>3);
+        appendSelectItemList(allColumns.getReplaceExpressions(), builder, subIndent, i, BreakLine.AS_NEEDED, indent);
+        builder.append(" )");
+      }
+
     }  else if (expression instanceof IntervalExpression) {
       IntervalExpression intervalExpression = (IntervalExpression) expression;
       if (intervalExpression.isUsingIntervalKeyword()) {
@@ -2805,8 +2834,29 @@ public class JSQLFormatter {
       if (intervalExpression.getIntervalType()!=null) {
         appendKeyWord(builder, outputFormat, intervalExpression.getIntervalType(), " ", "");
       }
-    }
-    else {
+    } else if (expression instanceof CastExpression) {
+      CastExpression castExpression = (CastExpression) expression;
+
+      if (castExpression.isUseCastKeyword()) {
+        if (castExpression.getColumnDefinitions().size()>1) {
+          appendFunction(builder, outputFormat, castExpression.keyword, " ", "( ");
+          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true, BreakLine.AS_NEEDED);
+          appendKeyWord(builder, outputFormat, "AS ROW ( ", " ", " ");
+          int j = 0;
+          for (ColumnDefinition columnDefinition : castExpression.getColumnDefinitions()) {
+            if (j++ > 0) builder.append(", ");
+            appendKeyWord(builder, outputFormat,  columnDefinition.toString(), "", "");
+          }
+        } else {
+          appendObjectName(builder, outputFormat, castExpression.keyword, " ", "( ");
+          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true, BreakLine.AS_NEEDED);
+          appendKeyWord(builder, outputFormat, "AS " + castExpression.getColDataType().toString() , " ", " )");
+        }
+      } else {
+        appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true, BreakLine.AS_NEEDED);
+        appendKeyWord(builder, outputFormat,  castExpression.getColDataType().toString(), "::", "");
+      }
+    } else {
       LOGGER
           .warning("Unhandled expression: " + expression.getClass().getName() + " = " + expression);
       builder.append(expression);

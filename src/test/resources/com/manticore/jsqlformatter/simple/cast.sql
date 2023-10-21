@@ -1,0 +1,2 @@
+SELECT  cast( ( SELECT 1 ) AS DECIMAL (1) )
+;
