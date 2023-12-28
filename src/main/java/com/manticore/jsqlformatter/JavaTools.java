@@ -1,6 +1,6 @@
 /**
  * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
- * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ * Copyright (C) 2023 Andreas Reichel <andreas@manticore-projects.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,11 @@
  */
 package com.manticore.jsqlformatter;
 
+import org.snt.inmemantlr.GenericParser;
+import org.snt.inmemantlr.listener.DefaultTreeListener;
+import org.snt.inmemantlr.tree.ParseTree;
+import org.snt.inmemantlr.tree.ParseTreeNode;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.snt.inmemantlr.GenericParser;
-import org.snt.inmemantlr.listener.DefaultTreeListener;
-import org.snt.inmemantlr.tree.ParseTree;
-import org.snt.inmemantlr.tree.ParseTreeNode;
 
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
@@ -38,8 +39,6 @@ import org.snt.inmemantlr.tree.ParseTreeNode;
  * @version 0.1
  */
 public class JavaTools {
-  private static final Logger LOGGER = Logger.getLogger(JavaTools.class.getName());
-
   private static class LocalVariableDeclaration {
     public String label = null;
     public String typeString = null;
@@ -60,23 +59,23 @@ public class JavaTools {
         "String test2 = new StringBuilder(\"SELECT \").append(columnName).append(\" from \").append(tableName).append(\";\").toString();",
         "\"SELECT \" + columnName2 + \" from \" + noVariableAssigned2 + \";\";",
         "assertSqlCanBeParsedAndDeparsed(\"WITH split (word, str, hascomma) AS (VALUES ('', 'Auto,A,1234444', 1) UNION ALL SELECT substr(str, 0, CASE WHEN instr(str, ',') THEN instr(str, ',') ELSE length(str) + 1 END), ltrim(substr(str, instr(str, ',')), ','), instr(str, ',') FROM split WHERE hascomma) SELECT trim(word) FROM split WHERE word != ''\");",
-        "String queryStr = new MessageFormat2(\n" + "			\"WITH split (    word\\n\"\n"
-            + "			+\"                , str\\n\"\n"
-            + "			+\"                , hascomma ) AS (\\n\"\n"
-            + "			+\"        VALUES ( '', 'Auto,A,1234444', 1 )\\n\"\n"
-            + "			+\"        UNION ALL\\n\"\n"
-            + "			+\"        SELECT  Substr( str, 0, CASE\\n\"\n"
-            + "			+\"                        WHEN Instr( str, ',' )\\n\"\n"
-            + "			+\"                            THEN Instr( str, ',' )\\n\"\n"
-            + "			+\"                        ELSE Length( str ) + 1\\n\"\n"
-            + "			+\"                    END )\\n\"\n"
-            + "			+\"                , Ltrim( Substr( str, Instr( str, ',' ) ), ',' )\\n\"\n"
-            + "			+\"                , Instr( str, ',' )\\n\"\n"
-            + "			+\"        FROM split\\n\"\n"
-            + "			+\"        WHERE hascomma )\\n\"\n"
-            + "			+\"SELECT Trim( word )\\n\"\n" + "			+\"FROM split\\n\"\n"
-            + "			+\"WHERE word != ''\\n\"\n" + "			+\";\\n\"\n"
-            + "		).format(new Object[]{});"};
+        "String queryStr = new MessageFormat2(\n" + "            \"WITH split (    word\\n\"\n"
+            + "            +\"                , str\\n\"\n"
+            + "            +\"                , hascomma ) AS (\\n\"\n"
+            + "            +\"        VALUES ( '', 'Auto,A,1234444', 1 )\\n\"\n"
+            + "            +\"        UNION ALL\\n\"\n"
+            + "            +\"        SELECT  Substr( str, 0, CASE\\n\"\n"
+            + "            +\"                        WHEN Instr( str, ',' )\\n\"\n"
+            + "            +\"                            THEN Instr( str, ',' )\\n\"\n"
+            + "            +\"                        ELSE Length( str ) + 1\\n\"\n"
+            + "            +\"                    END )\\n\"\n"
+            + "            +\"                , Ltrim( Substr( str, Instr( str, ',' ) ), ',' )\\n\"\n"
+            + "            +\"                , Instr( str, ',' )\\n\"\n"
+            + "            +\"        FROM split\\n\"\n"
+            + "            +\"        WHERE hascomma )\\n\"\n"
+            + "            +\"SELECT Trim( word )\\n\"\n" + "            +\"FROM split\\n\"\n"
+            + "            +\"WHERE word != ''\\n\"\n" + "            +\";\\n\"\n"
+            + "        ).format(new Object[]{});"};
     for (String s : escaped) {
       try {
         String sql = formatJava(s);
@@ -152,15 +151,16 @@ public class JavaTools {
           line = line.replaceFirst("\\$" + variableName + "\\$", "\" + " + variableName + " + \"");
         }
 
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append("\n\t");
         }
         if (i > 0) {
           builder.append("+ ");
-        } else
+        } else {
           builder.append("  ");
+        }
 
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append("\"").append(line).append("\\n\"");
           i++;
         }
@@ -181,7 +181,6 @@ public class JavaTools {
       StringReader stringReader = new StringReader(sql);
       BufferedReader bufferedReader = new BufferedReader(stringReader);
       String line;
-      int i = 0;
       while ((line = bufferedReader.readLine()) != null) {
         Matcher m;
         while ((m = pattern.matcher(line)).find()) {
@@ -190,13 +189,12 @@ public class JavaTools {
               "\").append(" + variableName + ").append(\"");
         }
 
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append("\n\t");
         }
 
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append(".append(\"").append(line).append("\\n\")");
-          i++;
         }
       }
       builder.append(";");
@@ -227,14 +225,14 @@ public class JavaTools {
           line = line.replaceFirst("\\$" + variableName + "\\$", "{" + k + "}");
           k++;
         }
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append("\n\t\t\t");
         }
         if (i > 0) {
           builder.append("+");
         }
 
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
           builder.append("\"").append(line).append("\\n\"");
           i++;
         }
@@ -244,8 +242,9 @@ public class JavaTools {
       builder.append("new Object[]{");
       i = 0;
       for (String v : variables) {
-        if (i > 0)
+        if (i > 0) {
           builder.append(", ");
+        }
         builder.append(v);
         i++;
       }
@@ -259,8 +258,9 @@ public class JavaTools {
 
   private static void append(StringBuilder builder, ParseTreeNode p, int indent,
       ArrayList<LocalVariableDeclaration> declarations) {
-    for (int i = 0; i < indent; i++)
+    for (int i = 0; i < indent; i++) {
       builder.append("    ");
+    }
 
     builder.append(p.toString()).append("\n");
     if (p.getRule().equalsIgnoreCase("blockStatement")) {
@@ -276,7 +276,7 @@ public class JavaTools {
       LocalVariableDeclaration declaration = declarations.get(declarations.size() - 1);
       String label = p.getLabel();
       if (p.hasChildren()) {
-        declaration.sqlBuilder.append(label.substring(1, label.length() - 1)).append(" ");
+        declaration.sqlBuilder.append(label, 1, label.length() - 1).append(" ");
       } else {
         declaration.sqlBuilder.append(" $").append(label).append("$");
         declaration.parameters.add(label);

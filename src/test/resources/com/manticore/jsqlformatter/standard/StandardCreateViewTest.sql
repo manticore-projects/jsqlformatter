@@ -81,7 +81,7 @@ CREATE OR REPLACE VIEW cfe.execution_v
                                     FROM cfe.execution
                                     WHERE id_status IN ( 'R', 'H' )
                                         AND value_date > e.value_date )
-                OR e1.value_date IS NULL )
+                    OR e1.value_date IS NULL )
         ORDER BY    e.posting_date DESC
                     , e.value_date DESC
 ;

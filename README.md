@@ -14,53 +14,53 @@ Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](ht
 * Export to Java String, StringBuilder or MessageFormat, while handling parameters
 * Command Line Option (CLI) and SQL Inline Options
 
-	```shell
-	java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
-	       --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
-	       [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
-	       <arg>] [--squareBracketQuotation <arg>]
+    ```shell
+    java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> |
+           --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>]
+           [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation
+           <arg>] [--squareBracketQuotation <arg>]
 
-	 -i,--inputFile <arg>               The input SQL file or folder.
-	 -o,--outputFile <arg>              The out SQL file for the formatted
-					    statements.
-	 -f,--outputFormat <arg>            The output-format.
-					    [PLAIN* ANSI HTML RTF]
-	    --ansi                          Output ANSI annotated text.
-	    --html                          Output HTML annotated text.
-	 -t,--indent <arg>                  The indent width.
-					    [2 4* 8]
-	 -2                                 Indent with 2 characters.
-	 -8                                 Indent with 8 characters.
-	    --keywordSpelling <arg>         Keyword spelling.
-					    [UPPER*, LOWER, CAMEL, KEEP]
-	    --functionSpelling <arg>        Function name spelling.
-					    [UPPER, LOWER, CAMEL*, KEEP]
-	    --objectSpelling <arg>          Object name spelling.
-					    [UPPER, LOWER*, CAMEL, KEEP]
-	    --separation <arg>              Position of the field separator.
-					    [BEFORE*, AFTER]
-	    --squareBracketQuotation <arg>  Position of the field separator.
-					    [AUTO*, YES, NO]
-	```
+     -i,--inputFile <arg>               The input SQL file or folder.
+     -o,--outputFile <arg>              The out SQL file for the formatted
+                        statements.
+     -f,--outputFormat <arg>            The output-format.
+                        [PLAIN* ANSI HTML RTF]
+        --ansi                          Output ANSI annotated text.
+        --html                          Output HTML annotated text.
+     -t,--indent <arg>                  The indent width.
+                        [2 4* 8]
+     -2                                 Indent with 2 characters.
+     -8                                 Indent with 8 characters.
+        --keywordSpelling <arg>         Keyword spelling.
+                        [UPPER*, LOWER, CAMEL, KEEP]
+        --functionSpelling <arg>        Function name spelling.
+                        [UPPER, LOWER, CAMEL*, KEEP]
+        --objectSpelling <arg>          Object name spelling.
+                        [UPPER, LOWER*, CAMEL, KEEP]
+        --separation <arg>              Position of the field separator.
+                        [BEFORE*, AFTER]
+        --squareBracketQuotation <arg>  Position of the field separator.
+                        [AUTO*, YES, NO]
+    ```
 
 
 * simple usage of the Java library
 
-	```java
-	import com.manticore.jsqlformatter.JSqlFormatter;
-	...
-	String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
-	```
+    ```java
+    import com.manticore.jsqlformatter.JSqlFormatter;
+    ...
+    String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
+    ```
 
-	with Maven Artifact:
+    with Maven Artifact:
 
-	```xml
-	<dependency>
-	    <groupId>com.manticore-projects.jsqlformatter</groupId>
-	    <artifactId>jsqlformatter</artifactId>
-	    <version>1.0.0</version>
-	</dependency>
-	```
+    ```xml
+    <dependency>
+        <groupId>com.manticore-projects.jsqlformatter</groupId>
+        <artifactId>jsqlformatter</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+    ```
 
 
 ## Samples
@@ -104,19 +104,18 @@ WHERE id_calendar = ?
 MERGE /*+ PARALLEL */ INTO test1 /*the target table*/ a
     USING all_objects      /*the source table*/
         ON ( /*joins in()!*/ a.object_id = b.object_id )
--- INSERT CLAUSE 
+-- INSERT CLAUSE
 WHEN /*comments between keywords!*/ NOT MATCHED THEN
     INSERT ( object_id     /*ID Column*/
                 , status   /*Status Column*/ )
     VALUES ( b.object_id
                 , b.status )
 /* UPDATE CLAUSE
-WITH A WHERE CONDITION */ 
+WITH A WHERE CONDITION */
 WHEN MATCHED THEN          /* Lets rock */
     UPDATE SET  a.status = '/*this is no comment!*/ and -- this ain''t either'
     WHERE   b."--status" != 'VALID'
 ;
 ```
 
-[More Samples](http://manticore-projects.com/JSQLFormatter/samples.html) 
-
+[More Samples](http://manticore-projects.com/JSQLFormatter/samples.html)

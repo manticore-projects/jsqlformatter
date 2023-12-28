@@ -1,6 +1,6 @@
 /**
  * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
- * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ * Copyright (C) 2023 Andreas Reichel <andreas@manticore-projects.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -34,13 +34,10 @@ import java.util.TreeSet;
 
 public class RRTools {
   public static void main(String[] args) throws IOException {
-    if (args.length < 1) {
-      // throw new IllegalArgumentException("No filename provided as parameters ARGS[0]");
-      args = new String[] {
-          "/home/are/Documents/src/JSQLFormatter/JSQLFormatter/src/site/sphinx/_static/railroad_diagram.xhtml"};
-    }
+    final String[] _args =
+        args.length < 1 ? new String[] {"src/site/sphinx/_static/railroad_diagram.xhtml"} : args;
 
-    File file = new File(args[0]);
+    File file = new File(_args[0]);
     if (file.exists() && file.canRead()) {
       // insertTOC(file);
       extractSVG(file);
@@ -50,10 +47,11 @@ public class RRTools {
   }
 
   private static String stripTrailing(String s, String suffix) {
-    if (s.endsWith(suffix))
+    if (s.endsWith(suffix)) {
       return s.substring(0, s.length() - suffix.length());
-    else
+    } else {
       return s;
+    }
   }
 
   public static void insertTOC(File file) throws IOException {

@@ -89,7 +89,7 @@ public class ParserTest {
     StatementVisitorAdapter statementVisitorAdapter = new StatementVisitorAdapter() {
       @Override
       public void visit(Select select) {
-        select.getSelectBody().accept(selectVisitorAdapter);
+        select.accept(selectVisitorAdapter);
       }
     };
 

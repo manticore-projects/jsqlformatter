@@ -46,6 +46,7 @@ something crazy;
 something crazy;
 */
 
+
 -- something crazy;
 SELECT  Substr( v$session.username, 1, 8 ) username
         , v$session.osuser osuser

@@ -25,8 +25,7 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "select *,a.*, b.*, c.*\n" +
-            "from a, b, c;";
+    String sqlStr = "select *,a.*, b.*, c.*\n" + "from a, b, c;";
     Statement statement1 = CCJSqlParserUtil.parse(sqlStr);
 
     String formatteredSqlStr = JSQLFormatter.format(sqlStr);

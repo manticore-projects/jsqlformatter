@@ -70,15 +70,17 @@ public class StandardFileTest {
           BufferedReader bufferedReader = new BufferedReader(fileReader)) {
         while ((line = bufferedReader.readLine()) != null) {
 
-          if (!start && line.startsWith("--") && !line.startsWith("-- @"))
+          if (!start && line.startsWith("--") && !line.startsWith("-- @")) {
             k = line.substring(3).trim().toUpperCase();
+          }
 
           start = start
-              || (!line.startsWith("--") || line.startsWith("-- @")) && line.trim().length() > 0;
+              || (!line.startsWith("--") || line.startsWith("-- @")) && !line.trim().isEmpty();
           end = start && !line.startsWith("--") && line.trim().endsWith(";");
 
-          if (start)
+          if (start) {
             stringBuilder.append(line).append("\n");
+          }
 
           if (end) {
             sqlMap.put(new SQLKeyEntry(file, k), stringBuilder.toString().trim());
@@ -98,7 +100,7 @@ public class StandardFileTest {
   public String buildSqlString(final String originalSql, boolean laxDeparsingCheck) {
     String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
     if (laxDeparsingCheck) {
-      String s = sql.replaceAll("\\n\\s*;", ";").replaceAll("\\s+", " ")
+      String s = sql.replaceAll("\\n*\\s*;", ";").replaceAll("\\s+", " ")
           .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1").toLowerCase().trim();
       return !s.endsWith(";") ? s + ";" : s;
     } else {
@@ -112,7 +114,7 @@ public class StandardFileTest {
    */
   @ParameterizedTest(name = "{index} {0}: {1}")
   @MethodSource("getSqlMap")
-  public void testFormat(Entry<SQLKeyEntry, String> entry) throws Exception {
+  void testFormat(Entry<SQLKeyEntry, String> entry) throws Exception {
     String expected = entry.getValue();
 
     String formatted = JSQLFormatter.format(expected, "indentWidth=4", "keywordSpelling=UPPER",
@@ -128,7 +130,7 @@ public class StandardFileTest {
    */
   @ParameterizedTest(name = "{index} {0}: {1}")
   @MethodSource("getSqlMap")
-  public void testParser(Entry<SQLKeyEntry, String> entry) {
+  void testParser(Entry<SQLKeyEntry, String> entry) {
     String expected = entry.getValue();
 
     if (expected.length() <= new CommentMap(expected).getLength()) {
@@ -151,7 +153,7 @@ public class StandardFileTest {
     }
   }
 
-  static class SQLKeyEntry implements Entry<File, String> {
+  public static class SQLKeyEntry implements Entry<File, String> {
     File key;
     String value;
 

@@ -1,6 +1,6 @@
 /**
  * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
- * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ * Copyright (C) 2023 Andreas Reichel <andreas@manticore-projects.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -64,22 +64,20 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     return builder;
   }
 
+  @SuppressWarnings({"PMD.CyclomaticComplexity"})
   public CommentMap(String sqlStr) {
     Matcher matcher = COMMENT_PATTERN.matcher(sqlStr);
-    int i = 0;
     while (matcher.find()) {
-      i++;
-
       String group = matcher.group(0);
       int start = matcher.start(0);
       int end = matcher.end(0);
 
       if (!STRING_PATTERN.matcher(group).matches()) {
-        if (OracleHint.isHintMatch(group))
+        if (OracleHint.isHintMatch(group)) {
           LOGGER.log(Level.FINE, "Oracle hint {0}", group);
-        else {
+        } else {
           Comment comment = new Comment(start, group);
-          if (start == 0 || (sqlStr.charAt(start - 1) == '\n' && sqlStr.charAt(end - 1) == '\n')) {
+          if (start == 0 || sqlStr.charAt(start - 1) == '\n' && sqlStr.charAt(end - 1) == '\n') {
             comment.newLine = true;
             comment.extraNewLine = start > 1 && sqlStr.charAt(start - 2) == '\n';
           }
@@ -95,8 +93,9 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     for (Comment comment : values()) {
       while (absolutePosition < comment.absolutePosition) {
         char c = sqlStr.charAt(absolutePosition);
-        if (!Character.isWhitespace(c))
+        if (!Character.isWhitespace(c)) {
           relativePosition++;
+        }
 
         absolutePosition++;
       }
@@ -108,6 +107,7 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     }
   }
 
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength"})
   public StringBuilder insertComments(StringBuilder sqlStrWithoutComments,
       OutputFormat outputFormat) {
 
@@ -124,15 +124,16 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
       for (int position = 0; position < sqlStrWithoutComments.length(); position++) {
         String c = sqlStrWithoutComments.substring(position, position + 1);
 
-        if (ansiStarted < 0)
+        if (ansiStarted < 0) {
           while (next.relativePosition <= relativePosition) {
             if (next.extraNewLine) {
               builder.append("\n");
             } else if (next.newLine && builder.length() > 1
                 && builder.charAt(builder.length() - 1) != '\n') {
               builder.append("\n");
-            } else if (!c.matches("\\w"))
+            } else if (!c.matches("\\w")) {
               builder.append(" ");
+            }
 
             if (!next.newLine && next.text.startsWith("--")) {
               appendComment(builder, outputFormat, next.text.trim().replaceFirst("--\\s?", "/* "),
@@ -148,23 +149,27 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
               break;
             }
           }
+        }
 
         if (wasLastComment) {
           String remaining = sqlStrWithoutComments.substring(position);
           if (next.newLine) {
             int nextBreak = remaining.indexOf('\n');
-            if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().length() == 0) {
+            if (nextBreak >= 0 && remaining.substring(0, nextBreak).trim().isEmpty()) {
               builder.append(remaining.substring(nextBreak + 1));
-            } else
+            } else {
               builder.append(remaining);
-          } else
+            }
+          } else {
             builder.append(remaining);
+          }
           break;
         }
 
         if (ansiStarted < 0 && position + 2 <= sqlStrWithoutComments.length()
-            && sqlStrWithoutComments.substring(position, position + 2).matches("\u001B\\["))
+            && sqlStrWithoutComments.substring(position, position + 2).matches("\u001B\\[")) {
           ansiStarted = position;
+        }
 
         if (ansiStarted >= 0 && sqlStrWithoutComments.substring(ansiStarted, position + 1)
             .matches("\u001B\\[[;\\d]*[ -/]*[@-~]")) {
@@ -176,8 +181,9 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
           if (lastBreak < 0 || builder.substring(lastBreak).trim().length() > 0) {
             builder.append(c);
           }
-        } else
+        } else {
           builder.append(c);
+        }
 
         if (ansiStarted < 0) {
           relativePosition = sqlStrWithoutComments.substring(0, position + 1)
@@ -189,10 +195,8 @@ public class CommentMap extends LinkedHashMap<Integer, Comment> {
     Matcher matcher = LINE_END_COMMENT_PATTERN.matcher(builder);
     ArrayList<Object[]> matches = new ArrayList<>();
 
-    int i = 0;
     int maxPosition = 0;
     while (matcher.find()) {
-      i++;
       int start = matcher.start(0);
 
       int lastLineBreak = builder.lastIndexOf("\n", start);
