@@ -441,7 +441,7 @@ ssh.settings {
 }
 
 tasks.register('upload') {
-    dependsOn(jar)
+    dependsOn(jar, gitChangelogTask, xmldoc, xslt, upload)
     doFirst {
         if (findProperty("${project.name}.host") == null) {
             println(
@@ -519,10 +519,6 @@ xslt {
     // Transform every .xml file in the "input" directory.
     input "$buildDir/rr/JSqlParserCC.xhtml"
     output "src/site/sphinx/syntax.rst"
-}
-
-publish {
-    dependsOn(gitChangelogTask, xmldoc, xslt, upload)
 }
 
 
