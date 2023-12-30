@@ -1,6 +1,6 @@
 /**
  * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
- * Copyright (C) 2022 Andreas Reichel <andreas@manticore-projects.com>
+ * Copyright (C) 2023 Andreas Reichel <andreas@manticore-projects.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
