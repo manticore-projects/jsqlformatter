@@ -1,10 +1,37 @@
 .. meta::
    :description: Java Software Library for formatting and pretty printing SQL Statements
-   :keywords: java sql statement format pretty printing
+   :keywords: java sql statement format formatter pretty printing
 
 ***************************
 Java SQL Formatting Library
 ***************************
+
+.. image:: https://github.com/manticore-projects/jsqlformatter/actions/workflows/gradle.yml/badge.svg
+    :alt: Gradle CI
+    :target: https://github.com/manticore-projects/jsqlformatter/actions/workflows/gradle.yml
+
+.. image:: https://badgen.net/maven/v/maven-central/com.manticore-projects.jsqlformatter/jsqlformatter
+    :alt: Maven
+    :target: https://mvnrepository.com/artifact/com.manticore-projects.jsqlformatter/jsqlformatter
+.. image:: https://app.codacy.com/project/badge/Grade/80374649d914462ebd6e5b160a1ebdbb
+    :alt: Codacy Badge
+    :target: https://app.codacy.com/gh/manticore-projects/jsqlformatter/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+
+.. image:: https://coveralls.io/repos/github/manticore-projects/jsqlformatter/badge.svg
+    :alt: Coverage Status
+    :target: https://coveralls.io/github/manticore-projects/jsqlformatter
+
+.. image:: https://img.shields.io/badge/License-AGPL-blue
+    :alt: License
+    :target: https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
+
+.. image:: https://img.shields.io/github/issues/manticore-projects/jsqlformatter
+    :alt: issues - JSQLFormatter
+    :target: https://github.com/manticore-projects/jsqlformatter/issues
+
+.. image:: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
+    :alt: PRs Welcome
+    :target: http://makeapullrequest.com
 
 .. toctree::
    :caption: Documentation
@@ -32,6 +59,13 @@ Java SQL Formatting Library
 	Format SQL files in the Terminal Console.
 
 Platform independent SQL Formatter, Beautifier and Pretty Printer by Manticore Projects.
+
+Latest stable release: |JSQLFORMATTER_STABLE_VERSION_LINK|
+
+Development version: |JSQLFORMATTER_SNAPSHOT_VERSION_LINK|
+
+`GitHub Repository <https://github.com/manticore-projects/JSQLFormatter>`_
+
 
 .........
 Features

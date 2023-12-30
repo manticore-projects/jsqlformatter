@@ -6,6 +6,8 @@ Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](ht
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/80374649d914462ebd6e5b160a1ebdbb)](https://app.codacy.com/gh/manticore-projects/jsqlformatter/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Coverage Status](https://coveralls.io/repos/github/manticore-projects/jsqlformatter/badge.svg)](https://coveralls.io/github/manticore-projects/jsqlformatter)
 [![License](https://img.shields.io/badge/License-AGPL-blue)](#LICENSE)
+[![issues - JSQLFormatter](https://img.shields.io/github/issues/manticore-projects/jsqlformatter)](https://github.com/manticore-projects/jsqlformatter/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 ![ANSI Output](./src/site/sphinx/_static/ansi-terminal.png)
 
