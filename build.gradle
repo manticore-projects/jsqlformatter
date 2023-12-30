@@ -441,7 +441,7 @@ ssh.settings {
 }
 
 tasks.register('upload') {
-    dependsOn(jar, gitChangelogTask, xmldoc, xslt, upload)
+    dependsOn(jar, gitChangelogTask, xmldoc, xslt)
     doFirst {
         if (findProperty("${project.name}.host") == null) {
             println(
