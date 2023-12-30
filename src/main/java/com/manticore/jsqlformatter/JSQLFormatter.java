@@ -1443,8 +1443,6 @@ public class JSQLFormatter {
     }
     appendKeyWord(builder, outputFormat, "USING", "", " ");
 
-    int subIndent = getSubIndent(builder, false);
-
     FromItem fromItem = merge.getFromItem();
     appendFromItem(fromItem, builder, indent, 0, 1);
 
@@ -2825,11 +2823,9 @@ public class JSQLFormatter {
   private static void appendExpressionsList(List<? extends Expression> expressions,
       StringBuilder builder, int indent, BreakLine breakLine) {
     int size = expressions.size();
-    int subIndent = breakLine.equals(BreakLine.NEVER)
-                    || breakLine.equals(BreakLine.AS_NEEDED) && size <= 3
-                    || size == 1
-                    ? indent
-                    : getSubIndent(builder, true);
+    int subIndent =
+        breakLine.equals(BreakLine.NEVER) || breakLine.equals(BreakLine.AS_NEEDED) && size <= 3
+            || size == 1 ? indent : getSubIndent(builder, true);
 
     int i = 0;
     for (Expression expression : expressions) {
