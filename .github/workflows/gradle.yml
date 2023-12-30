@@ -27,7 +27,9 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2.6.0
       with:
-        arguments: check
+        arguments: check coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
     - id: install-gradle-properties
       name: Install Gradle Properties from Secret
