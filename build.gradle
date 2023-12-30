@@ -186,13 +186,13 @@ license {
 
 coveralls {
     // /home/runner/work/jsqlformatter/jsqlformatter/build/reports/jacoco/test/jacocoTestReport.xml
-    jacocoReportPath  layout.buildDirectory.dir('reports/jacoco/test/jacocoTestReport.xml')
+    jacocoReportPath  layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml')
 }
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
     reports {
-        xml.required = false
+        xml.required = true
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
     }
@@ -202,20 +202,9 @@ jacocoTestCoverageVerification {
         rule {
             //element = 'CLASS'
             limit {
-                //@todo: temporarily reduced it 80%, we need to bring that back to 84% accepting the Keywords PR
-                minimum = 0.80
+                minimum = 0.69
             }
             excludes = [
-                    'net.sf.jsqlparser.util.validation.*',
-                    'net.sf.jsqlparser.**.*Adapter',
-                    'net.sf.jsqlparser.parser.JJTCCJSqlParserState',
-                    'net.sf.jsqlparser.parser.TokenMgrError',
-                    'net.sf.jsqlparser.parser.StreamProvider',
-                    'net.sf.jsqlparser.parser.CCJSqlParserTokenManager',
-                    'net.sf.jsqlparser.parser.ParseException',
-                    'net.sf.jsqlparser.parser.SimpleNode',
-                    'net.sf.jsqlparser.parser.SimpleCharStream',
-                    'net.sf.jsqlparser.parser.StringProvider',
             ]
         }
         rule {
@@ -224,42 +213,11 @@ jacocoTestCoverageVerification {
                 counter = 'LINE'
                 value = 'MISSEDCOUNT'
 
-                //@todo: temporarily increased to 7000, we need to bring that down to 5500 after accepting the Keywords PR
-                maximum = 7000
+                maximum = 800
             }
             excludes = [
-                    'net.sf.jsqlparser.util.validation.*',
-                    'net.sf.jsqlparser.**.*Adapter',
-                    'net.sf.jsqlparser.parser.JJTCCJSqlParserState',
-                    'net.sf.jsqlparser.parser.TokenMgrError',
-                    'net.sf.jsqlparser.parser.StreamProvider',
-                    'net.sf.jsqlparser.parser.CCJSqlParserTokenManager',
-                    'net.sf.jsqlparser.parser.ParseException',
-                    'net.sf.jsqlparser.parser.SimpleNode',
-                    'net.sf.jsqlparser.parser.SimpleCharStream',
-                    'net.sf.jsqlparser.parser.StringProvider',
             ]
         }
-//        rule {
-//            element = 'CLASS'
-//            limit {
-//                counter = 'LINE'
-//                value = 'MISSEDRATIO'
-//                maximum = 0.3
-//            }
-//            excludes = [
-//                    'net.sf.jsqlparser.util.validation.*',
-//                    'net.sf.jsqlparser.**.*Adapter',
-//                    'net.sf.jsqlparser.parser.JJTCCJSqlParserState',
-//                    'net.sf.jsqlparser.parser.TokenMgrError',
-//                    'net.sf.jsqlparser.parser.StreamProvider',
-//                    'net.sf.jsqlparser.parser.CCJSqlParserTokenManager',
-//                    'net.sf.jsqlparser.parser.ParseException',
-//                    'net.sf.jsqlparser.parser.SimpleNode',
-//                    'net.sf.jsqlparser.parser.SimpleCharStream',
-//                    'net.sf.jsqlparser.parser.StringProvider',
-//            ]
-//        }
     }
 }
 
