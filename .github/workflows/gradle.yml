@@ -24,10 +24,11 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Build with Gradle
+    - id: check
+      name: Build with Gradle
       uses: gradle/gradle-build-action@v2.6.0
       with:
-        arguments: check coveralls
+        arguments: check jacocoTestReport jacocoTestCoverageVerification coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
