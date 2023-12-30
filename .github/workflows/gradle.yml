@@ -39,6 +39,9 @@ jobs:
         echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
         echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties        
 
+    # create the ASCII armour:
+    #    gpg -a --export-secret-keys <key_id> > keyfile.asc
+    # then store the content of <keyfile.asc> as github secret <OSSRH_GPG_SECRET_KEY>
     - id: install-secret-key
       name: Install GPG Key from Secret
       run: |
@@ -47,7 +50,7 @@ jobs:
 
       # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
       # the publishing section of your build.gradle
-    - name: Publish to GitHub Packages
+    - name: Publish to SonaType and/or Github packages
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: publish
