@@ -59,3 +59,8 @@ ALTER TABLE customers
 ALTER TABLE departments
     RENAME COLUMN department_name TO dept_name
 ;
+
+-- issue14
+ALTER TABLE table1
+    RENAME TO table2
+;

@@ -2758,7 +2758,7 @@ public class JSQLFormatter {
             appendKeyWord(builder, outputFormat, columnDefinition.toString(), "", "");
           }
         } else {
-          appendObjectName(builder, outputFormat, castExpression.keyword, " ", "( ");
+          appendFunction(builder, outputFormat, castExpression.keyword, " ", "( ");
           appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true,
               BreakLine.AS_NEEDED);
           appendKeyWord(builder, outputFormat, "AS " + castExpression.getColDataType().toString(),
@@ -3481,7 +3481,13 @@ public class JSQLFormatter {
         for (int j = 0; j <= indent; j++) {
           builder.append(indentString);
         }
-        appendKeyWord(builder, outputFormat, operation.name(), "", " ");
+        if (operation == AlterOperation.RENAME_TABLE) {
+          appendKeyWord(builder, outputFormat, "RENAME TO", "", " ");
+          appendObjectName(builder, outputFormat, alterExpression.getNewTableName(), "", "");
+          break;
+        } else {
+          appendKeyWord(builder, outputFormat, operation.name(), "", " ");
+        }
 
         if (commentText != null) {
           if (columnName != null) {
