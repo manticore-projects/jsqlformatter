@@ -109,6 +109,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SetOperation;
 import net.sf.jsqlparser.statement.select.SetOperationList;
+import net.sf.jsqlparser.statement.select.Top;
 import net.sf.jsqlparser.statement.select.UnionOp;
 import net.sf.jsqlparser.statement.select.Values;
 import net.sf.jsqlparser.statement.select.WithItem;
@@ -1786,12 +1787,29 @@ public class JSQLFormatter {
         }
       }
 
-
       appendKeyWord(builder, outputFormat, "SELECT", "", " ");
 
       OracleHint oracleHint = plainSelect.getOracleHint();
       if (oracleHint != null) {
         appendHint(builder, outputFormat, oracleHint.toString(), "", " ");
+      }
+
+      Top top = plainSelect.getTop();
+      if (top !=null) {
+        appendKeyWord(builder, outputFormat, "TOP", "", top.hasParenthesis() ? "( " : " ");
+        appendExpression(top.getExpression(), null, builder, 0, 0, 0, false, BreakLine.AS_NEEDED);
+        if (top.hasParenthesis()) {
+          builder.append(" )");
+        }
+        appendNormalizingTrailingWhiteSpace(builder, " ");
+
+        if (top.isPercentage()) {
+          appendKeyWord(builder, outputFormat, "PERCENT", "", " ");
+        }
+
+        if (top.isWithTies()) {
+          appendKeyWord(builder, outputFormat, "WITH TIES", "", " ");
+        }
       }
 
       Distinct distinct = plainSelect.getDistinct();
@@ -1809,10 +1827,13 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
       }
 
-      int subIndent = oracleHint != null || distinct != null ? indent + 1
-          : getSubIndent(builder, plainSelect.getSelectItems().size() > 1);
+      int subIndent = oracleHint != null || distinct != null || top!=null
+                      ? indent + 1
+                      : getSubIndent(builder, plainSelect.getSelectItems().size() > 1);
       BreakLine bl =
-          oracleHint != null || distinct != null ? BreakLine.ALWAYS : BreakLine.AFTER_FIRST;
+          oracleHint != null || distinct != null || top!=null
+          ? BreakLine.ALWAYS
+          : BreakLine.AFTER_FIRST;
 
       List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
       appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);

@@ -460,3 +460,12 @@ GROUP BY    a
 HAVING Sum( d ) > 0
     AND Count( * ) > 1
 ;
+
+-- TOP clause
+SELECT TOP 10
+    qtysold
+    , sellerid
+FROM sales
+ORDER BY    qtysold DESC
+            , sellerid
+;
