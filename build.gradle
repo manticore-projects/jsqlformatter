@@ -117,8 +117,8 @@ description = 'JSQLFormatter'
 java {
     withSourcesJar()
     withJavadocJar()
-    sourceCompatibility(JavaVersion.VERSION_1_8)
-    targetCompatibility(JavaVersion.VERSION_1_8)
+    sourceCompatibility(JavaVersion.VERSION_11)
+    targetCompatibility(JavaVersion.VERSION_11)
 
     // needed for XML-Doclet to work (since Doclet changed again with Java 13)
     toolchain {
@@ -344,7 +344,7 @@ signing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 8
+    options.release = 11
 }
 
 tasks.withType(Test).configureEach {
@@ -437,12 +437,16 @@ tasks.register('renderRR') {
             src 'http://manticore-projects.com/download/convert.war'
             dest "$buildDir/rr/convert.war"
             overwrite false
+            onlyIfModified true
+            tempAndMove true
         }
 
         download.run {
             src 'http://manticore-projects.com/download/rr.war'
             dest "$buildDir/rr/rr.war"
             overwrite false
+            onlyIfModified true
+            tempAndMove true
         }
 
         javaexec {
