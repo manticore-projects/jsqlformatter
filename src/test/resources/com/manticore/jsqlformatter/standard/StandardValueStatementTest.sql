@@ -44,10 +44,10 @@ WITH split (    word
     AS (    VALUES ( '', 'Auto,A,1234444', 1 )
             UNION ALL
             SELECT  Substr( str, 0, CASE
-                            WHEN Instr( str, ',' )
-                                THEN Instr( str, ',' )
-                            ELSE Length( str ) + 1
-                        END )
+                                    WHEN Instr( str, ',' )
+                                        THEN Instr( str, ',' )
+                                    ELSE Length( str ) + 1
+                                    END )
                     , Ltrim( Substr( str, Instr( str, ',' ) ), ',' )
                     , Instr( str, ',' )
             FROM split

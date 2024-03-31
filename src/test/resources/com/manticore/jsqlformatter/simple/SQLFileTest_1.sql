@@ -155,28 +155,28 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , coll.description collaterals
         , p1.rate_pd pd_1y
         , CASE
-                WHEN c.amortised_cost_dirty_bc < 0
-                        OR ( c.amortised_cost_dirty_bc = 0
-                                AND c.open_commitment_bc < 0 )
-                    THEN Greatest( 1 + Round( Nvl( (    SELECT Sum( a1.amount * fxr.fxrate * Exp( - Nvl( c.yield, 0 ) * d.workout_period / 365 ) ) recovery_amount
-                                                        FROM cfe.instr_coll_recovery_hst a1
-                                                            INNER JOIN ex
-                                                                ON a1.valid_date = ex.value_date
-                                                            INNER JOIN fxr
-                                                                ON a1.id_currency = fxr.id_currency_from
-                                                            INNER JOIN cfe.collateral_ref b
-                                                                ON a1.id_collateral_ref = b.id_collateral_ref
-                                                            INNER JOIN cfe.collateral c
-                                                                ON b.id_collateral = c.id_collateral
-                                                            INNER JOIN common.collateral_type d
-                                                                ON c.id_collateral_type = d.id_collateral_type
-                                                                    AND d.id_status = 'C'
-                                                                    AND d.id_collateral_type_ref = (    SELECT Max( id_collateral_type_ref )
-                                                                                                        FROM common.collateral_type
-                                                                                                        WHERE id_collateral_type = d.id_collateral_type
-                                                                                                            AND id_status = 'C' )
-                                                        WHERE a1.id_instrument_ref = a.id_instrument_ref ), 0 ), 2 ) / ( Nvl( c.amortised_cost_dirty_bc, 0 ) + Nvl( c.open_commitment_bc, 0 ) * Nvl( e.ccf, 0.25 ) ), 0 )
-                ELSE 0
+            WHEN c.amortised_cost_dirty_bc < 0
+                    OR ( c.amortised_cost_dirty_bc = 0
+                            AND c.open_commitment_bc < 0 )
+                THEN Greatest( 1 + Round( Nvl( (    SELECT Sum( a1.amount * fxr.fxrate * Exp( - Nvl( c.yield, 0 ) * d.workout_period / 365 ) ) recovery_amount
+                                                    FROM cfe.instr_coll_recovery_hst a1
+                                                        INNER JOIN ex
+                                                            ON a1.valid_date = ex.value_date
+                                                        INNER JOIN fxr
+                                                            ON a1.id_currency = fxr.id_currency_from
+                                                        INNER JOIN cfe.collateral_ref b
+                                                            ON a1.id_collateral_ref = b.id_collateral_ref
+                                                        INNER JOIN cfe.collateral c
+                                                            ON b.id_collateral = c.id_collateral
+                                                        INNER JOIN common.collateral_type d
+                                                            ON c.id_collateral_type = d.id_collateral_type
+                                                                AND d.id_status = 'C'
+                                                                AND d.id_collateral_type_ref = (    SELECT Max( id_collateral_type_ref )
+                                                                                                    FROM common.collateral_type
+                                                                                                    WHERE id_collateral_type = d.id_collateral_type
+                                                                                                        AND id_status = 'C' )
+                                                    WHERE a1.id_instrument_ref = a.id_instrument_ref ), 0 ), 2 ) / ( Nvl( c.amortised_cost_dirty_bc, 0 ) + Nvl( c.open_commitment_bc, 0 ) * Nvl( e.ccf, 0.25 ) ), 0 )
+            ELSE 0
             END lgd_1y
         , p2.rate_pd pd_2y
         , p2.rate_lgd lgd_2y
@@ -185,12 +185,12 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , p10.rate_pd pd_10y
         , p10.rate_lgd lgd_10y
         , CASE
-                WHEN e.impairment_stage = 3
-                        AND d.impairment_is_specific = '0'
-                    THEN 'D'
-                ELSE Decode( d.impairment_is_specific
-                                , '1', 'S'
-                                , '0', 'C' )
+            WHEN e.impairment_stage = 3
+                    AND d.impairment_is_specific = '0'
+                THEN 'D'
+            ELSE Decode( d.impairment_is_specific
+                            , '1', 'S'
+                            , '0', 'C' )
             END impairment_is_specific
         , d.impairment
                  + d.impairment_spec impairment
@@ -490,28 +490,28 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , coll.description collaterals
         , p1.rate_pd pd_1y
         , CASE
-                WHEN c.amortised_cost_dirty_bc < 0
-                        OR ( c.amortised_cost_dirty_bc = 0
-                                AND c.open_commitment_bc < 0 )
-                    THEN Greatest( 1 + Round( Nvl( (    SELECT Sum( a1.amount * fxr.fxrate * Exp( - Nvl( c.yield, 0 ) * d.workout_period / 365 ) ) recovery_amount
-                                                        FROM cfe.instr_coll_recovery_hst a1
-                                                            INNER JOIN ex
-                                                                ON a1.valid_date = ex.value_date
-                                                            INNER JOIN fxr
-                                                                ON a1.id_currency = fxr.id_currency_from
-                                                            INNER JOIN cfe.collateral_ref b
-                                                                ON a1.id_collateral_ref = b.id_collateral_ref
-                                                            INNER JOIN cfe.collateral c
-                                                                ON b.id_collateral = c.id_collateral
-                                                            INNER JOIN common.collateral_type d
-                                                                ON c.id_collateral_type = d.id_collateral_type
-                                                                    AND d.id_status = 'C'
-                                                                    AND d.id_collateral_type_ref = (    SELECT Max( id_collateral_type_ref )
-                                                                                                        FROM common.collateral_type
-                                                                                                        WHERE id_collateral_type = d.id_collateral_type
-                                                                                                            AND id_status = 'C' )
-                                                        WHERE a1.id_instrument_ref = a.id_instrument_ref ), 0 ), 2 ) / ( Nvl( c.amortised_cost_dirty_bc, 0 ) + Nvl( c.open_commitment_bc, 0 ) * Nvl( e.ccf, 0.25 ) ), 0 )
-                ELSE 0
+            WHEN c.amortised_cost_dirty_bc < 0
+                    OR ( c.amortised_cost_dirty_bc = 0
+                            AND c.open_commitment_bc < 0 )
+                THEN Greatest( 1 + Round( Nvl( (    SELECT Sum( a1.amount * fxr.fxrate * Exp( - Nvl( c.yield, 0 ) * d.workout_period / 365 ) ) recovery_amount
+                                                    FROM cfe.instr_coll_recovery_hst a1
+                                                        INNER JOIN ex
+                                                            ON a1.valid_date = ex.value_date
+                                                        INNER JOIN fxr
+                                                            ON a1.id_currency = fxr.id_currency_from
+                                                        INNER JOIN cfe.collateral_ref b
+                                                            ON a1.id_collateral_ref = b.id_collateral_ref
+                                                        INNER JOIN cfe.collateral c
+                                                            ON b.id_collateral = c.id_collateral
+                                                        INNER JOIN common.collateral_type d
+                                                            ON c.id_collateral_type = d.id_collateral_type
+                                                                AND d.id_status = 'C'
+                                                                AND d.id_collateral_type_ref = (    SELECT Max( id_collateral_type_ref )
+                                                                                                    FROM common.collateral_type
+                                                                                                    WHERE id_collateral_type = d.id_collateral_type
+                                                                                                        AND id_status = 'C' )
+                                                    WHERE a1.id_instrument_ref = a.id_instrument_ref ), 0 ), 2 ) / ( Nvl( c.amortised_cost_dirty_bc, 0 ) + Nvl( c.open_commitment_bc, 0 ) * Nvl( e.ccf, 0.25 ) ), 0 )
+            ELSE 0
             END lgd_1y
         , p2.rate_pd pd_2y
         , p2.rate_lgd lgd_2y
@@ -520,12 +520,12 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , p10.rate_pd pd_10y
         , p10.rate_lgd lgd_10y
         , CASE
-                WHEN e.impairment_stage = 3
-                        AND d.impairment_is_specific = '0'
-                    THEN 'D'
-                ELSE Decode( d.impairment_is_specific
-                                , '1', 'S'
-                                , '0', 'C' )
+            WHEN e.impairment_stage = 3
+                    AND d.impairment_is_specific = '0'
+                THEN 'D'
+            ELSE Decode( d.impairment_is_specific
+                            , '1', 'S'
+                            , '0', 'C' )
             END impairment_is_specific
         , d.impairment
                  + d.impairment_spec impairment

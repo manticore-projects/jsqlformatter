@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
@@ -101,7 +102,7 @@ public class StandardFileTest {
     String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
     if (laxDeparsingCheck) {
       String s = sql.replaceAll("\\n*\\s*;", ";").replaceAll("\\s+", " ")
-          .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1").toLowerCase().trim();
+          .replaceAll("\\s*([!/,()=+\\-*|\\{\\}\\[\\]<>:])\\s*", "$1").toLowerCase().trim();
       return !s.endsWith(";") ? s + ";" : s;
     } else {
       return sql;

@@ -57,17 +57,17 @@ CREATE OR REPLACE VIEW cfe.execution_v
             , e.value_date
             , e.posting_date
             , CASE
-                    WHEN EXTRACT( year FROM e1.value_date ) > EXTRACT( year FROM e.value_date )
-                        THEN 'Y'
-                    WHEN To_Char( e1.value_date, 'Q' ) > To_Char( e.value_date, 'Q' )
-                        THEN 'Q'
-                    WHEN EXTRACT( month FROM e1.value_date ) > EXTRACT( month FROM e.value_date )
-                        THEN 'M'
-                    WHEN To_Char( e1.value_date, 'IW' ) > To_Char( e.value_date, 'IW' )
-                        THEN 'W'
-                    WHEN e1.value_date IS NULL
-                            AND e.id_status = 'R'
-                        THEN 'L'
+                WHEN EXTRACT( year FROM e1.value_date ) > EXTRACT( year FROM e.value_date )
+                    THEN 'Y'
+                WHEN To_Char( e1.value_date, 'Q' ) > To_Char( e.value_date, 'Q' )
+                    THEN 'Q'
+                WHEN EXTRACT( month FROM e1.value_date ) > EXTRACT( month FROM e.value_date )
+                    THEN 'M'
+                WHEN To_Char( e1.value_date, 'IW' ) > To_Char( e.value_date, 'IW' )
+                    THEN 'W'
+                WHEN e1.value_date IS NULL
+                        AND e.id_status = 'R'
+                    THEN 'L'
                 END flag
             , e.value_date_p
             , e.value_date_pp

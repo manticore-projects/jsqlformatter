@@ -24,6 +24,7 @@ import hu.webarticum.treeprinter.SimpleTreeNode;
 import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllValue;
+import net.sf.jsqlparser.expression.ArrayConstructor;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.CastExpression;
@@ -46,6 +47,7 @@ import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.RowConstructor;
 import net.sf.jsqlparser.expression.SignedExpression;
 import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.StructType;
 import net.sf.jsqlparser.expression.TimeKeyExpression;
 import net.sf.jsqlparser.expression.WhenClause;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -2406,44 +2408,49 @@ public class JSQLFormatter {
       appendNormalizingTrailingWhiteSpace(builder, " )");
 
     } else if (expression instanceof CaseExpression) {
+      int subIndent = getSubIndent(builder, false);
+
       CaseExpression caseExpression = (CaseExpression) expression;
       appendKeyWord(builder, outputFormat, "CASE", "", " ");
+      if (caseExpression.getSwitchExpression()!=null) {
+        appendExpression( caseExpression.getSwitchExpression(), null, builder, indent + 1, i, n, false, BreakLine.NEVER);
+      }
 
       List<WhenClause> whenClauses = caseExpression.getWhenClauses();
       for (WhenClause whenClause : whenClauses) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 1; j++) {
+        for (int j = 0; j < subIndent ; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "WHEN", "", " ");
-        appendExpression(whenClause.getWhenExpression(), null, builder, indent + 3, 0, 1, false,
+        appendExpression(whenClause.getWhenExpression(), null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
 
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 2; j++) {
+        for (int j = 0; j < subIndent + 1; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "THEN", "", " ");
-        appendExpression(whenClause.getThenExpression(), null, builder, indent + 1, 0, 1, false,
+        appendExpression(whenClause.getThenExpression(), null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
       }
 
       Expression elseExpression = caseExpression.getElseExpression();
       if (elseExpression != null) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 1; j++) {
+        for (int j = 0; j < subIndent; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "ELSE", "", " ");
-        appendExpression(elseExpression, null, builder, indent + 1, 0, 1, false,
+        appendExpression(elseExpression, null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
       }
 
       appendNormalizedLineBreak(builder);
-      for (int j = 0; j <= indent; j++) {
+      for (int j = 0; j < subIndent; j++) {
         builder.append(indentString);
       }
-      appendKeyWord(builder, outputFormat, "END", "", " ");
+      appendKeyWord(builder, outputFormat, "END", "", "");
 
     } else if (expression instanceof StringValue) {
       StringValue stringValue = (StringValue) expression;
@@ -2809,6 +2816,37 @@ public class JSQLFormatter {
 
       appendExpression(between.getBetweenExpressionEnd(), null, builder, indent + 1, i, n, false,
           BreakLine.NEVER);
+    } else if (expression instanceof ArrayConstructor) {
+      ArrayConstructor arrayConstructor = (ArrayConstructor) expression;
+      if (arrayConstructor.isArrayKeyword()) {
+        appendKeyWord(builder, outputFormat, "ARRAY", " ", "");
+      }
+
+      boolean multiline = false;
+      for (Expression p:arrayConstructor.getExpressions()) {
+        if (
+                p instanceof ArrayConstructor
+                        || p instanceof ExpressionList
+                        || p instanceof Select
+                        || p instanceof StructType
+        ) {
+          multiline = true;
+          break;
+        }
+      }
+
+      int subIndent = getSubIndent(builder, true);
+      builder.append("[ ");
+      if (multiline) {
+        appendExpressionList(arrayConstructor.getExpressions(), builder, subIndent, BreakLine.ALWAYS);
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent; j++) {
+          builder.append(indentString);
+        }
+      } else {
+        appendExpressionList(arrayConstructor.getExpressions(), builder, subIndent, BreakLine.NEVER);
+      }
+      builder.append("]");
     } else {
       LOGGER
           .warning("Unhandled expression: " + expression.getClass().getName() + " = " + expression);
