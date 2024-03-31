@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.manticore.jsqlformatter.CommentMap.COMMENT_PATTERN;
