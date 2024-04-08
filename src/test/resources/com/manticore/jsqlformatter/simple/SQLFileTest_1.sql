@@ -129,13 +129,13 @@ WITH ex AS (
     , cp AS (
         SELECT  b.foracid id_instrument
                 , b.cif_id id_counterparty
-                , Convert( a.description, varchar ) description
+                , Convert( VARCHAR, a.description ) description
         FROM risk.counterparty a
             INNER JOIN cfe.ext_gam b
                 ON a.id_counterparty = b.cif_id
                     AND a.id_status = 'C' )
 SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
-        , Coalesce( Convert( cp1.description, varchar ), cp.description, h2.attribute_value ) description
+        , Coalesce( Convert( VARCHAR, cp1.description ), cp.description, h2.attribute_value ) description
         , b.id_instrument
         , a.id_instrument_type
         , f2.attribute_value product
@@ -464,13 +464,13 @@ WITH ex AS (
     , cp AS (
         SELECT  b.foracid id_instrument
                 , b.cif_id id_counterparty
-                , Convert( a.description, varchar ) description
+                , Convert( VARCHAR, a.description ) description
         FROM risk.counterparty a
             INNER JOIN cfe.ext_gam b
                 ON a.id_counterparty = b.cif_id
                     AND a.id_status = 'C' )
 SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
-        , Coalesce( Convert( cp1.description, varchar ), cp.description, h2.attribute_value ) description
+        , Coalesce( Convert( VARCHAR, cp1.description ), cp.description, h2.attribute_value ) description
         , b.id_instrument
         , a.id_instrument_type
         , f2.attribute_value product
