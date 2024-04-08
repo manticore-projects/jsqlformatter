@@ -47,8 +47,10 @@ FROM (  SELECT  name
                 , finish_time
                 , division
                 , finishers
-                , First(finish_time) OVER w1 AS fastest_time
-                , NTH_VALUE(finish_time, 2) OVER w1 AS second_fastest
+                , First( finish_time )
+                        OVER w1 AS fastest_time
+                , Nth_Value( finish_time, 2 )
+                        OVER w1 AS second_fastest
         FROM finishers
         WINDOW
             w1 AS (
@@ -60,13 +62,9 @@ ORDER BY    3
             , 1
 ;
 
-SELECT  FIRST_VALUE( bc.merch_l1_name IGNORE NULLS )
-            OVER (  PARTITION BY sku
-                                , channel_id
-                    ORDER BY feed_date DESC ) AS merch_l1_name
-        , FIRST_VALUE( bc.brand IGNORE NULLS )
-            OVER (  PARTITION BY sku
-                                , channel_id
-                    ORDER BY feed_date DESC) AS brand
+SELECT  First_Value( bc.merch_l1_name IGNORE NULLS )
+            OVER (PARTITION BY sku, channel_id ORDER BY feed_date DESC) AS merch_l1_name
+        , First_Value( bc.brand IGNORE NULLS )
+                OVER (PARTITION BY sku, channel_id ORDER BY feed_date DESC) AS brand
 FROM temp.abc bc
 ;

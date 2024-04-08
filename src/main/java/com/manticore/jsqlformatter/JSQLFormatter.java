@@ -24,6 +24,8 @@ import hu.webarticum.treeprinter.SimpleTreeNode;
 import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllValue;
+import net.sf.jsqlparser.expression.AnalyticExpression;
+import net.sf.jsqlparser.expression.AnalyticType;
 import net.sf.jsqlparser.expression.ArrayConstructor;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
@@ -168,6 +170,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
@@ -2981,6 +2984,114 @@ public class JSQLFormatter {
         } else {
           builder.append(" )");
         }
+      }
+    } else if(expression instanceof AnalyticExpression) {
+      AnalyticExpression analyticExpression = (AnalyticExpression) expression;
+
+      int subIndent = getSubIndent(builder, false);
+      appendFunction(builder, outputFormat, analyticExpression.getName(), "", "( ");
+      if (analyticExpression.isDistinct()) {
+        appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
+      }
+
+      Expression expr = analyticExpression.getExpression();
+      if (expr != null) {
+        appendExpression(expr, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+        if (analyticExpression.getOffset() != null) {
+          builder.append(", ");
+          appendExpression(analyticExpression.getOffset(), null, builder, indent, 0, 1, true, BreakLine.NEVER);
+          if (analyticExpression.getDefaultValue()!= null) {
+            builder.append(", ");
+            appendExpression(analyticExpression.getDefaultValue(), null, builder, indent, 0, 1, true, BreakLine.NEVER);
+          }
+        }
+      } else if (analyticExpression.isAllColumns()) {
+        builder.append("*");
+      }
+
+      if (analyticExpression.getHavingClause() != null) {
+        analyticExpression.getHavingClause().appendTo(builder);
+      }
+
+      if (analyticExpression.getNullHandling() != null) {
+        switch (analyticExpression.getNullHandling()) {
+          case IGNORE_NULLS:
+            builder.append(" IGNORE NULLS");
+            break;
+          case RESPECT_NULLS:
+            builder.append(" RESPECT NULLS");
+        }
+      }
+
+      if (analyticExpression.getFuncOrderBy() != null) {
+        builder.append(" ORDER BY ");
+        builder.append(analyticExpression.getFuncOrderBy().stream().map(OrderByElement::toString).collect(Collectors.joining(", ")));
+      }
+
+      if (analyticExpression.getLimit() != null) {
+        builder.append(analyticExpression.getLimit());
+      }
+      builder.append(" ) ");
+
+      if (analyticExpression.getKeep() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent+1; j++) {
+          builder.append(indentString);
+        }
+        builder.append(analyticExpression.getKeep()).append(" ");
+      }
+
+      if (analyticExpression.getFilterExpression() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent+1; j++) {
+          builder.append(indentString);
+        }
+        builder.append("FILTER ( WHERE ");
+        builder.append(analyticExpression.getFilterExpression());
+        builder.append(" )");
+        if (analyticExpression.getType() != AnalyticType.FILTER_ONLY) {
+          builder.append(" ");
+        }
+      }
+
+      if (analyticExpression.isIgnoreNullsOutside()) {
+        builder.append("IGNORE NULLS ");
+      }
+
+      switch (analyticExpression.getType()) {
+        case FILTER_ONLY:
+          return;
+        case WITHIN_GROUP:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent+1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("WITHIN GROUP");
+          break;
+        case WITHIN_GROUP_OVER:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent+1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("WITHIN GROUP ( ");
+          analyticExpression.getWindowDefinition().getOrderBy().toStringOrderByElements(builder);
+          builder.append(" ) OVER ( ");
+          analyticExpression.getWindowDefinition().getPartitionBy().toStringPartitionBy(builder);
+          builder.append(" )");
+          break;
+        default:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent+1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("OVER");
+      }
+
+      if (analyticExpression.getWindowName() != null) {
+        builder.append(" ").append(analyticExpression.getWindowName());
+      } else if (analyticExpression.getType() != AnalyticType.WITHIN_GROUP_OVER) {
+        builder.append(" ");
+        builder.append(analyticExpression.getWindowDefinition());
       }
     } else {
       LOGGER
