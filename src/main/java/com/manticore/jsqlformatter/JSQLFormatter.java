@@ -172,8 +172,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.joining;
-
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
  *
@@ -1879,8 +1877,8 @@ public class JSQLFormatter {
           builder.append(indentString);
         }
         builder.append("WINDOW ");
-        int k=0;
-        for (WindowDefinition w: plainSelect.getWindowDefinitions()) {
+        int k = 0;
+        for (WindowDefinition w : plainSelect.getWindowDefinitions()) {
           appendNormalizedLineBreak(builder);
           for (int j = 0; j < indent + 1; j++) {
             builder.append(indentString);
@@ -1896,13 +1894,13 @@ public class JSQLFormatter {
           }
 
           appendNormalizedLineBreak(builder);
-          for (int j = 0; j < indent+2; j++) {
+          for (int j = 0; j < indent + 2; j++) {
             builder.append(indentString);
           }
           w.getPartitionBy().toStringPartitionBy(builder);
 
           appendNormalizedLineBreak(builder);
-          for (int j = 0; j < indent+2; j++) {
+          for (int j = 0; j < indent + 2; j++) {
             builder.append(indentString);
           }
           w.getOrderBy().toStringOrderByElements(builder);
@@ -1910,7 +1908,7 @@ public class JSQLFormatter {
           if (w.getWindowElement() != null) {
             if (w.getOrderBy().getOrderByElements() != null) {
               appendNormalizedLineBreak(builder);
-              for (int j = 0; j < indent+2; j++) {
+              for (int j = 0; j < indent + 2; j++) {
                 builder.append(indentString);
               }
             }
@@ -2893,7 +2891,7 @@ public class JSQLFormatter {
       if (castExpression.isImplicitCast()) {
         appendKeyWord(builder, outputFormat, castExpression.getColDataType().toString(), "", " ");
         appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, false,
-                BreakLine.NEVER);
+            BreakLine.NEVER);
       } else if (castExpression.isUseCastKeyword()) {
         if (castExpression.getColumnDefinitions().size() > 1) {
           appendFunction(builder, outputFormat, castExpression.keyword, " ", "( ");
@@ -2971,12 +2969,15 @@ public class JSQLFormatter {
       TranscodingFunction transcodingFunction = (TranscodingFunction) expression;
       appendFunction(builder, outputFormat, "Convert", "", "(");
       if (transcodingFunction.isTranscodeStyle()) {
-        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false, BreakLine.AS_NEEDED);
+        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false,
+            BreakLine.AS_NEEDED);
         appendKeyWord(builder, outputFormat, "USING", " ", "");
         appendKeyWord(builder, outputFormat, transcodingFunction.getTranscodingName(), " ", " )");
       } else {
-        appendKeyWord(builder, outputFormat, transcodingFunction.getColDataType().toString(), " ", ", ");
-        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false, BreakLine.AS_NEEDED);
+        appendKeyWord(builder, outputFormat, transcodingFunction.getColDataType().toString(), " ",
+            ", ");
+        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false,
+            BreakLine.AS_NEEDED);
 
         String transcodingName = transcodingFunction.getTranscodingName();
         if (transcodingName != null && !transcodingName.isEmpty()) {
@@ -2985,7 +2986,7 @@ public class JSQLFormatter {
           builder.append(" )");
         }
       }
-    } else if(expression instanceof AnalyticExpression) {
+    } else if (expression instanceof AnalyticExpression) {
       AnalyticExpression analyticExpression = (AnalyticExpression) expression;
 
       int subIndent = getSubIndent(builder, false);
@@ -2999,10 +3000,12 @@ public class JSQLFormatter {
         appendExpression(expr, null, builder, indent, 0, 1, false, BreakLine.NEVER);
         if (analyticExpression.getOffset() != null) {
           builder.append(", ");
-          appendExpression(analyticExpression.getOffset(), null, builder, indent, 0, 1, true, BreakLine.NEVER);
-          if (analyticExpression.getDefaultValue()!= null) {
+          appendExpression(analyticExpression.getOffset(), null, builder, indent, 0, 1, true,
+              BreakLine.NEVER);
+          if (analyticExpression.getDefaultValue() != null) {
             builder.append(", ");
-            appendExpression(analyticExpression.getDefaultValue(), null, builder, indent, 0, 1, true, BreakLine.NEVER);
+            appendExpression(analyticExpression.getDefaultValue(), null, builder, indent, 0, 1,
+                true, BreakLine.NEVER);
           }
         }
       } else if (analyticExpression.isAllColumns()) {
@@ -3025,7 +3028,8 @@ public class JSQLFormatter {
 
       if (analyticExpression.getFuncOrderBy() != null) {
         builder.append(" ORDER BY ");
-        builder.append(analyticExpression.getFuncOrderBy().stream().map(OrderByElement::toString).collect(Collectors.joining(", ")));
+        builder.append(analyticExpression.getFuncOrderBy().stream().map(OrderByElement::toString)
+            .collect(Collectors.joining(", ")));
       }
 
       if (analyticExpression.getLimit() != null) {
@@ -3035,7 +3039,7 @@ public class JSQLFormatter {
 
       if (analyticExpression.getKeep() != null) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j < subIndent+1; j++) {
+        for (int j = 0; j < subIndent + 1; j++) {
           builder.append(indentString);
         }
         builder.append(analyticExpression.getKeep()).append(" ");
@@ -3043,7 +3047,7 @@ public class JSQLFormatter {
 
       if (analyticExpression.getFilterExpression() != null) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j < subIndent+1; j++) {
+        for (int j = 0; j < subIndent + 1; j++) {
           builder.append(indentString);
         }
         builder.append("FILTER ( WHERE ");
@@ -3063,14 +3067,14 @@ public class JSQLFormatter {
           return;
         case WITHIN_GROUP:
           appendNormalizedLineBreak(builder);
-          for (int j = 0; j < subIndent+1; j++) {
+          for (int j = 0; j < subIndent + 1; j++) {
             builder.append(indentString);
           }
           builder.append("WITHIN GROUP");
           break;
         case WITHIN_GROUP_OVER:
           appendNormalizedLineBreak(builder);
-          for (int j = 0; j < subIndent+1; j++) {
+          for (int j = 0; j < subIndent + 1; j++) {
             builder.append(indentString);
           }
           builder.append("WITHIN GROUP ( ");
@@ -3081,7 +3085,7 @@ public class JSQLFormatter {
           break;
         default:
           appendNormalizedLineBreak(builder);
-          for (int j = 0; j < subIndent+1; j++) {
+          for (int j = 0; j < subIndent + 1; j++) {
             builder.append(indentString);
           }
           builder.append("OVER");
