@@ -19,7 +19,11 @@ package com.manticore.jsqlformatter;
 
 
 import blazing.chain.LZSEncoding;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -97,6 +101,24 @@ public class ASTVisualizationTest {
     for (Column column : columns) {
       System.out.println("Found specific column by complete XPath: " + column);
     }
+  }
+
+  @Test
+  public void testXPathReplace() throws Exception {
+    String sqlStr = "select func1( func2 ( func3 ( x ) ) ) from  tablename where a=b and b=c;";
+    PlainSelect select = (PlainSelect) CCJSqlParserUtil.parse(sqlStr);
+    Function func1 = (Function) select.getSelectItem(0).getExpression();
+    Function func2 = (Function) func1.getParameters().get(0);
+
+    // Get the parent ExpressionList
+    SimpleNode node = (SimpleNode) func2.getASTNode().jjtGetParent();
+    while (node.jjtGetValue() == null) {
+      node = (SimpleNode) node.jjtGetParent();
+    }
+
+    Function parentFunction = (Function) node.jjtGetValue();
+
+    Assertions.assertEquals(func1, parentFunction);
   }
 
   @Test

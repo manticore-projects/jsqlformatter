@@ -127,9 +127,9 @@ MERGE INTO empl_current tar
     USING ( SELECT  empno
                     , ename
                     , CASE
-                            WHEN leavedate <= sysdate
-                                THEN 'Y'
-                            ELSE 'N'
+                        WHEN leavedate <= sysdate
+                            THEN 'Y'
+                        ELSE 'N'
                         END AS delete_flag
             FROM empl ) src
         ON ( tar.empno = src.empno )

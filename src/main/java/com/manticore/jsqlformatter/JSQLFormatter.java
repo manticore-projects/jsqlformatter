@@ -24,6 +24,9 @@ import hu.webarticum.treeprinter.SimpleTreeNode;
 import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllValue;
+import net.sf.jsqlparser.expression.AnalyticExpression;
+import net.sf.jsqlparser.expression.AnalyticType;
+import net.sf.jsqlparser.expression.ArrayConstructor;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.CastExpression;
@@ -46,8 +49,11 @@ import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.RowConstructor;
 import net.sf.jsqlparser.expression.SignedExpression;
 import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.StructType;
 import net.sf.jsqlparser.expression.TimeKeyExpression;
+import net.sf.jsqlparser.expression.TranscodingFunction;
 import net.sf.jsqlparser.expression.WhenClause;
+import net.sf.jsqlparser.expression.WindowDefinition;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
@@ -109,6 +115,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SetOperation;
 import net.sf.jsqlparser.statement.select.SetOperationList;
+import net.sf.jsqlparser.statement.select.Top;
 import net.sf.jsqlparser.statement.select.UnionOp;
 import net.sf.jsqlparser.statement.select.Values;
 import net.sf.jsqlparser.statement.select.WithItem;
@@ -163,6 +170,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A powerful Java SQL Formatter based on the JSQLParser.
@@ -1786,12 +1794,29 @@ public class JSQLFormatter {
         }
       }
 
-
       appendKeyWord(builder, outputFormat, "SELECT", "", " ");
 
       OracleHint oracleHint = plainSelect.getOracleHint();
       if (oracleHint != null) {
         appendHint(builder, outputFormat, oracleHint.toString(), "", " ");
+      }
+
+      Top top = plainSelect.getTop();
+      if (top != null) {
+        appendKeyWord(builder, outputFormat, "TOP", "", top.hasParenthesis() ? "( " : " ");
+        appendExpression(top.getExpression(), null, builder, 0, 0, 0, false, BreakLine.AS_NEEDED);
+        if (top.hasParenthesis()) {
+          builder.append(" )");
+        }
+        appendNormalizingTrailingWhiteSpace(builder, " ");
+
+        if (top.isPercentage()) {
+          appendKeyWord(builder, outputFormat, "PERCENT", "", " ");
+        }
+
+        if (top.isWithTies()) {
+          appendKeyWord(builder, outputFormat, "WITH TIES", "", " ");
+        }
       }
 
       Distinct distinct = plainSelect.getDistinct();
@@ -1809,10 +1834,10 @@ public class JSQLFormatter {
         appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
       }
 
-      int subIndent = oracleHint != null || distinct != null ? indent + 1
+      int subIndent = oracleHint != null || distinct != null || top != null ? indent + 1
           : getSubIndent(builder, plainSelect.getSelectItems().size() > 1);
-      BreakLine bl =
-          oracleHint != null || distinct != null ? BreakLine.ALWAYS : BreakLine.AFTER_FIRST;
+      BreakLine bl = oracleHint != null || distinct != null || top != null ? BreakLine.ALWAYS
+          : BreakLine.AFTER_FIRST;
 
       List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
       appendSelectItemList(selectItems, builder, subIndent, i, bl, indent);
@@ -1838,6 +1863,95 @@ public class JSQLFormatter {
 
       Expression havingExpression = plainSelect.getHaving();
       appendHavingExpression(havingExpression, builder, indent);
+
+      // @todo: write-out Qualify
+      if (plainSelect.getQualify() != null) {
+        builder.append(" QUALIFY ");
+        builder.append(plainSelect.getQualify());
+      }
+
+      // @todo: write-out Windows
+      if (plainSelect.getWindowDefinitions() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) {
+          builder.append(indentString);
+        }
+        builder.append("WINDOW ");
+        int k = 0;
+        for (WindowDefinition w : plainSelect.getWindowDefinitions()) {
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < indent + 1; j++) {
+            builder.append(indentString);
+          }
+          if (k++ > 0) {
+            builder.append(", ");
+          }
+          if (w.getWindowName() != null) {
+            appendObjectName(builder, outputFormat, w.getWindowName(), "", " ");
+            appendKeyWord(builder, outputFormat, "AS", "", " (");
+          } else {
+            builder.append("(");
+          }
+
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < indent + 2; j++) {
+            builder.append(indentString);
+          }
+          w.getPartitionBy().toStringPartitionBy(builder);
+
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < indent + 2; j++) {
+            builder.append(indentString);
+          }
+          w.getOrderBy().toStringOrderByElements(builder);
+
+          if (w.getWindowElement() != null) {
+            if (w.getOrderBy().getOrderByElements() != null) {
+              appendNormalizedLineBreak(builder);
+              for (int j = 0; j < indent + 2; j++) {
+                builder.append(indentString);
+              }
+            }
+            appendKeyWord(builder, outputFormat, w.getWindowElement().toString(), "", "");
+          }
+
+          builder.append(" )");
+        }
+      }
+
+      // @todo: write-out FOR MODE
+      if (plainSelect.getForMode() != null) {
+        builder.append(" FOR ");
+        builder.append(plainSelect.getForMode().getValue());
+
+        if (plainSelect.getForUpdateTable() != null) {
+          builder.append(" OF ").append(plainSelect.getForUpdateTable());
+        }
+        if (plainSelect.getWait() != null) {
+          // wait's toString will do the formatting for us
+          builder.append(plainSelect.getWait());
+        }
+        if (plainSelect.isNoWait()) {
+          builder.append(" NOWAIT");
+        } else if (plainSelect.isSkipLocked()) {
+          builder.append(" SKIP LOCKED");
+        }
+      }
+
+      // @todo: write-out FOR CLAUSE
+      if (plainSelect.getForClause() != null) {
+        plainSelect.getForClause().appendTo(builder);
+      }
+
+      // @todo: write-out EMIT CHANGES
+      if (plainSelect.isEmitChanges()) {
+        builder.append(" EMIT CHANGES");
+      }
+
+      // @todo: write-out LIMIT BY
+      if (plainSelect.getLimitBy() != null) {
+        builder.append(plainSelect.getLimitBy());
+      }
 
       List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
       appendOrderByElements(orderByElements, builder, indent);
@@ -1908,6 +2022,30 @@ public class JSQLFormatter {
           appendKeyWord(builder, outputFormat, s, " ", "");
         }
 
+        // @todo: write-out ISOLATION
+        if (plainSelect.getIsolation() != null) {
+          builder.append(plainSelect.getIsolation());
+        }
+
+        // @todo: write-out Optimizer For
+        if (plainSelect.getOptimizeFor() != null) {
+          builder.append(plainSelect.getOptimizeFor());
+        }
+
+        // @todo: write-out FOR XML PATH
+        if (plainSelect.getForXmlPath() != null) {
+          builder.append(" FOR XML PATH(").append(plainSelect.getForXmlPath()).append(")");
+        }
+
+        // @todo: write-out INTO TEMP Table
+        if (plainSelect.getIntoTempTable() != null) {
+          builder.append(" INTO TEMP ").append(plainSelect.getIntoTempTable());
+        }
+
+        // @todo: write-out WITH NO LOG
+        if (plainSelect.isUseWithNoLog()) {
+          builder.append(" WITH NO LOG");
+        }
       }
 
     } else if (select instanceof SetOperationList) {
@@ -2385,44 +2523,50 @@ public class JSQLFormatter {
       appendNormalizingTrailingWhiteSpace(builder, " )");
 
     } else if (expression instanceof CaseExpression) {
+      int subIndent = getSubIndent(builder, false);
+
       CaseExpression caseExpression = (CaseExpression) expression;
       appendKeyWord(builder, outputFormat, "CASE", "", " ");
+      if (caseExpression.getSwitchExpression() != null) {
+        appendExpression(caseExpression.getSwitchExpression(), null, builder, indent + 1, i, n,
+            false, BreakLine.NEVER);
+      }
 
       List<WhenClause> whenClauses = caseExpression.getWhenClauses();
       for (WhenClause whenClause : whenClauses) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 1; j++) {
+        for (int j = 0; j < subIndent; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "WHEN", "", " ");
-        appendExpression(whenClause.getWhenExpression(), null, builder, indent + 3, 0, 1, false,
+        appendExpression(whenClause.getWhenExpression(), null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
 
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 2; j++) {
+        for (int j = 0; j < subIndent + 1; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "THEN", "", " ");
-        appendExpression(whenClause.getThenExpression(), null, builder, indent + 1, 0, 1, false,
+        appendExpression(whenClause.getThenExpression(), null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
       }
 
       Expression elseExpression = caseExpression.getElseExpression();
       if (elseExpression != null) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 1; j++) {
+        for (int j = 0; j < subIndent; j++) {
           builder.append(indentString);
         }
         appendKeyWord(builder, outputFormat, "ELSE", "", " ");
-        appendExpression(elseExpression, null, builder, indent + 1, 0, 1, false,
+        appendExpression(elseExpression, null, builder, subIndent + 1, 0, 1, false,
             BreakLine.AFTER_FIRST);
       }
 
       appendNormalizedLineBreak(builder);
-      for (int j = 0; j <= indent; j++) {
+      for (int j = 0; j < subIndent; j++) {
         builder.append(indentString);
       }
-      appendKeyWord(builder, outputFormat, "END", "", " ");
+      appendKeyWord(builder, outputFormat, "END", "", "");
 
     } else if (expression instanceof StringValue) {
       StringValue stringValue = (StringValue) expression;
@@ -2744,11 +2888,15 @@ public class JSQLFormatter {
     } else if (expression instanceof CastExpression) {
       CastExpression castExpression = (CastExpression) expression;
 
-      if (castExpression.isUseCastKeyword()) {
+      if (castExpression.isImplicitCast()) {
+        appendKeyWord(builder, outputFormat, castExpression.getColDataType().toString(), "", " ");
+        appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, false,
+            BreakLine.NEVER);
+      } else if (castExpression.isUseCastKeyword()) {
         if (castExpression.getColumnDefinitions().size() > 1) {
           appendFunction(builder, outputFormat, castExpression.keyword, " ", "( ");
-          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true,
-              BreakLine.AS_NEEDED);
+          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, false,
+              BreakLine.NEVER);
           appendKeyWord(builder, outputFormat, "AS ROW ( ", " ", " ");
           int j = 0;
           for (ColumnDefinition columnDefinition : castExpression.getColumnDefinitions()) {
@@ -2758,9 +2906,9 @@ public class JSQLFormatter {
             appendKeyWord(builder, outputFormat, columnDefinition.toString(), "", "");
           }
         } else {
-          appendObjectName(builder, outputFormat, castExpression.keyword, " ", "( ");
-          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true,
-              BreakLine.AS_NEEDED);
+          appendFunction(builder, outputFormat, castExpression.keyword, " ", "( ");
+          appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, false,
+              BreakLine.NEVER);
           appendKeyWord(builder, outputFormat, "AS " + castExpression.getColDataType().toString(),
               " ", " )");
         }
@@ -2788,6 +2936,167 @@ public class JSQLFormatter {
 
       appendExpression(between.getBetweenExpressionEnd(), null, builder, indent + 1, i, n, false,
           BreakLine.NEVER);
+    } else if (expression instanceof ArrayConstructor) {
+      ArrayConstructor arrayConstructor = (ArrayConstructor) expression;
+      if (arrayConstructor.isArrayKeyword()) {
+        appendKeyWord(builder, outputFormat, "ARRAY", " ", "");
+      }
+
+      boolean multiline = false;
+      for (Expression p : arrayConstructor.getExpressions()) {
+        if (p instanceof ArrayConstructor || p instanceof ExpressionList || p instanceof Select
+            || p instanceof StructType) {
+          multiline = true;
+          break;
+        }
+      }
+
+      int subIndent = getSubIndent(builder, true);
+      builder.append("[ ");
+      if (multiline) {
+        appendExpressionList(arrayConstructor.getExpressions(), builder, subIndent,
+            BreakLine.ALWAYS);
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent; j++) {
+          builder.append(indentString);
+        }
+      } else {
+        appendExpressionList(arrayConstructor.getExpressions(), builder, subIndent,
+            BreakLine.NEVER);
+      }
+      builder.append("]");
+    } else if (expression instanceof TranscodingFunction) {
+      TranscodingFunction transcodingFunction = (TranscodingFunction) expression;
+      appendFunction(builder, outputFormat, "Convert", "", "(");
+      if (transcodingFunction.isTranscodeStyle()) {
+        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false,
+            BreakLine.AS_NEEDED);
+        appendKeyWord(builder, outputFormat, "USING", " ", "");
+        appendKeyWord(builder, outputFormat, transcodingFunction.getTranscodingName(), " ", " )");
+      } else {
+        appendKeyWord(builder, outputFormat, transcodingFunction.getColDataType().toString(), " ",
+            ", ");
+        appendExpression(transcodingFunction.getExpression(), null, builder, indent, 0, 1, false,
+            BreakLine.AS_NEEDED);
+
+        String transcodingName = transcodingFunction.getTranscodingName();
+        if (transcodingName != null && !transcodingName.isEmpty()) {
+          appendKeyWord(builder, outputFormat, transcodingName, ", ", " )");
+        } else {
+          builder.append(" )");
+        }
+      }
+    } else if (expression instanceof AnalyticExpression) {
+      AnalyticExpression analyticExpression = (AnalyticExpression) expression;
+
+      int subIndent = getSubIndent(builder, false);
+      appendFunction(builder, outputFormat, analyticExpression.getName(), "", "( ");
+      if (analyticExpression.isDistinct()) {
+        appendKeyWord(builder, outputFormat, "DISTINCT", "", " ");
+      }
+
+      Expression expr = analyticExpression.getExpression();
+      if (expr != null) {
+        appendExpression(expr, null, builder, indent, 0, 1, false, BreakLine.NEVER);
+        if (analyticExpression.getOffset() != null) {
+          builder.append(", ");
+          appendExpression(analyticExpression.getOffset(), null, builder, indent, 0, 1, true,
+              BreakLine.NEVER);
+          if (analyticExpression.getDefaultValue() != null) {
+            builder.append(", ");
+            appendExpression(analyticExpression.getDefaultValue(), null, builder, indent, 0, 1,
+                true, BreakLine.NEVER);
+          }
+        }
+      } else if (analyticExpression.isAllColumns()) {
+        builder.append("*");
+      }
+
+      if (analyticExpression.getHavingClause() != null) {
+        analyticExpression.getHavingClause().appendTo(builder);
+      }
+
+      if (analyticExpression.getNullHandling() != null) {
+        switch (analyticExpression.getNullHandling()) {
+          case IGNORE_NULLS:
+            builder.append(" IGNORE NULLS");
+            break;
+          case RESPECT_NULLS:
+            builder.append(" RESPECT NULLS");
+        }
+      }
+
+      if (analyticExpression.getFuncOrderBy() != null) {
+        builder.append(" ORDER BY ");
+        builder.append(analyticExpression.getFuncOrderBy().stream().map(OrderByElement::toString)
+            .collect(Collectors.joining(", ")));
+      }
+
+      if (analyticExpression.getLimit() != null) {
+        builder.append(analyticExpression.getLimit());
+      }
+      builder.append(" ) ");
+
+      if (analyticExpression.getKeep() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent + 1; j++) {
+          builder.append(indentString);
+        }
+        builder.append(analyticExpression.getKeep()).append(" ");
+      }
+
+      if (analyticExpression.getFilterExpression() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < subIndent + 1; j++) {
+          builder.append(indentString);
+        }
+        builder.append("FILTER ( WHERE ");
+        builder.append(analyticExpression.getFilterExpression());
+        builder.append(" )");
+        if (analyticExpression.getType() != AnalyticType.FILTER_ONLY) {
+          builder.append(" ");
+        }
+      }
+
+      if (analyticExpression.isIgnoreNullsOutside()) {
+        builder.append("IGNORE NULLS ");
+      }
+
+      switch (analyticExpression.getType()) {
+        case FILTER_ONLY:
+          return;
+        case WITHIN_GROUP:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent + 1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("WITHIN GROUP");
+          break;
+        case WITHIN_GROUP_OVER:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent + 1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("WITHIN GROUP ( ");
+          analyticExpression.getWindowDefinition().getOrderBy().toStringOrderByElements(builder);
+          builder.append(" ) OVER ( ");
+          analyticExpression.getWindowDefinition().getPartitionBy().toStringPartitionBy(builder);
+          builder.append(" )");
+          break;
+        default:
+          appendNormalizedLineBreak(builder);
+          for (int j = 0; j < subIndent + 1; j++) {
+            builder.append(indentString);
+          }
+          builder.append("OVER");
+      }
+
+      if (analyticExpression.getWindowName() != null) {
+        builder.append(" ").append(analyticExpression.getWindowName());
+      } else if (analyticExpression.getType() != AnalyticType.WITHIN_GROUP_OVER) {
+        builder.append(" ");
+        builder.append(analyticExpression.getWindowDefinition());
+      }
     } else {
       LOGGER
           .warning("Unhandled expression: " + expression.getClass().getName() + " = " + expression);
@@ -3481,7 +3790,13 @@ public class JSQLFormatter {
         for (int j = 0; j <= indent; j++) {
           builder.append(indentString);
         }
-        appendKeyWord(builder, outputFormat, operation.name(), "", " ");
+        if (operation == AlterOperation.RENAME_TABLE) {
+          appendKeyWord(builder, outputFormat, "RENAME TO", "", " ");
+          appendObjectName(builder, outputFormat, alterExpression.getNewTableName(), "", "");
+          break;
+        } else {
+          appendKeyWord(builder, outputFormat, operation.name(), "", " ");
+        }
 
         if (commentText != null) {
           if (columnName != null) {

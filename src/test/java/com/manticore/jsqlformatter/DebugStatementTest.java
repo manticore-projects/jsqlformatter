@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "select *,a.*, b.*, c.*\n" + "from a, b, c;";
+    String sqlStr = "ALTER TABLE table1\n" + "    RENAME TO table2";
     Statement statement1 = CCJSqlParserUtil.parse(sqlStr);
 
     String formatteredSqlStr = JSQLFormatter.format(sqlStr);

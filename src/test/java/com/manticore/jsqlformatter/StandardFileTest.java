@@ -101,7 +101,7 @@ public class StandardFileTest {
     String sql = COMMENT_PATTERN.matcher(originalSql).replaceAll("");
     if (laxDeparsingCheck) {
       String s = sql.replaceAll("\\n*\\s*;", ";").replaceAll("\\s+", " ")
-          .replaceAll("\\s*([!/,()=+\\-*|\\]<>])\\s*", "$1").toLowerCase().trim();
+          .replaceAll("\\s*([!/,()=+\\-*|\\{\\}\\[\\]<>:])\\s*", "$1").toLowerCase().trim();
       return !s.endsWith(";") ? s + ";" : s;
     } else {
       return sql;

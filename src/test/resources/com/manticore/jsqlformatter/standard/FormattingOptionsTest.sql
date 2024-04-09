@@ -28,10 +28,10 @@ merge into EMPL_CURRENT TAR
   using ( select  EMPNO,
                   ENAME,
                   case
-                      when LEAVEDATE <= SYSDATE
-                        then 'Y'
-                      else 'N'
-                    end as DELETE_FLAG
+                  when LEAVEDATE <= SYSDATE
+                    then 'Y'
+                  else 'N'
+                  end as DELETE_FLAG
           from EMPL ) SRC
     on ( TAR.EMPNO = SRC.EMPNO )
 when not matched then

@@ -1,5 +1,6 @@
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
+
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version 'latest.release'
@@ -12,6 +13,8 @@ plugins {
     id 'com.github.kt3k.coveralls' version "latest.release"
     id "com.github.spotbugs" version "latest.release"
     id "com.diffplug.spotless" version "latest.release"
+    id "org.owasp.dependencycheck" version "latest.release"
+    id "org.sonatype.gradle.plugins.scan" version "latest.release"
 
     // download the RR tools which have no Maven Repository
     id "de.undercouch.download" version "latest.release"
@@ -67,7 +70,12 @@ dependencies {
     // for the ASCII Trees
     implementation 'hu.webarticum:tree-printer:2.+'
     implementation 'com.github.tommyettinger:blazingchain:1.+'
+}
 
+configurations.configureEach {
+    resolutionStrategy {
+        force 'org.apache.commons:commons-text:+'
+    }
 }
 
 def getVersion = { boolean considerSnapshot ->
@@ -117,8 +125,8 @@ description = 'JSQLFormatter'
 java {
     withSourcesJar()
     withJavadocJar()
-    sourceCompatibility(JavaVersion.VERSION_1_8)
-    targetCompatibility(JavaVersion.VERSION_1_8)
+    sourceCompatibility(JavaVersion.VERSION_11)
+    targetCompatibility(JavaVersion.VERSION_11)
 
     // needed for XML-Doclet to work (since Doclet changed again with Java 13)
     toolchain {
@@ -344,7 +352,7 @@ signing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 8
+    options.release = 11
 }
 
 tasks.withType(Test).configureEach {
@@ -437,12 +445,16 @@ tasks.register('renderRR') {
             src 'http://manticore-projects.com/download/convert.war'
             dest "$buildDir/rr/convert.war"
             overwrite false
+            onlyIfModified true
+            tempAndMove true
         }
 
         download.run {
             src 'http://manticore-projects.com/download/rr.war'
             dest "$buildDir/rr/rr.war"
             overwrite false
+            onlyIfModified true
+            tempAndMove true
         }
 
         javaexec {

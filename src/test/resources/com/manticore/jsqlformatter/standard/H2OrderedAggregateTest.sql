@@ -1,12 +1,12 @@
 -- LISTAGG 1
-SELECT LISTAGG(NAME, ', ') WITHIN GROUP (ORDER BY ID)
+SELECT Listagg( name, ', ' )
+            WITHIN GROUP (ORDER BY ID)
 ;
-
 
 -- LISTAGG 2
-SELECT LISTAGG(COALESCE(NAME, 'null'), ', ') WITHIN GROUP (ORDER BY ID)
+SELECT Listagg( Coalesce( name, 'null' ), ', ' )
+            WITHIN GROUP (ORDER BY ID)
 ;
-
 
 -- LISTAGG 3
 /* Unsupported: SELECT LISTAGG(ID, ', ') WITHIN GROUP (ORDER BY ID) OVER (ORDER BY ID); */
@@ -18,11 +18,10 @@ FROM dual
 SELECT Array_Agg( name )
 ;
 
-
 -- ARRAY_AGG 2
-SELECT ARRAY_AGG(NAME ORDER BY ID) FILTER (WHERE NAME IS NOT NULL)
+SELECT Array_Agg( name ORDER BY ID )
+            FILTER ( WHERE NAME IS NOT NULL )
 ;
-
 
 -- ARRAY_AGG 3
 /* SELECT ARRAY_AGG(ID ORDER BY ID) OVER (ORDER BY ID); */
