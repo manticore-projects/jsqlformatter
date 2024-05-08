@@ -10,19 +10,19 @@ Static Binaries
 
   .. code:: Bash
 
-     java -jar JSQLFormatter.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     java -jar JSQLFormatterCLI.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
 .. tab:: Linux Shell
 
   .. code:: Bash
 
-     ./JSQLFormatter [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     ./JSQLFormatterCLI [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
 .. tab:: Windows Power Shell
 
   .. code:: Bash
 
-     JSQLFormatter.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     JSQLFormatterCLI.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
 
 ..........................
 Command Line Options (CLI)
@@ -47,7 +47,7 @@ Command Line Options (CLI)
    
   .. code:: Bash
         
-    java -jar JSQLFormatter.jar "select * from dual;"
+    java -jar JSQLFormatterCLI.jar "select * from dual;"
 
 .. note::
 
@@ -81,7 +81,7 @@ Dynamic Libraries
 
     class Sample {
         public static void main(String[] args) {
-            String formattedSql = JSqlFormatter.format("select * fromd dual;");
+            String formattedSql = JSqlFormatter.format("select * from dual;");
         }
     }
 

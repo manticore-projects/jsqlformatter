@@ -48,33 +48,25 @@ configurations {
 
 dependencies {
     implementation('com.github.jsqlparser:jsqlparser:+'){ changing = true }
-    // Java Doc in XML Format
-    xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
-
-    implementation 'commons-cli:commons-cli:+'
     implementation 'com.diogonunes:JColor:+'
 
-    // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
-    implementation 'org.graalvm.sdk:graal-sdk:22.+'
-
-    implementation 'commons-io:commons-io:+'
-    implementation 'com.github.julianthome:inmemantlr-api:+'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.+'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.+'
 
     // for the RR Tools
-    implementation 'org.jsoup:jsoup:+'
     compileOnly 'net.sf.saxon:Saxon-HE:+'
 
-    // for the ASCII Trees
-    implementation 'hu.webarticum:tree-printer:2.+'
-    implementation 'com.github.tommyettinger:blazingchain:1.+'
+    // Java Doc in XML Format
+    xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
 }
 
 configurations.configureEach {
-    resolutionStrategy {
-        force 'org.apache.commons:commons-text:+'
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'com.github.jsqlparser') {
+            // Check for updates every build
+            resolutionStrategy.cacheChangingModulesFor 30, 'seconds'
+        }
     }
 }
 
