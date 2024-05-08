@@ -890,7 +890,7 @@ public class JSQLFormatter {
               CCJSqlParserUtil.parse(CCJSqlParserUtil.sanitizeSingleSql(statementSql),
                   parser -> parser.withSquareBracketQuotation(useSquareBracketQuotation)
                       .withBackslashEscapeCharacter(useBackSlashQuoting).withTimeOut(60000)
-                      .withUnsupportedStatements());
+                      .withUnsupportedStatements(false));
 
           if (statement instanceof Select) {
             Select select = (Select) statement;
@@ -1131,7 +1131,7 @@ public class JSQLFormatter {
         builder.append(indentString);
       }
       appendKeyWord(builder, outputFormat, "ON", "", " ");
-      appendExpression(onExpression, null, builder, indent, 0, 1, false, BreakLine.AS_NEEDED);
+      appendExpression(onExpression, null, builder, indent + 2, 0, 1, false, BreakLine.AS_NEEDED);
 
       appendNormalizingTrailingWhiteSpace(builder, " ");
     }
@@ -2476,19 +2476,19 @@ public class JSQLFormatter {
       // Abstract Class, call last and let the specific implementations catch first
     } else if (expression instanceof BinaryExpression) {
       BinaryExpression binaryExpression = (BinaryExpression) expression;
-      appendExpression(binaryExpression.getLeftExpression(), null, builder, indent + 1, i, n, false,
+      appendExpression(binaryExpression.getLeftExpression(), null, builder, indent, i, n, false,
           BreakLine.NEVER);
 
       if ((i > 0 || breakLine.equals(BreakLine.ALWAYS)) && !breakLine.equals(BreakLine.NEVER)) {
         appendNormalizedLineBreak(builder);
-        for (int j = 0; j <= indent + 1; j++) {
+        for (int j = 0; j <= indent; j++) {
           builder.append(indentString);
         }
       }
       appendOperator(builder, outputFormat, binaryExpression.getStringExpression(), " ", " ");
 
-      appendExpression(binaryExpression.getRightExpression(), null, builder, indent + 1, i, n,
-          false, BreakLine.NEVER);
+      appendExpression(binaryExpression.getRightExpression(), null, builder, indent, i, n, false,
+          BreakLine.NEVER);
 
     } else if (expression instanceof ExpressionList) {
       ExpressionList<?> expressions = (ExpressionList<?>) expression;
@@ -2782,11 +2782,12 @@ public class JSQLFormatter {
 
   private static void appendExpressionList(ExpressionList<?> expressionList, StringBuilder builder,
       int indent, BreakLine breakLine) {
+    int subIndent = indent;
     if (expressionList instanceof ParenthesedExpressionList) {
       builder.append("( ");
-      indent++;
+      subIndent++;
     }
-    appendExpressionsList(expressionList, builder, indent, breakLine);
+    appendExpressionsList(expressionList, builder, subIndent, breakLine);
     if (expressionList instanceof ParenthesedExpressionList) {
       builder.append(" )");
     }
@@ -2805,8 +2806,7 @@ public class JSQLFormatter {
         case AS_NEEDED:
           BreakLine bl =
               size == 4 || size >= 5 && i % 3 == 0 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
-          appendExpression(expression, null, builder, subIndent, i, expressions.size(), true,
-              bl);
+          appendExpression(expression, null, builder, subIndent, i, expressions.size(), true, bl);
           break;
 
         default:

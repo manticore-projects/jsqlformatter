@@ -364,7 +364,7 @@ WITH ex AS (
 SELECT /*+ PARALLEL */
     a.code code
     , Lpad( ' ', 4 * ( a.gl_level - 1 ), ' ' )
-             || a.code format_code
+         || a.code format_code
     , b.description
     , c.balance_bc
     , c1.balance_bc
@@ -437,6 +437,7 @@ SELECT *
 FROM teststmt
 ;
 
+-- UNION
 (
     SELECT __time
     FROM traffic_protocol_stat_log
@@ -469,3 +470,4 @@ FROM sales
 ORDER BY    qtysold DESC
             , sellerid
 ;
+

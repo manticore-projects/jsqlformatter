@@ -19,18 +19,27 @@ package com.manticore.jsqlformatter;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.Select;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "ALTER TABLE table1\n" + "    RENAME TO table2";
-    Statement statement1 = CCJSqlParserUtil.parse(sqlStr);
+    String sqlStr = "-- GROUP BY\n" + "SELECT  a\n" + "        , b\n" + "        , c\n"
+        + "        , Sum( d )\n" + "FROM t\n" + "GROUP BY    a\n" + "            , b\n"
+        + "            , c\n" + "HAVING Sum( d ) > 0\n" + "    AND Count( * ) > 1\n" + ";";
+    Statement statement1 =
+        CCJSqlParserUtil.parse(sqlStr, parser -> parser.withUnsupportedStatements(false));
+
+    Assertions.assertInstanceOf(Select.class, statement1);
 
     String formatteredSqlStr = JSQLFormatter.format(sqlStr);
     System.out.println(formatteredSqlStr);
-    Statement statement2 = CCJSqlParserUtil.parse(formatteredSqlStr);
+    Statement statement2 = CCJSqlParserUtil.parse(formatteredSqlStr,
+        parser -> parser.withUnsupportedStatements(false));
+
+    Assertions.assertInstanceOf(Select.class, statement2);
 
     Assertions.assertEquals(statement1.toString().toLowerCase(),
         statement2.toString().toLowerCase());

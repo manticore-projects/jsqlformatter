@@ -4,15 +4,15 @@ WITH p AS (
             value_date
         FROM risk.migration_data_v
         WHERE ( :ID_PORTFOLIO IS NULL
-                    OR :ID_PORTFOLIO = ''
-                    OR id_portfolio = Decode( :ID_PORTFOLIO
-                                                , '001', 'IFRS1'
-                                                , '002', 'IFRS2'
-                                                , '003', 'IFRS3'
-                                                , '004', 'IFRS4'
-                                                , '005', 'IFRS5'
-                                                , '006', 'IFRS6'
-                                                , :ID_PORTFOLIO ) )
+                OR :ID_PORTFOLIO = ''
+                OR id_portfolio = Decode( :ID_PORTFOLIO
+                                            , '001', 'IFRS1'
+                                            , '002', 'IFRS2'
+                                            , '003', 'IFRS3'
+                                            , '004', 'IFRS4'
+                                            , '005', 'IFRS5'
+                                            , '006', 'IFRS6'
+                                            , :ID_PORTFOLIO ) )
             AND value_date >= :FROM
             AND value_date <= :TO )
     , ri AS (
@@ -147,9 +147,9 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , c.amortised_cost_dirty
         , c.amortised_cost_dirty_bc
         , c.nominal_balance
-                 + c.receivable_principal nominal_balance
+             + c.receivable_principal nominal_balance
         , c.nominal_balance_bc
-                 + c.receivable_principal_bc nominal_balance_bc
+             + c.receivable_principal_bc nominal_balance_bc
         , c.open_commitment
         , c.open_commitment_bc
         , coll.description collaterals
@@ -193,21 +193,21 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
                             , '0', 'C' )
             END impairment_is_specific
         , d.impairment
-                 + d.impairment_spec impairment
+             + d.impairment_spec impairment
         , d.impairment_bc
-                 + d.impairment_spec_bc impairment_bc
+             + d.impairment_spec_bc impairment_bc
         , d.impairment_contingent impairment_contingent
         , d.impairment_contingent_bc impairment_contingent_bc
         , d.unwinding unwinding
         , d.unwinding_bc unwinding_bc
         , d.impairment_spec_d
-                 + d.unwinding_d impairment_spec_d
+             + d.unwinding_d impairment_spec_d
         , d.impairment_spec_d_bc
-                 + d.unwinding_d_bc impairment_spec_d_bc
+             + d.unwinding_d_bc impairment_spec_d_bc
         , d.impairment_d
-                 + d.impairment_contingent_d impairment_d
+             + d.impairment_contingent_d impairment_d
         , d.impairment_d_bc
-                 + d.impairment_contingent_d_bc impairment_d_bc
+             + d.impairment_contingent_d_bc impairment_d_bc
         , d.unwinding_d unwinding_d
         , d.unwinding_d_bc unwinding_d_bc
         , e.id_portfolio
@@ -301,14 +301,14 @@ FROM ex
                     OR ( p10.period_scalar = 360
                             AND p10.id_period_type = 'M' ) )
 WHERE ( amortised_cost_dirty < 0
-            OR ( amortised_cost_dirty = 0
-                    AND open_commitment <= 0 )
-            OR impairment != 0
-            OR impairment_d != 0
-            OR impairment_spec != 0
-            OR impairment_spec_d != 0
-            OR impairment_contingent != 0
-            OR impairment_contingent_d != 0 )
+        OR ( amortised_cost_dirty = 0
+                AND open_commitment <= 0 )
+        OR impairment != 0
+        OR impairment_d != 0
+        OR impairment_spec != 0
+        OR impairment_spec_d != 0
+        OR impairment_contingent != 0
+        OR impairment_contingent_d != 0 )
     AND NOT ( id_instrument_type IN ( 'own_acc', 'sec_hft', 'sec_hft_set' )
                 OR ( f2.attribute_value IS NOT NULL
                         AND f2.attribute_value IN ( 'GOVBONDS', 'TBILL' /*CBN Issues*/ ) )
@@ -482,9 +482,9 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
         , c.amortised_cost_dirty
         , c.amortised_cost_dirty_bc
         , c.nominal_balance
-                 + c.receivable_principal nominal_balance
+             + c.receivable_principal nominal_balance
         , c.nominal_balance_bc
-                 + c.receivable_principal_bc nominal_balance_bc
+             + c.receivable_principal_bc nominal_balance_bc
         , c.open_commitment
         , c.open_commitment_bc
         , coll.description collaterals
@@ -528,21 +528,21 @@ SELECT  Coalesce( cp.id_counterparty, g2.attribute_value ) id_counterparty
                             , '0', 'C' )
             END impairment_is_specific
         , d.impairment
-                 + d.impairment_spec impairment
+             + d.impairment_spec impairment
         , d.impairment_bc
-                 + d.impairment_spec_bc impairment_bc
+             + d.impairment_spec_bc impairment_bc
         , d.impairment_contingent impairment_contingent
         , d.impairment_contingent_bc impairment_contingent_bc
         , d.unwinding unwinding
         , d.unwinding_bc unwinding_bc
         , d.impairment_spec_d
-                 + d.unwinding_d impairment_spec_d
+             + d.unwinding_d impairment_spec_d
         , d.impairment_spec_d_bc
-                 + d.unwinding_d_bc impairment_spec_d_bc
+             + d.unwinding_d_bc impairment_spec_d_bc
         , d.impairment_d
-                 + d.impairment_contingent_d impairment_d
+             + d.impairment_contingent_d impairment_d
         , d.impairment_d_bc
-                 + d.impairment_contingent_d_bc impairment_d_bc
+             + d.impairment_contingent_d_bc impairment_d_bc
         , d.unwinding_d unwinding_d
         , d.unwinding_d_bc unwinding_d_bc
         , e.id_portfolio
@@ -636,14 +636,14 @@ FROM ex
                     OR ( p10.period_scalar = 360
                             AND p10.id_period_type = 'M' ) )
 WHERE ( amortised_cost_dirty < 0
-            OR ( amortised_cost_dirty = 0
-                    AND open_commitment <= 0 )
-            OR impairment != 0
-            OR impairment_d != 0
-            OR impairment_spec != 0
-            OR impairment_spec_d != 0
-            OR impairment_contingent != 0
-            OR impairment_contingent_d != 0 )
+        OR ( amortised_cost_dirty = 0
+                AND open_commitment <= 0 )
+        OR impairment != 0
+        OR impairment_d != 0
+        OR impairment_spec != 0
+        OR impairment_spec_d != 0
+        OR impairment_contingent != 0
+        OR impairment_contingent_d != 0 )
     AND NOT ( id_instrument_type IN ( 'own_acc', 'sec_hft', 'sec_hft_set' )
                 OR ( f2.attribute_value IS NOT NULL
                         AND f2.attribute_value IN ( 'GOVBONDS', 'TBILL' /*CBN Issues*/ ) )

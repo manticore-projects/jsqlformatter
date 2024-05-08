@@ -196,6 +196,14 @@ jacocoTestReport {
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
     }
+    // Jacoco can't handle the TokenManager class
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "**CCJSqlParserTokenManager**"
+            ])
+        }))
+    }
 }
 jacocoTestCoverageVerification {
     violationRules {
