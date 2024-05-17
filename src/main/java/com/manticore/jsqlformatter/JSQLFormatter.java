@@ -3702,7 +3702,7 @@ public class JSQLFormatter {
                 "objectSpelling"), SEPARATION("separation"), INDENT_WIDTH(
                     "indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
 
-    private final String optionName;
+    public final String optionName;
 
     FormattingOption(String optionName) {
       this.optionName = optionName;
