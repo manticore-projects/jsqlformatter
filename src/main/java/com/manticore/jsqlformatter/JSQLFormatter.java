@@ -148,20 +148,21 @@ public class JSQLFormatter {
       "(((?!\\[\\d+])\\[.*]\\.\\.?)|(\\.\\[\\w+( +\\w+)*])|((?!\\s\\[\\d+])\\s\\[\\w+( +\\w+)*]))");
 
   private static final Logger LOGGER = Logger.getLogger(JSQLFormatter.class.getName());
-  private static final AnsiFormat ANSI_FORMAT_LINE_NUMBER =
+  public static final AnsiFormat ANSI_FORMAT_LINE_NUMBER =
       new AnsiFormat(Attribute.BRIGHT_BLACK_BACK(), Attribute.DESATURATED());
-  private static final AnsiFormat ANSI_FORMAT_KEYWORD =
+  public static final AnsiFormat ANSI_FORMAT_KEYWORD =
       new AnsiFormat(Attribute.BLUE_TEXT(), Attribute.BOLD());
-  private static final AnsiFormat ANSI_FORMAT_HINT = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT());
-  private static final AnsiFormat ANSI_FORMAT_OPERATOR = new AnsiFormat(Attribute.BLUE_TEXT());
-  private static final AnsiFormat ANSI_FORMAT_PARAMETER =
+  public static final AnsiFormat ANSI_FORMAT_HINT = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT());
+  public static final AnsiFormat ANSI_FORMAT_OPERATOR = new AnsiFormat(Attribute.BLUE_TEXT());
+  public static final AnsiFormat ANSI_FORMAT_PARAMETER =
       new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
-  private static final AnsiFormat ANSI_FORMAT_ALIAS =
+  public static final AnsiFormat ANSI_FORMAT_ALIAS =
       new AnsiFormat(Attribute.RED_TEXT(), Attribute.BOLD(), Attribute.DESATURATED());
-  private static final AnsiFormat ANSI_FORMAT_FUNCTION =
+  public static final AnsiFormat ANSI_FORMAT_FUNCTION =
       new AnsiFormat(Attribute.BRIGHT_RED_TEXT());
-  private static final AnsiFormat ANSI_FORMAT_TYPE =
+  public static final AnsiFormat ANSI_FORMAT_TYPE =
       new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
+
   private static SquaredBracketQuotation squaredBracketQuotation = SquaredBracketQuotation.AUTO;
   private static Separation separation = Separation.BEFORE;
   private static Spelling keywordSpelling = Spelling.UPPER;
