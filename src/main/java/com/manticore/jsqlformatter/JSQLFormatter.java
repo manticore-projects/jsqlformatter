@@ -158,8 +158,7 @@ public class JSQLFormatter {
       new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
   public static final AnsiFormat ANSI_FORMAT_ALIAS =
       new AnsiFormat(Attribute.RED_TEXT(), Attribute.BOLD(), Attribute.DESATURATED());
-  public static final AnsiFormat ANSI_FORMAT_FUNCTION =
-      new AnsiFormat(Attribute.BRIGHT_RED_TEXT());
+  public static final AnsiFormat ANSI_FORMAT_FUNCTION = new AnsiFormat(Attribute.BRIGHT_RED_TEXT());
   public static final AnsiFormat ANSI_FORMAT_TYPE =
       new AnsiFormat(Attribute.YELLOW_TEXT(), Attribute.DESATURATED());
 
@@ -1821,6 +1820,18 @@ public class JSQLFormatter {
     }
   }
 
+  public static void appendColumnSelectItemList(List<SelectItem<Column>> selectItems,
+      StringBuilder builder, int subIndent, int i, BreakLine bl, int indent)
+      throws UnsupportedOperationException {
+    int j = i;
+    for (SelectItem<?> selectItem : selectItems) {
+      Alias alias = selectItem.getAlias();
+      Expression expression = selectItem.getExpression();
+
+      appendExpression(expression, alias, builder, subIndent, j++, selectItems.size(), true, bl);
+    }
+  }
+
   @SuppressWarnings({"PMD.CyclomaticComplexity"})
   private static void appendOrderByElements(List<OrderByElement> orderByElements,
       StringBuilder builder, int indent) {
@@ -2501,7 +2512,7 @@ public class JSQLFormatter {
 
       if (allTableColumns.getExceptColumns() != null
           && !allTableColumns.getExceptColumns().isEmpty()) {
-        appendKeyWord(builder, outputFormat, "EXCEPT", " ", "( ");
+        appendKeyWord(builder, outputFormat, allTableColumns.getExceptKeyword(), " ", "( ");
         appendExpressionsList(allTableColumns.getExceptColumns(), builder, indent,
             BreakLine.AS_NEEDED);
         builder.append(" )");
@@ -2511,7 +2522,7 @@ public class JSQLFormatter {
           && !allTableColumns.getReplaceExpressions().isEmpty()) {
         appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
         int subIndent = getSubIndent(builder, allTableColumns.getReplaceExpressions().size() > 3);
-        appendSelectItemList(allTableColumns.getReplaceExpressions(), builder, subIndent, i,
+        appendColumnSelectItemList(allTableColumns.getReplaceExpressions(), builder, subIndent, i,
             BreakLine.AS_NEEDED, indent);
         builder.append(" )");
       }
@@ -2520,7 +2531,7 @@ public class JSQLFormatter {
       appendObjectName(builder, outputFormat, "*", "", "");
 
       if (allColumns.getExceptColumns() != null && !allColumns.getExceptColumns().isEmpty()) {
-        appendKeyWord(builder, outputFormat, "EXCEPT", " ", "( ");
+        appendKeyWord(builder, outputFormat, allColumns.getExceptKeyword(), " ", "( ");
         appendExpressionsList(allColumns.getExceptColumns(), builder, indent, BreakLine.AS_NEEDED);
         builder.append(" )");
       }
@@ -2529,7 +2540,7 @@ public class JSQLFormatter {
           && !allColumns.getReplaceExpressions().isEmpty()) {
         appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
         int subIndent = getSubIndent(builder, allColumns.getReplaceExpressions().size() > 3);
-        appendSelectItemList(allColumns.getReplaceExpressions(), builder, subIndent, i,
+        appendColumnSelectItemList(allColumns.getReplaceExpressions(), builder, subIndent, i,
             BreakLine.AS_NEEDED, indent);
         builder.append(" )");
       }

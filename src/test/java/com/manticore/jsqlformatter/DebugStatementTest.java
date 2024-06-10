@@ -26,9 +26,7 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "-- GROUP BY\n" + "SELECT  a\n" + "        , b\n" + "        , c\n"
-        + "        , Sum( d )\n" + "FROM t\n" + "GROUP BY    a\n" + "            , b\n"
-        + "            , c\n" + "HAVING Sum( d ) > 0\n" + "    AND Count( * ) > 1\n" + ";";
+    String sqlStr = "SELECT sales.* EXCLUDE( a, b, c )\n" + "FROM sales\n" + ";";
     Statement statement1 =
         CCJSqlParserUtil.parse(sqlStr, parser -> parser.withUnsupportedStatements(false));
 
