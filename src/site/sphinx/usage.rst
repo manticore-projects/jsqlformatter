@@ -10,19 +10,19 @@ Static Binaries
 
   .. code:: Bash
 
-     java -jar JSQLFormatterCLI.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     java -jar JSQLFormatterCLI.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
 
 .. tab:: Linux Shell
 
   .. code:: Bash
 
-     ./JSQLFormatterCLI [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     ./JSQLFormatterCLI [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
 
 .. tab:: Windows Power Shell
 
   .. code:: Bash
 
-     JSQLFormatterCLI.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] --squareBracketQuotation <arg>
+     JSQLFormatterCLI.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>] 
 
 ..........................
 Command Line Options (CLI)
@@ -39,7 +39,8 @@ Command Line Options (CLI)
 --objectSpelling <arg>          Spelling of object names. [UPPER* LOWER CAMEL KEEP]
 --functionSpelling <arg>        Spelling of function names. [UPPER* LOWER CAMEL KEEP]
 --separation <arg>              Position of the field separator. [BEFORE* AFTER]
---squareBracketQuotation <arg>  Interpret Square Brackets "[]" as quotes instead of arrays. [AUTO* YES NO] 
+--squareBracketQuotation <arg>  Interpret Square Brackets "[]" as quotes instead of arrays. [AUTO* YES NO]
+--statementTerminator <arg>     Set the statement terminator. [SEMICOLON* NONE GO BACKSLASH]
  
 .. note::
 

@@ -1,6 +1,6 @@
 /**
  * Manticore Projects JSQLFormatter is a SQL Beautifying and Formatting Software.
- * Copyright (C) 2023 Andreas Reichel <andreas@manticore-projects.com>
+ * Copyright (C) 2024 Andreas Reichel <andreas@manticore-projects.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -169,6 +169,7 @@ public class JSQLFormatter {
   private static Spelling objectSpelling = Spelling.LOWER;
   private static OutputFormat outputFormat = OutputFormat.PLAIN;
   private static ShowLineNumbers showLineNumbers = ShowLineNumbers.NO;
+  private static StatementTerminator statementTerminator = StatementTerminator.SEMICOLON;
 
   private static BackSlashQuoting backSlashQuoting = BackSlashQuoting.NO;
   private static int indentWidth = 4;
@@ -189,6 +190,14 @@ public class JSQLFormatter {
 
   public static void setBackSlashQuoting(BackSlashQuoting backSlashQuoting) {
     JSQLFormatter.backSlashQuoting = backSlashQuoting;
+  }
+
+  public static StatementTerminator getStatementTerminator() {
+    return statementTerminator;
+  }
+
+  public static void setStatementTerminator(StatementTerminator statementTerminator) {
+    JSQLFormatter.statementTerminator = statementTerminator;
   }
 
   public static Separation getSeparation() {
@@ -940,7 +949,21 @@ public class JSQLFormatter {
                   "The " + statement.getClass().getName() + " Statement is not supported yet.");
             }
           }
-          appendNormalizedLineBreak(statementBuilder).append(";\n");
+
+          switch (statementTerminator) {
+            case SEMICOLON:
+              appendNormalizedLineBreak(statementBuilder).append(";\n");
+              break;
+            case NONE:
+              appendNormalizedLineBreak(statementBuilder).append("\n\n");
+              break;
+            case GO:
+              appendNormalizedLineBreak(statementBuilder).append("GO\n");
+              break;
+            case BACKSLASH:
+              appendNormalizedLineBreak(statementBuilder).append("\\\n");
+              break;
+          }
 
           builder.append(commentMap.isEmpty() ? statementBuilder
               : commentMap.insertComments(statementBuilder, outputFormat));
@@ -1076,6 +1099,13 @@ public class JSQLFormatter {
             } catch (Exception ex) {
               LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
             }
+          } else if (key.equalsIgnoreCase(FormattingOption.STATEMENT_TERMINATOR.toString())) {
+            try {
+              statementTerminator = StatementTerminator.valueOf(value.toUpperCase());
+            } catch (Exception ex) {
+              LOGGER.log(Level.WARNING, "Formatting Option {0} does not support {1} ", o);
+            }
+
           } else {
             LOGGER.log(Level.WARNING, "Unknown Formatting Option {0} = {1} ", o);
           }
@@ -3706,12 +3736,32 @@ public class JSQLFormatter {
     YES, NO
   }
 
+  public enum StatementTerminator {
+    SEMICOLON, NONE, GO, BACKSLASH
+  }
+
   public enum FormattingOption {
-    SQUARE_BRACKET_QUOTATION("squareBracketQuotation"), BACKSLASH_QUOTING(
-        "backSlashQuoting"), OUTPUT_FORMAT("outputFormat"), KEYWORD_SPELLING(
-            "keywordSpelling"), FUNCTION_SPELLING("functionSpelling"), OBJECT_SPELLING(
-                "objectSpelling"), SEPARATION("separation"), INDENT_WIDTH(
-                    "indentWidth"), SHOW_LINE_NUMBERS("showLineNumbers");
+    SQUARE_BRACKET_QUOTATION("squareBracketQuotation")
+
+    , BACKSLASH_QUOTING("backSlashQuoting")
+
+    , OUTPUT_FORMAT("outputFormat")
+
+    , KEYWORD_SPELLING("keywordSpelling")
+
+    , FUNCTION_SPELLING("functionSpelling")
+
+    , OBJECT_SPELLING("objectSpelling")
+
+    , SEPARATION("separation")
+
+    , INDENT_WIDTH("indentWidth")
+
+    , SHOW_LINE_NUMBERS("showLineNumbers")
+
+    , STATEMENT_TERMINATOR("statementTerminator")
+
+    ;
 
     public final String optionName;
 

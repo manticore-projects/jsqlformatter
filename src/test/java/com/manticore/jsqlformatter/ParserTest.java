@@ -24,6 +24,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -65,7 +66,7 @@ public class ParserTest {
         "SELECT * FROM test WHERE aaa = 1 or bbb = 2 and case when ccc = 3 then 4 else 5 end = 6";
     Statement statement = CCJSqlParserUtil.parse(sqlStr);
 
-    ExpressionVisitorAdapter expressionVisitorAdapter = new ExpressionVisitorAdapter() {
+    ExpressionVisitorAdapter<?> expressionVisitorAdapter = new ExpressionVisitorAdapter<>() {
       @Override
       public void visit(OrExpression orExpression) {
         super.visit(orExpression);
@@ -79,17 +80,17 @@ public class ParserTest {
       }
     };
 
-    SelectVisitorAdapter selectVisitorAdapter = new SelectVisitorAdapter() {
+    SelectVisitorAdapter<?> selectVisitorAdapter = new SelectVisitorAdapter<>() {
       @Override
       public void visit(PlainSelect plainSelect) {
         plainSelect.getWhere().accept(expressionVisitorAdapter);
       }
     };
 
-    StatementVisitorAdapter statementVisitorAdapter = new StatementVisitorAdapter() {
+    StatementVisitorAdapter<?> statementVisitorAdapter = new StatementVisitorAdapter<>() {
       @Override
       public void visit(Select select) {
-        select.accept(selectVisitorAdapter);
+        select.accept((StatementVisitor<?>) selectVisitorAdapter);
       }
     };
 
