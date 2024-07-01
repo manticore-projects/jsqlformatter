@@ -49,9 +49,9 @@ dependencies {
     implementation('com.github.jsqlparser:jsqlparser:+'){ changing = true }
     implementation 'com.diogonunes:JColor:+'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:+'
 
     // Java Doc in XML Format
     xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
