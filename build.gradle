@@ -106,7 +106,7 @@ def getVersion = { boolean considerSnapshot ->
             ? "${major}.${minor}.${patch}${snapshot}"
             :  "${major}.${minor}${snapshot}"
 }
-version = getVersion(true)
+version = getVersion(false)
 group = 'com.manticore-projects.jsqlformatter'
 description = 'JSQLFormatter'
 
@@ -332,6 +332,7 @@ publishing {
 }
 
 signing {
+    required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
     sign publishing.publications.mavenJava
 }
 
