@@ -65,6 +65,7 @@ import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionLi
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.ExplainStatement;
 import net.sf.jsqlparser.statement.OutputClause;
 import net.sf.jsqlparser.statement.ReferentialAction;
 import net.sf.jsqlparser.statement.Statement;
@@ -127,6 +128,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -623,12 +625,12 @@ public class JSQLFormatter {
 
   @SuppressWarnings({"PMD.CyclomaticComplexity"})
   private static void appendDelete(StringBuilder builder, Delete delete, int indent) {
-    List<WithItem> withItems = delete.getWithItemsList();
+    List<WithItem<?>> withItems = delete.getWithItemsList();
     if (withItems != null && !withItems.isEmpty()) {
       int i = 0;
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
-      for (WithItem withItem : withItems) {
+      for (WithItem<?> withItem : withItems) {
         appendWithItem(withItem, builder, indent, i, withItems.size());
         i++;
       }
@@ -941,6 +943,26 @@ public class JSQLFormatter {
             Alter alter = (Alter) statement;
             appendAlter(statementBuilder, alter, indent);
 
+          } else if (statement instanceof ExplainStatement) {
+            ExplainStatement explainStatement = (ExplainStatement) statement;
+            appendNormalizedLineBreak(builder);
+            appendKeyWord(builder, outputFormat, explainStatement.getKeyword(), "", " ");
+
+            if (explainStatement.getTable() == null) {
+
+              final LinkedHashMap<ExplainStatement.OptionType, ExplainStatement.Option> options1 =
+                  explainStatement.getOptions();
+              if (options1 != null && !options1.isEmpty()) {
+                builder.append(options1.values().stream().map(ExplainStatement.Option::formatOption)
+                    .collect(Collectors.joining(" ")));
+              }
+              appendSelect(explainStatement.getStatement(), builder, indent, true, false);
+
+            } else {
+              appendTable(explainStatement.getTable(), explainStatement.getTable().getAlias(),
+                  builder);
+            }
+
           } else if (statement != null) {
             try {
               statementBuilder.append("\n").append(statement);
@@ -1119,12 +1141,12 @@ public class JSQLFormatter {
 
   private static void appendMerge(StringBuilder builder, Merge merge, int indent) {
 
-    List<WithItem> withItems = merge.getWithItemsList();
+    List<WithItem<?>> withItems = merge.getWithItemsList();
     if (withItems != null && !withItems.isEmpty()) {
       int i = 0;
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
-      for (WithItem withItem : withItems) {
+      for (WithItem<?> withItem : withItems) {
         appendWithItem(withItem, builder, indent, i, withItems.size());
         i++;
       }
@@ -1330,12 +1352,12 @@ public class JSQLFormatter {
   }
 
   private static void appendInsert(StringBuilder builder, Insert insert, int indent) {
-    List<WithItem> withItems = insert.getWithItemsList();
+    List<WithItem<?>> withItems = insert.getWithItemsList();
     if (withItems != null && !withItems.isEmpty()) {
       int i = 0;
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
-      for (WithItem withItem : withItems) {
+      for (WithItem<?> withItem : withItems) {
         appendWithItem(withItem, builder, indent, i, withItems.size());
         i++;
       }
@@ -1372,12 +1394,12 @@ public class JSQLFormatter {
   }
 
   private static void appendUpdate(StringBuilder builder, Update update, int indent) {
-    List<WithItem> withItems = update.getWithItemsList();
+    List<WithItem<?>> withItems = update.getWithItemsList();
     if (withItems != null && !withItems.isEmpty()) {
       int i = 0;
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
-      for (WithItem withItem : withItems) {
+      for (WithItem<?> withItem : withItems) {
         appendWithItem(withItem, builder, indent, i, withItems.size());
         i++;
       }
@@ -1464,7 +1486,7 @@ public class JSQLFormatter {
   private static void appendSelect(Select select, StringBuilder builder, int indent,
       boolean breakLineBefore, boolean indentFirstLine) {
 
-    List<WithItem> withItems = select.getWithItemsList();
+    List<WithItem<?>> withItems = select.getWithItemsList();
     if (withItems != null && !withItems.isEmpty()) {
       int i = 0;
       if (breakLineBefore) {
@@ -1475,7 +1497,7 @@ public class JSQLFormatter {
       }
       appendKeyWord(builder, outputFormat, "WITH", "", " ");
 
-      for (WithItem withItem : withItems) {
+      for (WithItem<?> withItem : withItems) {
         appendWithItem(withItem, builder, indent, i, withItems.size());
         i++;
       }
