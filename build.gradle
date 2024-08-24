@@ -20,7 +20,7 @@ plugins {
     id 'org.hidetake.ssh' version "latest.release"
     id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
-    id "com.nwalsh.gradle.saxon.saxon-gradle" version "0.9.6"
+    id "com.nwalsh.gradle.saxon.saxon-gradle" version "0.10.7"
 }
 
 repositories {
