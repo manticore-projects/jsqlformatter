@@ -54,9 +54,9 @@ Java SQL Formatter, Beautifier and Pretty Printer. Please visit our [Website](ht
 * simple usage of the Java library
 
     ```java
-    import com.manticore.jsqlformatter.JSqlFormatter;
+    import com.manticore.jsqlformatter.JSQLFormatter;
     ...
-    String formattedSql = JSqlFormatter.format("SELECT * FROM table1")
+    String formattedSql = JSQLFormatter.format("SELECT * FROM table1")
     ```
 
     with Maven Artifact:
