@@ -26,7 +26,7 @@ jobs:
         distribution: 'temurin'
     - id: check
       name: Build with Gradle
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@main
       with:
         arguments: check jacocoTestReport jacocoTestCoverageVerification coveralls
       env:
@@ -54,7 +54,7 @@ jobs:
       # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
       # the publishing section of your build.gradle
     - name: Publish to SonaType and/or Github packages
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@main
       with:
         arguments: publish
       env:
