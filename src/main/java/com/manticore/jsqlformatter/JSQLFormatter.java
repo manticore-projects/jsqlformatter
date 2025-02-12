@@ -1660,6 +1660,22 @@ public class JSQLFormatter {
         }
       }
 
+      if (plainSelect.getPivot() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) {
+          builder.append(indentString);
+        }
+        builder.append(plainSelect.getPivot());
+      }
+
+      if (plainSelect.getUnPivot() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) {
+          builder.append(indentString);
+        }
+        builder.append(plainSelect.getUnPivot());
+      }
+
       // @todo: write-out FOR CLAUSE
       if (plainSelect.getForClause() != null) {
         plainSelect.getForClause().appendTo(builder);
@@ -1858,6 +1874,22 @@ public class JSQLFormatter {
       appendSelect(parenthesedSelect.getSelect(), builder, subIndent, breakLineBefore,
           indentFirstLine);
       builder.append(" )");
+
+      if (parenthesedSelect.getPivot() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) {
+          builder.append(indentString);
+        }
+        builder.append(parenthesedSelect.getPivot());
+      }
+
+      if (parenthesedSelect.getUnPivot() != null) {
+        appendNormalizedLineBreak(builder);
+        for (int j = 0; j < indent; j++) {
+          builder.append(indentString);
+        }
+        builder.append(parenthesedSelect.getUnPivot());
+      }
     }
   }
 
@@ -2574,7 +2606,7 @@ public class JSQLFormatter {
           && !allTableColumns.getReplaceExpressions().isEmpty()) {
         appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
         int subIndent = getSubIndent(builder, allTableColumns.getReplaceExpressions().size() > 3);
-        appendColumnSelectItemList(allTableColumns.getReplaceExpressions(), builder, subIndent, i,
+        appendSelectItemList(allTableColumns.getReplaceExpressions(), builder, subIndent, i,
             BreakLine.AS_NEEDED, indent);
         builder.append(" )");
       }
@@ -2592,7 +2624,7 @@ public class JSQLFormatter {
           && !allColumns.getReplaceExpressions().isEmpty()) {
         appendKeyWord(builder, outputFormat, "REPLACE", " ", "( ");
         int subIndent = getSubIndent(builder, allColumns.getReplaceExpressions().size() > 3);
-        appendColumnSelectItemList(allColumns.getReplaceExpressions(), builder, subIndent, i,
+        appendSelectItemList(allColumns.getReplaceExpressions(), builder, subIndent, i,
             BreakLine.AS_NEEDED, indent);
         builder.append(" )");
       }
