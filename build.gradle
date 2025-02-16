@@ -1,5 +1,11 @@
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
+import com.nwalsh.gradle.saxon.SaxonXsltTask
 
+buildscript {
+    dependencies {
+        classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '12.5'
+    }
+}
 
 plugins {
     id 'java'
@@ -19,8 +25,8 @@ plugins {
     id "de.undercouch.download" version "latest.release"
     id 'org.hidetake.ssh' version "latest.release"
     id "com.github.hierynomus.license" version "latest.release"
-    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "2.0.0" //later depends on JDK 17
-    id "com.nwalsh.gradle.saxon.saxon-gradle" version "0.9.6"
+    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
+    id "com.nwalsh.gradle.saxon.saxon-gradle" version "latest.release"
 }
 
 repositories {
@@ -49,12 +55,12 @@ dependencies {
     implementation('com.github.jsqlparser:jsqlparser:+'){ changing = true }
     implementation 'com.diogonunes:JColor:+'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.+'
 
     // Java Doc in XML Format
-    xmlDoclet 'com.manticore-projects.tools:xml-doclet:1.+'
+    xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
 }
 
 configurations.configureEach {
@@ -109,17 +115,20 @@ description = 'JSQLFormatter'
 java {
     withSourcesJar()
     withJavadocJar()
-    sourceCompatibility(JavaVersion.VERSION_11)
-    targetCompatibility(JavaVersion.VERSION_11)
+
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 
     // needed for XML-Doclet to work (since Doclet changed again with Java 13)
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
 
 javadoc {
+    include("build/generated/javacc/net/sf/jsqlparser/parser/*.java" )
+    include("../JSQLParser/src/main/java/**/*.java")
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
@@ -127,14 +136,27 @@ javadoc {
 }
 
 tasks.register('xmldoc', Javadoc) {
+    def outFile =  reporting.file(
+            version.endsWith("-SNAPSHOT")
+                    ? "xmlDoclet/javadoc_snapshot.xml"
+                    : "xmlDoclet/javadoc_stable.xml"
+    )
+
+    def rstFile =  reporting.file(
+            version.endsWith("-SNAPSHOT")
+                    ? "xmlDoclet/javadoc_snapshot.rst"
+                    : "xmlDoclet/javadoc_stable.rst"
+    )
+
     source = sourceSets.main.allJava
+    title = "API $version"
     destinationDir = reporting.file("xmlDoclet")
     options.docletpath = configurations.xmlDoclet.files as List
-    options.doclet = "com.github.markusbernhardt.xmldoclet.XmlDoclet"
-
+    options.doclet = "com.manticore.tools.xmldoclet.XmlDoclet"
     options.addBooleanOption("rst", true)
     options.addBooleanOption("withFloatingToc", true)
     options.addStringOption("basePackage", "com.manticore.jsqlformatter")
+    options.addStringOption("filename", outFile.getName())
 
     dependsOn(compileJava)
     doLast {
@@ -345,11 +367,14 @@ tasks.withType(Test).configureEach {
 }
 
 tasks.register('gitChangelogTask', GitChangelogTask) {
-    fromRepo = file("$projectDir")
-    file = new File("${projectDir}/src/site/sphinx/changelog.rst")
-    //fromRef = "4.0";
+    fromRepo.set( file("$projectDir").toString() )
+    file.set( new File("${projectDir}/src/site/sphinx/changelog.rst") )
+    fromRevision.set( "4.0")
     //toRef = "1.1";
-    templateContent = """
+
+    // switch off the formatter since the indentation matters for Mark-down
+    // @formatter:off
+    templateContent.set ("""
 ************************
 Changelog
 ************************
@@ -357,7 +382,7 @@ Changelog
 
 {{#tags}}
 {{#ifMatches name "^Unreleased.*"}}
-Latest Changes since |JSQLFORMATTER_VERSION|
+Latest Changes since |JSQLPARSER_VERSION|
 {{/ifMatches}}
 {{#ifMatches name "^(?!Unreleased).*"}}
 Version {{name}}
@@ -376,7 +401,8 @@ Version {{name}}
 
  {{/issues}}
 {{/tags}}
-"""
+""")
+    // @formatter:on
 }
 
 remotes {
@@ -443,7 +469,7 @@ tasks.register('renderRR') {
             mainClass = "-jar"
             args = [
                     new File(rrDir, "convert.war").absolutePath,
-                    layout.buildDirectory.dir("generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj").get().asFile.absolutePath
+                    project(":JSQLParser").buildDir("generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj").get().asFile.absolutePath
             ]
         }.get().exec()
 
@@ -464,13 +490,13 @@ tasks.register('renderRR') {
 }
 
 
-xslt  {
+task xslt(type: SaxonXsltTask) {
     def outFile = version.endsWith("-SNAPSHOT")
             ?   file("src/site/sphinx/syntax_snapshot.rst")
             :   file("src/site/sphinx/syntax_stable.rst")
 
     dependsOn(renderRR)
-    stylesheet 'src/main/resources/rr/xhtml2rst.xsl'
+    stylesheet file('src/main/resources/rr/xhtml2rst.xsl')
 
     parameters (
             "withFloatingToc": System.getenv().getOrDefault("FLOATING_TOC", "true"),
@@ -478,7 +504,7 @@ xslt  {
     )
 
     // Transform every .xml file in the "input" directory.
-    input layout.buildDirectory.file("rr/JSqlParserCC.xhtml")
+    input layout.buildDirectory.file("rr/JSqlParserCC.xhtml").get()
     output outFile
 }
 
