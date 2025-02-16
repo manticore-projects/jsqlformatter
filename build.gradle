@@ -149,6 +149,9 @@ tasks.register('xmldoc', Javadoc) {
     )
 
     source = sourceSets.main.allJava
+    include("build/generated/javacc/net/sf/jsqlparser/parser/*.java" )
+    include("../JSQLParser/src/main/java/**/*.java")
+
     title = "API $version"
     destinationDir = reporting.file("xmlDoclet")
     options.docletpath = configurations.xmlDoclet.files as List
@@ -369,7 +372,7 @@ tasks.withType(Test).configureEach {
 tasks.register('gitChangelogTask', GitChangelogTask) {
     fromRepo.set( file("$projectDir").toString() )
     file.set( new File("${projectDir}/src/site/sphinx/changelog.rst") )
-    fromRevision.set( "4.0")
+    //fromRevision.set( "4.0")
     //toRef = "1.1";
 
     // switch off the formatter since the indentation matters for Mark-down
@@ -469,7 +472,7 @@ tasks.register('renderRR') {
             mainClass = "-jar"
             args = [
                     new File(rrDir, "convert.war").absolutePath,
-                    project(":JSQLParser").buildDir("generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj").get().asFile.absolutePath
+                    project(":JSQLParser").layout.buildDirectory.file("generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj").get().getAsFile().absolutePath
             ]
         }.get().exec()
 
