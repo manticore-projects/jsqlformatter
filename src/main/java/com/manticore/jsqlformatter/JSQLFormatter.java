@@ -2671,8 +2671,8 @@ public class JSQLFormatter {
               " ", " )");
         }
       } else {
-        appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, true,
-            BreakLine.AS_NEEDED);
+        appendExpression(castExpression.getLeftExpression(), null, builder, indent, i, n, false,
+            BreakLine.NEVER);
         appendKeyWord(builder, outputFormat, castExpression.getColDataType().toString(), "::", "");
       }
     } else if (expression instanceof Between) {

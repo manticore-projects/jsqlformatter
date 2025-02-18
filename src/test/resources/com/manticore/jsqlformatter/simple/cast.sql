@@ -7,3 +7,10 @@ SELECT  Cast( CASE
                 ELSE description
                 END AS CHAR ) accounting_event
 ;
+
+SELECT  id
+        ,  Try_Cast( v AS JSON ) j
+        , '2013-05-08'::DATE AS v1
+FROM vartab
+ORDER BY id
+;
