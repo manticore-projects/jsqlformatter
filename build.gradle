@@ -57,7 +57,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.+'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.12.+'
 
     // Java Doc in XML Format
     xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
