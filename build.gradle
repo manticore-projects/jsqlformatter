@@ -3,7 +3,7 @@ import com.nwalsh.gradle.saxon.SaxonXsltTask
 
 buildscript {
     dependencies {
-        classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '12.5'
+        classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: 'latest.release'
     }
 }
 
@@ -27,6 +27,7 @@ plugins {
     id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
     id "com.nwalsh.gradle.saxon.saxon-gradle" version "latest.release"
+    id 'biz.aQute.bnd.builder' version "latest.release"
 }
 
 repositories {
@@ -55,9 +56,9 @@ dependencies {
     implementation('com.github.jsqlparser:jsqlparser:+'){ changing = true }
     implementation 'com.diogonunes:JColor:+'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
 
     // Java Doc in XML Format
     xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
@@ -125,10 +126,28 @@ java {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+                "Created-By": System.properties['user.name'],
+                "Automatic-Module-Name": "com.manticore.jsqlformatter"
+        )
+    }
+
+    bundle {
+        properties.empty()
+        bnd(
+                "Created-By": System.properties.get('user.name'),
+                "Bundle-SymbolicName": "com.manticore.jsqlformatter",
+                "Import-Package": "*",
+                "Export-Package": "com.manticore.jsqlformatter.*",
+                "Automatic-Module-Name": "com.manticore.jsqlformatter"
+        )
+    }
+}
+
 
 javadoc {
-    include("build/generated/javacc/net/sf/jsqlparser/parser/*.java" )
-    include("../JSQLParser/src/main/java/**/*.java")
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
@@ -149,8 +168,8 @@ tasks.register('xmldoc', Javadoc) {
     )
 
     source = sourceSets.main.allJava
-    include("build/generated/javacc/net/sf/jsqlparser/parser/*.java" )
-    include("../JSQLParser/src/main/java/**/*.java")
+    classpath = sourceSets.main.runtimeClasspath
+
 
     title = "API $version"
     destinationDir = reporting.file("xmlDoclet")
@@ -164,8 +183,8 @@ tasks.register('xmldoc', Javadoc) {
     dependsOn(compileJava)
     doLast {
         copy {
-            from reporting.file("xmlDoclet/javadoc.rst")
-            into "${projectDir}/src/site/sphinx/"
+            from rstFile
+            into layout.projectDirectory.dir("src/site/sphinx/").asFile
         }
     }
 }
@@ -214,6 +233,7 @@ jacocoTestReport {
         }))
     }
 }
+
 jacocoTestCoverageVerification {
     violationRules {
         rule {

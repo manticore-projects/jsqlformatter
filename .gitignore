@@ -44,3 +44,4 @@ pom.xml.versionsBackup
 
 /pom.xml
 /dependency-reduced-pom.xml
+/src/site/sphinx/javadoc_snapshot.rst
