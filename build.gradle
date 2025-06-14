@@ -224,14 +224,6 @@ jacocoTestReport {
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
     }
-    // Jacoco can't handle the TokenManager class
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: [
-                    "**CCJSqlParserTokenManager**"
-            ])
-        }))
-    }
 }
 
 jacocoTestCoverageVerification {
@@ -513,15 +505,15 @@ tasks.register('renderRR') {
 }
 
 
-task xslt(type: SaxonXsltTask) {
+tasks.register('xslt', SaxonXsltTask) {
     def outFile = version.endsWith("-SNAPSHOT")
-            ?   file("src/site/sphinx/syntax_snapshot.rst")
-            :   file("src/site/sphinx/syntax_stable.rst")
+            ? file("src/site/sphinx/syntax_snapshot.rst")
+            : file("src/site/sphinx/syntax_stable.rst")
 
     dependsOn(renderRR)
     stylesheet file('src/main/resources/rr/xhtml2rst.xsl')
 
-    parameters (
+    parameters(
             "withFloatingToc": System.getenv().getOrDefault("FLOATING_TOC", "true"),
             "isSnapshot": Boolean.toString(version.endsWith("-SNAPSHOT"))
     )

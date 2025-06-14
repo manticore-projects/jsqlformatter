@@ -1577,20 +1577,13 @@ public class JSQLFormatter {
         appendJoins(joins, builder, indent);
       }
 
-      Expression whereExpression = plainSelect.getWhere();
-      appendWhere(whereExpression, builder, indent);
+      appendWhere(plainSelect.getWhere(), builder, indent);
 
-      GroupByElement groupByElement = plainSelect.getGroupBy();
-      appendGroupByElement(groupByElement, builder, indent);
+      appendGroupByElement(plainSelect.getGroupBy(), builder, indent);
 
-      Expression havingExpression = plainSelect.getHaving();
-      appendHavingExpression(havingExpression, builder, indent);
+      appendHavingExpression(plainSelect.getHaving(), builder, indent);
 
-      // @todo: write-out Qualify
-      if (plainSelect.getQualify() != null) {
-        builder.append(" QUALIFY ");
-        builder.append(plainSelect.getQualify());
-      }
+      appendQualify(plainSelect.getQualify(), builder, indent);
 
       // @todo: write-out Windows
       if (plainSelect.getWindowDefinitions() != null) {
@@ -2012,14 +2005,28 @@ public class JSQLFormatter {
     }
   }
 
-  private static void appendWhere(Expression whereExpression, StringBuilder builder, int indent) {
-    if (whereExpression != null) {
+  private static void appendKeywordedExpression(String keyword, Expression expression,
+      StringBuilder builder, int indent) {
+    if (expression != null) {
       appendNormalizedLineBreak(builder);
       for (int j = 0; j < indent; j++) {
         builder.append(indentString);
       }
-      appendKeyWord(builder, outputFormat, "WHERE", "", " ");
-      appendExpression(whereExpression, null, builder, indent, 0, 1, false, BreakLine.AFTER_FIRST);
+      appendKeyWord(builder, outputFormat, keyword, "", " ");
+      appendExpression(expression, null, builder, indent, 0, 1, false, BreakLine.AFTER_FIRST);
+    }
+  }
+
+  private static void appendWhere(Expression whereExpression, StringBuilder builder, int indent) {
+    if (whereExpression != null) {
+      appendKeywordedExpression("WHERE", whereExpression, builder, indent);
+    }
+  }
+
+  private static void appendQualify(Expression qualifyExpression, StringBuilder builder,
+      int indent) {
+    if (qualifyExpression != null) {
+      appendKeywordedExpression("QUALIFY", qualifyExpression, builder, indent);
     }
   }
 
