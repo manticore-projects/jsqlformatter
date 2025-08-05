@@ -41,7 +41,8 @@ Java SQL Formatting Library
    install
    usage
    Syntax   <syntax.rst>
-   Java API <javadoc.rst>
+   Stable API <javadoc_stable.rst>
+   Development API <javadoc_snapshot.rst>
    samples
    demo
 

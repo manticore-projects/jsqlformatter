@@ -34,17 +34,9 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    // Sonatype OSSRH
+    //Sonatype
     maven {
-        url = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
-    }
-
-    maven {
-        url = uri('https://oss.sonatype.org/content/groups/public/')
-    }
-
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
+        url = uri('https://central.sonatype.com/repository/maven-snapshots/')
     }
 }
 
@@ -61,7 +53,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
 
     // Java Doc in XML Format
-    xmlDoclet 'com.manticore-projects.tools:xml-doclet:+'
+    xmlDoclet ('com.manticore-projects.tools:xml-doclet:+'){ changing = true }
 }
 
 configurations.configureEach {
@@ -155,12 +147,13 @@ javadoc {
 }
 
 tasks.register('xmldoc', Javadoc) {
+    dependsOn(compileJava)
+
     def outFile =  reporting.file(
             version.endsWith("-SNAPSHOT")
                     ? "xmlDoclet/javadoc_snapshot.xml"
                     : "xmlDoclet/javadoc_stable.xml"
     )
-
     def rstFile =  reporting.file(
             version.endsWith("-SNAPSHOT")
                     ? "xmlDoclet/javadoc_snapshot.rst"
@@ -169,7 +162,6 @@ tasks.register('xmldoc', Javadoc) {
 
     source = sourceSets.main.allJava
     classpath = sourceSets.main.runtimeClasspath
-
 
     title = "API $version"
     destinationDir = reporting.file("xmlDoclet")
@@ -180,12 +172,9 @@ tasks.register('xmldoc', Javadoc) {
     options.addStringOption("basePackage", "com.manticore.jsqlformatter")
     options.addStringOption("filename", outFile.getName())
 
-    dependsOn(compileJava)
-    doLast {
-        copy {
-            from rstFile
-            into layout.projectDirectory.dir("src/site/sphinx/").asFile
-        }
+    copy {
+        from rstFile
+        into layout.projectDirectory.dir("src/site/sphinx/").asFile
     }
 }
 
