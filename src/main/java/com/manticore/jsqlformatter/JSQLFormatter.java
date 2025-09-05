@@ -95,14 +95,11 @@ import net.sf.jsqlparser.statement.merge.MergeUpdate;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.Distinct;
-import net.sf.jsqlparser.statement.select.ExceptOp;
 import net.sf.jsqlparser.statement.select.Fetch;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.GroupByElement;
-import net.sf.jsqlparser.statement.select.IntersectOp;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.Limit;
-import net.sf.jsqlparser.statement.select.MinusOp;
 import net.sf.jsqlparser.statement.select.Offset;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByElement.NullOrdering;
@@ -115,7 +112,6 @@ import net.sf.jsqlparser.statement.select.SetOperation;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.TableFunction;
 import net.sf.jsqlparser.statement.select.Top;
-import net.sf.jsqlparser.statement.select.UnionOp;
 import net.sf.jsqlparser.statement.select.Values;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.truncate.Truncate;
@@ -2654,7 +2650,10 @@ public class JSQLFormatter {
           BreakLine.NEVER);
 
       int subIndent = getSubIndent(builder, false);
-      appendKeyWord(builder, outputFormat, "BETWEEN", between.isNot() ? " NOT " : " ", " ");
+
+      appendKeyWord(builder, outputFormat, "BETWEEN", between.isNot() ? " NOT " : " ",
+          (between.isUsingSymmetric() ? " SYMMETRIC" : "")
+              + (between.isUsingAsymmetric() ? " ASYMMETRIC " : " "));
 
       appendExpression(between.getBetweenExpressionStart(), null, builder, indent + 1, i, n, false,
           BreakLine.NEVER);
@@ -2938,36 +2937,9 @@ public class JSQLFormatter {
   @SuppressWarnings({"PMD.CyclomaticComplexity"})
   private static void appendSetOperation(SetOperation setOperation, StringBuilder builder,
       int indent) {
-
-    // Direct Known Subclasses:
-    // ExceptOp, IntersectOp, MinusOp, UnionOp
-    if (setOperation instanceof UnionOp) {
-      UnionOp unionOp = (UnionOp) setOperation;
-
-      appendNormalizedLineBreak(builder);
-      builder.append(indentString.repeat(indent));
-      appendOperator(builder, outputFormat, "UNION", "", " ");
-
-      if (unionOp.isAll()) {
-        appendOperator(builder, outputFormat, "ALL", "", " ");
-      }
-    } else if (setOperation instanceof MinusOp) {
-      appendNormalizedLineBreak(builder);
-      builder.append(indentString.repeat(indent));
-      appendOperator(builder, outputFormat, "MINUS", "", " ");
-    } else if (setOperation instanceof IntersectOp) {
-      appendNormalizedLineBreak(builder);
-      builder.append(indentString.repeat(indent));
-      appendOperator(builder, outputFormat, "INTERSECT", "", " ");
-
-    } else if (setOperation instanceof ExceptOp) {
-      appendNormalizedLineBreak(builder);
-      builder.append(indentString.repeat(indent));
-      appendOperator(builder, outputFormat, "EXCEPT", "", " ");
-    } else if (setOperation != null) {
-      throw new UnsupportedOperationException(
-          setOperation.getClass().getName() + " is not supported yet.");
-    }
+    appendNormalizedLineBreak(builder);
+    builder.append(indentString.repeat(indent));
+    appendOperator(builder, outputFormat, setOperation.toString(), "", " ");
   }
 
   private static void appendTruncate(StringBuilder builder, Truncate truncate) {

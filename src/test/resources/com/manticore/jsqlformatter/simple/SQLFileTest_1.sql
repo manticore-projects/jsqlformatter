@@ -730,3 +730,10 @@ FROM (  SELECT  e.dept_id
     , department d
 WHERE v.dept_id(+)  = d.dept_id
 ;
+
+-- BETWEEN
+SELECT *
+FROM t
+WHERE a BETWEEN SYMMETRIC 2
+             AND 1
+;
