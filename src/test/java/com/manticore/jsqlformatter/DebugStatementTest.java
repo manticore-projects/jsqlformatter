@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 public class DebugStatementTest {
   @Test
   public void debugStatementTest() throws Exception {
-    String sqlStr = "SELECT sales.* EXCLUDE( a, b, c )\n" + "FROM sales\n" + ";";
+    String sqlStr = "SELECT cd_nature_operation = \"C\" AS top_facture_credit;";
     Statement statement1 =
         CCJSqlParserUtil.parse(sqlStr, parser -> parser.withUnsupportedStatements(false));
 

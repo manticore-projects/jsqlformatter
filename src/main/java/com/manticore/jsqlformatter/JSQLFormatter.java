@@ -2252,7 +2252,7 @@ public class JSQLFormatter {
         appendOperator(builder, outputFormat, "PRIOR", "", " ");
       }
 
-      appendExpression(equalsTo.getRightExpression(), alias, builder, indent + 1, i, n, false,
+      appendExpression(equalsTo.getRightExpression(), null, builder, indent + 1, i, n, false,
           BreakLine.AFTER_FIRST);
 
       if (equalsTo.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT) {
