@@ -11,6 +11,7 @@ buildscript {
 
 plugins {
     id 'java'
+    id "com.vanniktech.maven.publish"
     id 'maven-publish'
     id 'signing'
 
@@ -33,10 +34,10 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    gradlePluginPortal()
     mavenCentral()
 
-    //Sonatype
+    // Snapshots
     maven {
         url = uri('https://central.sonatype.com/repository/maven-snapshots/')
     }
@@ -47,7 +48,7 @@ configurations {
 }
 
 dependencies {
-    implementation('com.github.jsqlparser:jsqlparser:+'){ changing = true }
+    implementation('com.manticore-projects.jsqlformatter:jsqlparser:+') { changing = true }
     implementation 'com.diogonunes:JColor:+'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
@@ -55,7 +56,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
 
     // Java Doc in XML Format
-    xmlDoclet ('com.manticore-projects.tools:xml-doclet:+'){ changing = true }
+    xmlDoclet('com.manticore-projects.tools:xml-doclet:+') { changing = true }
 }
 
 configurations.configureEach {
@@ -76,7 +77,7 @@ def getVersion = { boolean considerSnapshot ->
     String snapshot = ""
 
     def versionStr = providers.exec {
-        commandLine "git", "--no-pager", "-C", project.projectDir,  "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
+        commandLine "git", "--no-pager", "-C", project.projectDir, "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
     }.standardOutput.asText.get().trim()
 
     def pattern = /(?<major>\d*)\.(?<minor>\d*)(\.(?<patch>\d*))?(-(?<build>\d*)-(?<commit>[a-zA-Z\d]*))?/
@@ -96,29 +97,30 @@ def getVersion = { boolean considerSnapshot ->
         snapshot = "-SNAPSHOT"
     }
 
-    return patch != null
-            ? "${major}.${minor}.${patch}${snapshot}"
-            : "${major}.${minor}${snapshot}"
+    return "${major}.${minor}" +
+            (patch != null ? ".${patch}" : "") +
+            (build != null ? ".${build}" : "") +
+            snapshot
 }
 
 // for publishing a release, call Gradle with Environment Variable RELEASE:
 // RELEASE=true gradle JSQLFormatter:publish
-version = getVersion( !System.getenv("RELEASE") )
+version = getVersion(!System.getenv("RELEASE"))
 group = 'com.manticore-projects.jsqlformatter'
 description = 'JSQLFormatter'
 
 tasks.register('generateBuildInfo') {
     outputs.dir layout.buildDirectory.file("resources/main")
     doLast {
-        def outputDir =  new File( layout.buildDirectory.file("generated/sources/buildinfo/java/main").get().asFile, "com/manticore/jsqlformatter")
+        def outputDir = new File(layout.buildDirectory.file("generated/sources/buildinfo/java/main").get().asFile, "com/manticore/jsqlformatter")
         outputDir.mkdirs()
 
         def gitVersionStr = providers.exec {
-            commandLine "git", "--no-pager", "-C", project.projectDir,  "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
+            commandLine "git", "--no-pager", "-C", project.projectDir, "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
         }.standardOutput.asText.get().trim()
 
         def gitCommitStr = providers.exec {
-            commandLine "git", "--no-pager", "-C", project.projectDir,  "rev-parse", "--short", "HEAD"
+            commandLine "git", "--no-pager", "-C", project.projectDir, "rev-parse", "--short", "HEAD"
         }.standardOutput.asText.get().trim()
 
         def buildTime = Instant.now().toString()
@@ -153,7 +155,6 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
-    withJavadocJar()
 
     sourceCompatibility = '11'
     targetCompatibility = '11'
@@ -184,9 +185,8 @@ jar {
     }
 }
 
-
 javadoc {
-    if(JavaVersion.current().isJava9Compatible()) {
+    if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
     options.addBooleanOption("Xdoclint:none", true)
@@ -195,12 +195,12 @@ javadoc {
 tasks.register('xmldoc', Javadoc) {
     dependsOn(compileJava)
 
-    def outFile =  reporting.file(
+    def outFile = reporting.file(
             version.endsWith("-SNAPSHOT")
                     ? "xmlDoclet/javadoc_snapshot.xml"
                     : "xmlDoclet/javadoc_stable.xml"
     )
-    def rstFile =  reporting.file(
+    def rstFile = reporting.file(
             version.endsWith("-SNAPSHOT")
                     ? "xmlDoclet/javadoc_snapshot.rst"
                     : "xmlDoclet/javadoc_stable.rst"
@@ -236,7 +236,7 @@ test {
 }
 
 license {
-    excludes(["**/*.txt", "**/*.conf", "**/*.sql",])
+    excludes(["**/*.txt", "**/*.conf", "**/*.sql"])
     includes(["**/*.properties", "**/*.java", "**/*.xml"])
 
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
@@ -248,8 +248,7 @@ license {
 }
 
 coveralls {
-    // /home/runner/work/jsqlformatter/jsqlformatter/build/reports/jacoco/test/jacocoTestReport.xml
-    jacocoReportPath  layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml')
+    jacocoReportPath layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml')
 }
 
 jacocoTestReport {
@@ -264,23 +263,18 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
     violationRules {
         rule {
-            //element = 'CLASS'
             limit {
                 minimum = 0.69
             }
-            excludes = [
-            ]
+            excludes = []
         }
         rule {
-            //element = 'CLASS'
             limit {
                 counter = 'LINE'
                 value = 'MISSEDCOUNT'
-
                 maximum = 800
             }
-            excludes = [
-            ]
+            excludes = []
         }
     }
 }
@@ -309,13 +303,10 @@ pmd {
     // clear the ruleset in order to use configured rules only
     ruleSets = []
 
-    //rulesMinimumPriority = 1
     ruleSetFiles = files("config/pmd/ruleset.xml")
 
     pmdMain {
-        excludes = [
-                "build/generated/*"
-        ]
+        excludes = ["build/generated/*"]
     }
 }
 
@@ -334,11 +325,11 @@ spotless {
 
         // define the steps to apply to those files
         trimTrailingWhitespace()
-        leadingTabsToSpaces(4) // or spaces. Takes an integer argument if you don't like 4
+        leadingTabsToSpaces(4)
         endWithNewline()
     }
     java {
-        leadingTabsToSpaces(4) // or spaces. Takes an integer argument if you don't like 4
+        leadingTabsToSpaces(4)
         eclipse().configFile('config/formatter/eclipse-java-google-style.xml')
     }
 }
@@ -350,60 +341,76 @@ tasks.withType(Checkstyle).configureEach {
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId 'jsqlformatter'
-            from(components.java)
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
+mavenPublishing {
+    coordinates(group, "jsqlformatter", version)
 
-            pom {
-                name = 'JSQLFormatter library'
-                description = 'Format and pretty print SQL Statements'
-                url = 'https://manticore-projects.com/JSQLFormatter/index.html'
-                licenses {
-                    license {
-                        name = 'GNU Affero General Public License Version 3'
-                        url = 'https://www.gnu.org/licenses/agpl-3.0.html'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'are'
-                        name = 'Andreas Reichel'
-                        email = 'andreas@manticore-projects.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/manticore-projects/jsqlformatter.git'
-                    developerConnection = 'scm:git:ssh://git@github.com:manticore-projects/jsqlformatter.git'
-                    url = 'http://manticore-projects.com/JSQLFormatter/index.html'
-                }
+    pom {
+        name = 'JSQLFormatter library'
+        description = 'Format and pretty print SQL Statements'
+        url = 'https://manticore-projects.com/JSQLFormatter/index.html'
+        licenses {
+            license {
+                name = 'GNU Affero General Public License Version 3'
+                url = 'https://www.gnu.org/licenses/agpl-3.0.html'
             }
         }
-    }
-    repositories {
-        maven {
-            // Username and Password are defined in ~/.gradle/gradle.properties
-            name "central"
-            url version.toString().endsWith('-SNAPSHOT')
-                    ? "https://central.sonatype.com/repository/maven-snapshots/"
-                    : "https://central.sonatype.com/repository/maven-releases"
-            credentials(PasswordCredentials)
+        developers {
+            developer {
+                id = 'are'
+                name = 'Andreas Reichel'
+                email = 'andreas@manticore-projects.com'
+            }
+        }
+        scm {
+            connection = 'scm:git:https://github.com/manticore-projects/jsqlformatter.git'
+            developerConnection = 'scm:git:ssh://git@github.com:manticore-projects/jsqlformatter.git'
+            url = 'http://manticore-projects.com/JSQLFormatter/index.html'
         }
     }
 }
 
+// Fix signing task dependencies
+tasks.withType(AbstractPublishToMaven).configureEach {
+    dependsOn(tasks.withType(Sign))
+}
+
 signing {
     required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
-    sign publishing.publications.mavenJava
+}
+
+// Resolve dynamic dependencies to concrete versions in POM
+publishing {
+    publications {
+        configureEach {
+            if (it instanceof MavenPublication) {
+                // Suppress the warning about Maven-incompatible version notation
+                it.suppressPomMetadataWarningsFor('runtimeElements')
+
+                it.pom.withXml {
+                    def runtimeDeps = project.configurations.runtimeClasspath
+                            .resolvedConfiguration
+                            .firstLevelModuleDependencies
+
+                    def depsNode = asNode().dependencies?.dependency
+
+                    depsNode?.each { depNode ->
+                        def groupId = depNode.groupId.text()
+                        def artifactId = depNode.artifactId.text()
+
+                        // Find the resolved dependency
+                        def resolved = runtimeDeps.find {
+                            it.moduleGroup == groupId && it.moduleName == artifactId
+                        }
+
+                        if (resolved != null) {
+                            // Replace dynamic version (+, latest.release, etc.) with resolved version
+                            depNode.version[0].value = resolved.moduleVersion
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -417,14 +424,12 @@ tasks.withType(Test).configureEach {
 }
 
 tasks.register('gitChangelogTask', GitChangelogTask) {
-    fromRepo.set( file("$projectDir").toString() )
-    file.set( new File("${projectDir}/src/site/sphinx/changelog.rst") )
-    //fromRevision.set( "4.0")
-    //toRef = "1.1";
+    fromRepo.set(file("$projectDir").toString())
+    file.set(new File("${projectDir}/src/site/sphinx/changelog.rst"))
 
     // switch off the formatter since the indentation matters for Mark-down
     // @formatter:off
-    templateContent.set ("""
+    templateContent.set("""
 ************************
 Changelog
 ************************
@@ -471,11 +476,10 @@ tasks.register('upload') {
     dependsOn(jar, gitChangelogTask, xmldoc, xslt)
     doFirst {
         if (findProperty("${project.name}.host") == null) {
-            println(
-                    """
-                Property \"${project.name}.host\' not found.
-                Please define \"${project.name}.host\" in the Gradle configuration (e. g. \$HOME/.gradle/gradle.properties.
-                """
+            println("""
+                Property "${project.name}.host" not found.
+                Please define "${project.name}.host" in the Gradle configuration (e.g. \$HOME/.gradle/gradle.properties).
+                """.stripIndent()
             )
         }
     }
@@ -484,7 +488,7 @@ tasks.register('upload') {
             session(remotes.webServer) {
                 def versionStable = getVersion(false)
                 execute "mkdir -p download/${project.name}-${versionStable}"
-                for (File file: fileTree(include:['*.jar'], dir:"${project.buildDir}/libs").collect()) {
+                for (File file : fileTree(include: ['*.jar'], dir: "${project.buildDir}/libs").collect()) {
                     put from: file, into: "download/${project.name}-${versionStable}"
                 }
             }
@@ -539,7 +543,6 @@ tasks.register('renderRR') {
     }
 }
 
-
 tasks.register('xslt', SaxonXsltTask) {
     def outFile = version.endsWith("-SNAPSHOT")
             ? file("src/site/sphinx/syntax_snapshot.rst")
@@ -557,5 +560,3 @@ tasks.register('xslt', SaxonXsltTask) {
     input layout.buildDirectory.file("rr/JSqlParserCC.xhtml").get()
     output outFile
 }
-
-
