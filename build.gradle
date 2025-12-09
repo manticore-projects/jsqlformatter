@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id "com.vanniktech.maven.publish"
+    id "com.vanniktech.maven.publish" version "latest.release"
     id 'maven-publish'
     id 'signing'
 
