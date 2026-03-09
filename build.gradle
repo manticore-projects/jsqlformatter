@@ -343,6 +343,9 @@ tasks.withType(Checkstyle).configureEach {
 }
 
 mavenPublishing {
+    publishToMavenCentral(true)
+    signAllPublications()
+
     coordinates(group, "jsqlformatter", version)
 
     pom {
