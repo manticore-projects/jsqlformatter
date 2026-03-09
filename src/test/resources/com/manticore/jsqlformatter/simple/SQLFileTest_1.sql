@@ -380,7 +380,7 @@ WHERE foo.id = bar.id(+)
 SELECT *
 FROM foo
     , bar
-WHERE foo.id(+)  = bar.id
+WHERE foo.id(+) = bar.id
 ;
 
 SELECT  v.lname
@@ -391,9 +391,9 @@ FROM (  SELECT  e.dept_id
                 , j.function
         FROM employee e
             , job j
-        WHERE e.job_id(+)  = j.job_id ) v
+        WHERE e.job_id(+) = j.job_id ) v
     , department d
-WHERE v.dept_id(+)  = d.dept_id
+WHERE v.dept_id(+) = d.dept_id
 ;
 INSERT INTO cfe.ext_eab
 SELECT /*+ PARALLEL DRIVING_SITE(A) */
@@ -715,7 +715,7 @@ WHERE foo.id = bar.id(+)
 SELECT *
 FROM foo
     , bar
-WHERE foo.id(+)  = bar.id
+WHERE foo.id(+) = bar.id
 ;
 
 SELECT  v.lname
@@ -726,9 +726,9 @@ FROM (  SELECT  e.dept_id
                 , j.function
         FROM employee e
             , job j
-        WHERE e.job_id(+)  = j.job_id ) v
+        WHERE e.job_id(+) = j.job_id ) v
     , department d
-WHERE v.dept_id(+)  = d.dept_id
+WHERE v.dept_id(+) = d.dept_id
 ;
 
 -- BETWEEN

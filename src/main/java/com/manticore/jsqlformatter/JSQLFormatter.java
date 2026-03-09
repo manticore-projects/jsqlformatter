@@ -1010,8 +1010,17 @@ public class JSQLFormatter {
                 builder.append(options1.values().stream().map(ExplainStatement.Option::formatOption)
                     .collect(Collectors.joining(" ")));
               }
-              appendSelect(explainStatement.getStatement(), builder, indent, true, false);
 
+              Statement stm = explainStatement.getStatement();
+              if (stm instanceof Select) {
+                appendSelect( (Select) stm, builder, indent, true, false);
+              } else if (stm instanceof Update) {
+                appendUpdate( builder, (Update) stm, indent);
+              } else if (stm instanceof Merge) {
+                appendMerge( builder, (Merge) stm, indent);
+              } else if (stm instanceof Delete) {
+                appendDelete( builder, (Delete) stm, indent);
+              }
             } else {
               appendTable(explainStatement.getTable(), explainStatement.getTable().getAlias(),
                   builder);
@@ -2206,7 +2215,7 @@ public class JSQLFormatter {
 
     if (expression instanceof Column) {
       Column column = (Column) expression;
-      appendObjectName(builder, outputFormat, column.getFullyQualifiedName(), "", "");
+      appendObjectName(builder, outputFormat, column.toString(), "", "");
 
     } else if (expression instanceof AndExpression) {
       AndExpression andExpression = (AndExpression) expression;
