@@ -4,7 +4,10 @@ import java.time.Year
 
 plugins {
     id 'java'
-    id "com.vanniktech.maven.publish" version "latest.release"
+    // Pinned deliberately. This plugin's API has changed shape more than once
+    // (publishToMavenCentral(SonatypeHost.S01) -> (CENTRAL_PORTAL) -> no-arg).
+    // On "latest.release" an upgrade can silently break the publishing config.
+    id "com.vanniktech.maven.publish" version "0.34.0"
     id 'maven-publish'
     id 'signing'
 
@@ -38,8 +41,11 @@ configurations {
 }
 
 dependencies {
-    implementation 'com.manticore-projects.jsqlformatter:jsqlparser:[5.3.242,)'
-    implementation 'com.diogonunes:JColor:5.+'
+    // Pinned, not ranged. Gradle caches dynamic-version resolution for 24h, so an
+    // open range resolves differently on a warm desktop and a cold CI runner --
+    // which shows up as tests that pass locally and fail on GitHub.
+    implementation 'com.manticore-projects.jsqlformatter:jsqlparser:5.3.242'
+    implementation 'com.diogonunes:JColor:5.5.1'
 
     testImplementation platform('org.junit:junit-bom:5.+')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -275,14 +281,16 @@ tasks.withType(Test).configureEach {
     minHeapSize = "128m"
     maxHeapSize = "1G"
 
-    // Deterministic until FormattingOptions is threaded through (see below).
-    // Once formatting state is per-call, raise this again.
-    maxParallelForks = 1
-
-    // Belt and braces: a fresh JVM per class makes static leakage structurally
-    // impossible. Costs a few seconds on a suite this size. Remove together
-    // with maxParallelForks = 1 once the refactor lands.
+    // forkEvery = 1 gives every test class a pristine JVM, so JSQLFormatter's mutable
+    // static formatting options cannot leak from one class into the next. That holds
+    // regardless of how many forks run concurrently, so parallelism stays on.
+    //
+    // Dropping forkEvery is what exposed the leak: JUnit's *class* discovery order
+    // follows filesystem enumeration and fork assignment follows availableProcessors(),
+    // so order differs between a desktop and a CI runner -- "passes locally, fails on
+    // GitHub". Remove once FormattingOptions is threaded through per call.
     forkEvery = 1
+    maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(2))
 
     // Stable, machine-independent environment.
     systemProperty 'user.language', 'en'
@@ -432,6 +440,13 @@ spotless {
 
 mavenPublishing {
 
+    // These two are what actually wire up Sonatype Central. Without
+    // publishToMavenCentral() the plugin builds a publication with correct POM
+    // metadata but has no deployment target, and Central rejects unsigned artifacts,
+    // so signAllPublications() is equally non-optional.
+    publishToMavenCentral()
+    signAllPublications()
+
     coordinates(group, "jsqlformatter", version)
 
     pom {
@@ -440,8 +455,9 @@ mavenPublishing {
         url = 'https://manticore-projects.com/JSQLFormatter/index.html'
         licenses {
             license {
-                name = 'GNU Affero General Public License Version 3'
-                url = 'https://www.gnu.org/licenses/agpl-3.0.html'
+                name = 'The Apache License, Version 2.0'
+                url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'repo'
             }
         }
         developers {
@@ -459,7 +475,11 @@ mavenPublishing {
     }
 }
 
-// Fix signing task dependencies
+// NOTE: signAllPublications() above makes the vanniktech plugin own signing, including
+// the publish/sign task ordering. These two blocks were most likely scaffolding added
+// while signAllPublications() was missing. Try deleting both once a signed release
+// succeeds -- if signing still works, they were redundant. Left in place for now
+// because removing them blind risks an unsigned release.
 tasks.withType(AbstractPublishToMaven).configureEach {
     dependsOn(tasks.withType(Sign))
 }
