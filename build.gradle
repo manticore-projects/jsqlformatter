@@ -1,13 +1,6 @@
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
-import com.nwalsh.gradle.saxon.SaxonXsltTask
 
-import java.time.Instant
-
-buildscript {
-    dependencies {
-        classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: 'latest.release'
-    }
-}
+import java.time.Year
 
 plugins {
     id 'java'
@@ -24,62 +17,67 @@ plugins {
     id "org.owasp.dependencycheck" version "latest.release"
     id "org.sonatype.gradle.plugins.scan" version "latest.release"
 
-    // download the RR tools which have no Maven Repository
-    id "de.undercouch.download" version "latest.release"
     id 'org.hidetake.ssh' version "latest.release"
     id "com.github.hierynomus.license" version "latest.release"
     id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "latest.release"
-    id "com.nwalsh.gradle.saxon.saxon-gradle" version "latest.release"
     id 'biz.aQute.bnd.builder' version "latest.release"
 }
 
 repositories {
-    gradlePluginPortal()
     mavenCentral()
-
-    // Snapshots
-    maven {
-        url = uri('https://central.sonatype.com/repository/maven-snapshots/')
-    }
+    gradlePluginPortal()
 }
 
 configurations {
-    xmlDoclet
+    // Gradle 9: give the configuration a single, explicit role instead of the legacy
+    // "consumable AND resolvable AND declarable" default.
+    xmlDoclet {
+        canBeConsumed = false
+        canBeResolved = true
+    }
 }
 
 dependencies {
-    implementation('com.manticore-projects.jsqlformatter:jsqlparser:+') { changing = true }
-    implementation 'com.diogonunes:JColor:+'
+    implementation 'com.manticore-projects.jsqlformatter:jsqlparser:[5.3.242,)'
+    implementation 'com.diogonunes:JColor:5.+'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testImplementation platform('org.junit:junit-bom:5.+')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // Java Doc in XML Format
     xmlDoclet('com.manticore-projects.tools:xml-doclet:+') { changing = true }
 }
 
-configurations.configureEach {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        if (details.requested.group == 'com.github.jsqlparser') {
-            // Check for updates every build
-            resolutionStrategy.cacheChangingModulesFor 30, 'seconds'
-        }
-    }
-}
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Git-derived version
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
-def getVersion = { boolean considerSnapshot ->
+// providers.exec is evaluated lazily and is a Configuration-Cache-safe value source.
+// Declared once at configuration time so nothing shells out to git during execution.
+def gitDescribeProvider = providers.exec {
+    commandLine "git", "--no-pager", "-C", projectDir, "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
+}.standardOutput.asText.map { it.trim() }
+
+def gitCommitProvider = providers.exec {
+    commandLine "git", "--no-pager", "-C", projectDir, "rev-parse", "--short", "HEAD"
+}.standardOutput.asText.map { it.trim() }
+
+// Commit timestamp instead of Instant.now(): keeps generateBuildInfo up-to-date-able
+// (Instant.now() invalidated the task on every single build, forcing a full recompile)
+// and makes the jar reproducible.
+def gitCommitTimeProvider = providers.exec {
+    commandLine "git", "--no-pager", "-C", projectDir, "log", "-1", "--format=%cI"
+}.standardOutput.asText.map { it.trim() }
+
+def buildVersion = { boolean considerSnapshot ->
     Integer major = 0
     Integer minor = 0
     Integer patch = null
     Integer build = null
-    String commit = null
     String snapshot = ""
 
-    def versionStr = providers.exec {
-        commandLine "git", "--no-pager", "-C", project.projectDir, "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
-    }.standardOutput.asText.get().trim()
+    String versionStr = gitDescribeProvider.get()
 
     def pattern = /(?<major>\d*)\.(?<minor>\d*)(\.(?<patch>\d*))?(-(?<build>\d*)-(?<commit>[a-zA-Z\d]*))?/
     def matcher = versionStr =~ pattern
@@ -89,7 +87,6 @@ def getVersion = { boolean considerSnapshot ->
         minor = matcher.group('minor') as Integer ?: 0
         patch = matcher.group('patch') as Integer ?: null
         build = matcher.group('build') as Integer ?: null
-        commit = matcher.group('commit') ?: null
     }
 
     if (considerSnapshot && (versionStr.endsWith('SNAPSHOT') || build != null)) {
@@ -106,70 +103,113 @@ def getVersion = { boolean considerSnapshot ->
 
 // for publishing a release, call Gradle with Environment Variable RELEASE:
 // RELEASE=true gradle JSQLFormatter:publish
-version = getVersion(!System.getenv("RELEASE"))
+def isRelease = !providers.environmentVariable("RELEASE").getOrElse("").isEmpty()
+version = buildVersion(!isRelease)
 group = 'com.manticore-projects.jsqlformatter'
 description = 'JSQLFormatter'
 
-tasks.register('generateBuildInfo') {
-    outputs.dir layout.buildDirectory.file("resources/main")
-    doLast {
-        def outputDir = new File(layout.buildDirectory.file("generated/sources/buildinfo/java/main").get().asFile, "com/manticore/jsqlformatter")
-        outputDir.mkdirs()
+// Captured once so no task action has to touch project state at execution time.
+def stableVersion = buildVersion(false)
+def isSnapshot = version.toString().endsWith("-SNAPSHOT")
 
-        def gitVersionStr = providers.exec {
-            commandLine "git", "--no-pager", "-C", project.projectDir, "describe", "--tags", "--always", "--dirty=-SNAPSHOT"
-        }.standardOutput.asText.get().trim()
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// BuildInfo source generation
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
-        def gitCommitStr = providers.exec {
-            commandLine "git", "--no-pager", "-C", project.projectDir, "rev-parse", "--short", "HEAD"
-        }.standardOutput.asText.get().trim()
+abstract class GenerateBuildInfo extends DefaultTask {
 
-        def buildTime = Instant.now().toString()
+    @Input
+    abstract Property<String> getModuleName()
 
-        def content = """\
-            |package com.manticore.jsqlformatter;
+    @Input
+    abstract Property<String> getPackageName()
+
+    @Input
+    abstract Property<String> getGitVersion()
+
+    @Input
+    abstract Property<String> getGitCommit()
+
+    @Input
+    abstract Property<String> getBuildTime()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDirectory()
+
+    @TaskAction
+    void generate() {
+        def dir = new File(outputDirectory.get().asFile, packageName.get().replace('.', '/'))
+        dir.mkdirs()
+
+        new File(dir, "BuildInfo.java").text = """\
+            |package ${packageName.get()};
             |
             |public final class BuildInfo {
-            |  public static final String NAME = "${project.name}";
-            |  public static final String VERSION = "${gitVersionStr}";
-            |  public static final String GIT_COMMIT = "${gitCommitStr ?: 'unknown'}";
-            |  public static final String BUILD_TIME = "${buildTime}";
+            |  public static final String NAME = "${moduleName.get()}";
+            |  public static final String VERSION = "${gitVersion.get()}";
+            |  public static final String GIT_COMMIT = "${gitCommit.get()}";
+            |  public static final String BUILD_TIME = "${buildTime.get()}";
+            |
+            |  private BuildInfo() {}
             |}
             """.stripMargin()
-
-        new File(outputDir, "BuildInfo.java").text = content
     }
 }
 
-// Make sure the file is included in the compiled sources
+def generateBuildInfo = tasks.register('generateBuildInfo', GenerateBuildInfo) {
+    moduleName.set(project.name)
+    packageName.set('com.manticore.jsqlformatter')
+    gitVersion.set(gitDescribeProvider)
+    gitCommit.set(gitCommitProvider.orElse('unknown'))
+    buildTime.set(gitCommitTimeProvider.orElse('unknown'))
+    outputDirectory.set(layout.buildDirectory.dir("generated/sources/buildinfo/java/main"))
+}
+
+// Registering the TaskProvider (not a bare File) is what wires the task dependency.
+// The previous `srcDir(<File>)` + `mustRunAfter` combination declared NO dependency at
+// all - mustRunAfter only orders tasks that are already both in the graph - so a clean
+// build could reach compileJava without BuildInfo.java existing.
 sourceSets {
     main {
         java {
-            srcDir layout.buildDirectory.file("generated/sources/buildinfo/java/main").get().asFile
+            srcDir(generateBuildInfo)
         }
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    mustRunAfter("generateBuildInfo")
-}
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Java toolchain / compilation
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
 java {
     withSourcesJar()
 
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
-
-    // needed for XML-Doclet to work (since Doclet changed again with Java 13)
+    // Compile and run with 17 (needed for XML-Doclet, since Doclet changed with Java 13),
+    // emit Java 11 bytecode via `options.release` below. `sourceCompatibility` /
+    // `targetCompatibility` are intentionally NOT set: `release` supersedes them and also
+    // validates against the Java 11 API surface, which target/source never did.
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
-jar {
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 11
+}
+
+// Reproducible archives.
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+def createdBy = providers.systemProperty('user.name').orElse('unknown')
+
+tasks.named('jar', Jar) {
     manifest {
         attributes(
-                "Created-By": System.properties['user.name'],
+                "Created-By": createdBy.get(),
                 "Automatic-Module-Name": "com.manticore.jsqlformatter"
         )
     }
@@ -177,7 +217,7 @@ jar {
     bundle {
         properties.empty()
         bnd(
-                "Created-By": System.properties.get('user.name'),
+                "Created-By": createdBy.get(),
                 "Bundle-SymbolicName": "com.manticore.jsqlformatter",
                 "Import-Package": "*",
                 "Export-Package": "com.manticore.jsqlformatter.*",
@@ -186,27 +226,19 @@ jar {
     }
 }
 
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
+tasks.named('javadoc', Javadoc) {
+    options.encoding = 'UTF-8'
+    options.addBooleanOption('html5', true)
     options.addBooleanOption("Xdoclint:none", true)
 }
 
-tasks.register('xmldoc', Javadoc) {
-    dependsOn(compileJava)
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// XML Javadoc
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
-    def outFile = reporting.file(
-            version.endsWith("-SNAPSHOT")
-                    ? "xmlDoclet/javadoc_snapshot.xml"
-                    : "xmlDoclet/javadoc_stable.xml"
-    )
-    def rstFile = reporting.file(
-            version.endsWith("-SNAPSHOT")
-                    ? "xmlDoclet/javadoc_snapshot.rst"
-                    : "xmlDoclet/javadoc_stable.rst"
-    )
+def xmlDocFileName = isSnapshot ? "javadoc_snapshot.xml" : "javadoc_stable.xml"
 
+def xmldoc = tasks.register('xmldoc', Javadoc) {
     source = sourceSets.main.allJava
     classpath = sourceSets.main.runtimeClasspath
 
@@ -214,33 +246,56 @@ tasks.register('xmldoc', Javadoc) {
     destinationDir = reporting.file("xmlDoclet")
     options.docletpath = configurations.xmlDoclet.files as List
     options.doclet = "com.manticore.tools.xmldoclet.XmlDoclet"
-    options.addBooleanOption("rst", true)
-    options.addBooleanOption("withFloatingToc", true)
     options.addStringOption("basePackage", "com.manticore.jsqlformatter")
-    options.addStringOption("filename", outFile.getName())
-
-    copy {
-        from rstFile
-        into layout.projectDirectory.dir("src/site/sphinx/").asFile
-    }
+    options.addStringOption("filename", xmlDocFileName)
 }
 
-test {
-    useJUnitPlatform()
-    jacoco {
-        excludes = ['net/sf/jsqlparser/parser/CCJSqlParserTokenManager']
+// The legacy build called `copy { }` inline in the task *configuration* block, so it ran
+// at configuration time - before the Javadoc had been generated - and copied whatever
+// stale file happened to be on disk. A real Copy task fixes the ordering and the
+// up-to-date checking.
+def copyXmlDoc = tasks.register('copyXmlDoc', Copy) {
+    from(xmldoc) {
+        include xmlDocFileName
     }
+    into layout.projectDirectory.dir("src/site/sphinx")
+}
 
-    // set heap size for the test JVM(s)
+xmldoc.configure {
+    finalizedBy(copyXmlDoc)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Test
+// ═══════════════════════════════════════════════════════════════════════════════════════
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
     minHeapSize = "128m"
     maxHeapSize = "1G"
+
+    // Was `maxParallelForks = 100` + `forkEvery = 1`: a fresh 1 GB JVM per test class,
+    // up to 100 concurrently. Scale to the machine instead and let forks be reused.
+    maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(2))
+
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Quality / coverage
+// ═══════════════════════════════════════════════════════════════════════════════════════
+
+def generatedSourceExclude = '**/BuildInfo.java'
+
 license {
-    excludes(["**/*.txt", "**/*.conf", "**/*.sql"])
+    excludes(["**/*.txt", "**/*.conf", "**/*.sql", generatedSourceExclude])
     includes(["**/*.properties", "**/*.java", "**/*.xml"])
 
-    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.year = Year.now().value
     ext.name = 'Andreas Reichel'
     ext.email = 'andreas@manticore-projects.com'
 
@@ -252,8 +307,8 @@ coveralls {
     jacocoReportPath layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml')
 }
 
-jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
+tasks.named('jacocoTestReport', JacocoReport) {
+    dependsOn tasks.named('test')
     reports {
         xml.required = true
         csv.required = false
@@ -261,7 +316,7 @@ jacocoTestReport {
     }
 }
 
-jacocoTestCoverageVerification {
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
     violationRules {
         rule {
             limit {
@@ -280,40 +335,57 @@ jacocoTestCoverageVerification {
     }
 }
 
-spotbugsMain {
+spotbugs {
+    excludeFilter = file("config/spotbugs/spotBugsExcludeFilter.xml")
+}
+
+tasks.named('spotbugsMain') {
     reports {
         html {
-            destination = file("build/reports/spotbugs/main/spotbugs.html")
+            required = true
+            // Gradle 9 removed Report.destination - outputLocation is the only setter left.
+            outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
             stylesheet = 'fancy-hist.xsl'
         }
     }
 }
 
-spotbugs {
-    // fail only on P1 and without the net.sf.jsqlparser.parser.*
-    excludeFilter = file("config/spotbugs/spotBugsExcludeFilter.xml")
-
-    // do not run over the test, although we should do that eventually
-    spotbugsTest.enabled = false
+// do not run over the test, although we should do that eventually
+tasks.named('spotbugsTest') {
+    enabled = false
 }
 
 pmd {
     consoleOutput = true
     sourceSets = [sourceSets.main]
 
+    // Pin the analyzer. Gradle 9.6 defaults to PMD 7.24.0; leaving it implicit means a
+    // Gradle upgrade can silently change which rules exist and break config/pmd/ruleset.xml.
+    toolVersion = '7.24.0'
+
     // clear the ruleset in order to use configured rules only
     ruleSets = []
 
     ruleSetFiles = files("config/pmd/ruleset.xml")
+}
 
-    pmdMain {
-        excludes = ["build/generated/*"]
-    }
+tasks.named('pmdMain', Pmd) {
+    // SourceTask patterns are relative to the source roots, so the old
+    // "build/generated/*" pattern never matched anything.
+    exclude generatedSourceExclude
 }
 
 checkstyle {
     sourceSets = [sourceSets.main, sourceSets.test]
     configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+}
+
+tasks.withType(Checkstyle).configureEach {
+    exclude generatedSourceExclude
+    reports {
+        xml.required = false
+        html.required = true
+    }
 }
 
 spotless {
@@ -330,21 +402,17 @@ spotless {
         endWithNewline()
     }
     java {
+        targetExclude 'build/**'
         leadingTabsToSpaces(4)
         eclipse().configFile('config/formatter/eclipse-java-google-style.xml')
     }
 }
 
-tasks.withType(Checkstyle).configureEach {
-    reports {
-        xml.required = false
-        html.required = true
-    }
-}
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Publishing
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
 mavenPublishing {
-    publishToMavenCentral(true)
-    signAllPublications()
 
     coordinates(group, "jsqlformatter", version)
 
@@ -368,7 +436,7 @@ mavenPublishing {
         scm {
             connection = 'scm:git:https://github.com/manticore-projects/jsqlformatter.git'
             developerConnection = 'scm:git:ssh://git@github.com:manticore-projects/jsqlformatter.git'
-            url = 'http://manticore-projects.com/JSQLFormatter/index.html'
+            url = 'https://manticore-projects.com/JSQLFormatter/index.html'
         }
     }
 }
@@ -379,7 +447,7 @@ tasks.withType(AbstractPublishToMaven).configureEach {
 }
 
 signing {
-    required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
+    required { !isSnapshot && gradle.taskGraph.hasTask("publish") }
 }
 
 // Resolve dynamic dependencies to concrete versions in POM
@@ -390,25 +458,20 @@ publishing {
                 // Suppress the warning about Maven-incompatible version notation
                 it.suppressPomMetadataWarningsFor('runtimeElements')
 
+                def runtimeClasspath = configurations.runtimeClasspath
+
                 it.pom.withXml {
-                    def runtimeDeps = project.configurations.runtimeClasspath
-                            .resolvedConfiguration
-                            .firstLevelModuleDependencies
+                    def resolved = runtimeClasspath.incoming.resolutionResult.allComponents
+                            .collect { it.moduleVersion }
+                            .findAll { it != null }
 
-                    def depsNode = asNode().dependencies?.dependency
-
-                    depsNode?.each { depNode ->
-                        def groupId = depNode.groupId.text()
-                        def artifactId = depNode.artifactId.text()
-
-                        // Find the resolved dependency
-                        def resolved = runtimeDeps.find {
-                            it.moduleGroup == groupId && it.moduleName == artifactId
+                    asNode().dependencies?.dependency?.each { depNode ->
+                        def match = resolved.find {
+                            it.group == depNode.groupId.text() && it.name == depNode.artifactId.text()
                         }
-
-                        if (resolved != null) {
-                            // Replace dynamic version (+, latest.release, etc.) with resolved version
-                            depNode.version[0].value = resolved.moduleVersion
+                        if (match != null) {
+                            // Replace dynamic version (+, latest.release, ...) with resolved version
+                            depNode.version[0].value = match.version
                         }
                     }
                 }
@@ -417,19 +480,13 @@ publishing {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.release = 11
-}
-
-tasks.withType(Test).configureEach {
-    maxParallelForks = 100
-    forkEvery = 1
-}
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// Site: changelog, upload
+// ═══════════════════════════════════════════════════════════════════════════════════════
 
 tasks.register('gitChangelogTask', GitChangelogTask) {
-    fromRepo.set(file("$projectDir").toString())
-    file.set(new File("${projectDir}/src/site/sphinx/changelog.rst"))
+    fromRepo.set(projectDir.toString())
+    file.set(new File(projectDir, "src/site/sphinx/changelog.rst"))
 
     // switch off the formatter since the indentation matters for Mark-down
     // @formatter:off
@@ -477,12 +534,28 @@ ssh.settings {
 }
 
 tasks.register('upload') {
-    dependsOn(jar, gitChangelogTask, xmldoc, xslt)
+    dependsOn(tasks.named('jar'), tasks.named('gitChangelogTask'), xmldoc)
+
+    // The hidetake ssh plugin runs its session from a task action, which is inherently
+    // incompatible with the Configuration Cache. Declared rather than discovered.
+    //
+    // TODO(Gradle 10): `ssh.run { }` reaches into Project at execution time. That is a
+    // deprecation warning in Gradle 9 and an error in Gradle 10, and the plugin offers no
+    // lazy alternative. Replace with an `Exec` task shelling out to rsync/scp, or with a
+    // custom task using an injected ExecOperations, before upgrading past 9.x.
+    notCompatibleWithConfigurationCache("org.hidetake.ssh uses Project services at execution time")
+
+    // Everything the action needs is captured here, at configuration time.
+    def webServerHost = findProperty("${project.name}.host")
+    def remoteDir = "download/${project.name}-${stableVersion}"
+    def jarFiles = layout.buildDirectory.dir("libs").map { it.asFileTree.matching { include '*.jar' } }
+    def moduleName = project.name
+
     doFirst {
-        if (findProperty("${project.name}.host") == null) {
+        if (webServerHost == null) {
             println("""
-                Property "${project.name}.host" not found.
-                Please define "${project.name}.host" in the Gradle configuration (e.g. \$HOME/.gradle/gradle.properties).
+                Property "${moduleName}.host" not found.
+                Please define "${moduleName}.host" in the Gradle configuration (e.g. \$HOME/.gradle/gradle.properties).
                 """.stripIndent()
             )
         }
@@ -490,77 +563,11 @@ tasks.register('upload') {
     doLast {
         ssh.run {
             session(remotes.webServer) {
-                def versionStable = getVersion(false)
-                execute "mkdir -p download/${project.name}-${versionStable}"
-                for (File file : fileTree(include: ['*.jar'], dir: "${project.buildDir}/libs").collect()) {
-                    put from: file, into: "download/${project.name}-${versionStable}"
+                execute "mkdir -p ${remoteDir}"
+                jarFiles.get().each { File f ->
+                    put from: f, into: remoteDir
                 }
             }
         }
     }
-}
-
-tasks.register('renderRR') {
-    doLast {
-        def rrDir = layout.buildDirectory.dir("rr").get().asFile
-
-        // Download convert.war
-        download.run {
-            src 'http://manticore-projects.com/download/convert.war'
-            dest new File(rrDir, "convert.war")
-            overwrite false
-            onlyIfModified true
-        }
-
-        // Download rr.war
-        download.run {
-            src 'http://manticore-projects.com/download/rr.war'
-            dest new File(rrDir, "rr.war")
-            overwrite false
-            onlyIfModified true
-            tempAndMove true
-        }
-
-        // Convert JJ file to EBNF
-        tasks.register("convertJJ", JavaExec) {
-            standardOutput = new FileOutputStream(new File(rrDir, "JSqlParserCC.ebnf"))
-            mainClass = "-jar"
-            args = [
-                    new File(rrDir, "convert.war").absolutePath,
-                    project(":JSQLParser").layout.buildDirectory.file("generated/jjtree/net/sf/jsqlparser/parser/JSqlParserCC.jj").get().getAsFile().absolutePath
-            ]
-        }.get().exec()
-
-        // Generate RR diagrams
-        tasks.register("generateRR", JavaExec) {
-            mainClass = "-jar"
-            args = [
-                    new File(rrDir, "rr.war").absolutePath,
-                    "-noepsilon",
-                    "-color:#4D88FF",
-                    "-offset:0",
-                    "-width:800",
-                    "-out:${new File(rrDir, "JSqlParserCC.xhtml")}",
-                    new File(rrDir, "JSqlParserCC.ebnf").absolutePath
-            ]
-        }.get().exec()
-    }
-}
-
-tasks.register('xslt', SaxonXsltTask) {
-    def outFile = version.endsWith("-SNAPSHOT")
-            ? file("src/site/sphinx/syntax_snapshot.rst")
-            : file("src/site/sphinx/syntax_stable.rst")
-
-    dependsOn(renderRR)
-    stylesheet file('src/main/resources/rr/xhtml2rst.xsl')
-
-    parameters(
-            "withFloatingToc": System.getenv().getOrDefault("FLOATING_TOC", "true"),
-            "isSnapshot": Boolean.toString(version.endsWith("-SNAPSHOT"))
-    )
-
-    // Transform every .xml file in the "input" directory.
-    input layout.buildDirectory.file("rr/JSqlParserCC.xhtml").get()
-    output outFile
 }

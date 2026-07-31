@@ -17,104 +17,151 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<ruleset name="Default Maven PMD Plugin Ruleset" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+<ruleset name="Manticore Projects Ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
-	<description>
-        The default ruleset used by the Maven PMD Plugin, when no other ruleset is specified.
-        It contains the rules of the old (pre PMD 6.0.0) rulesets java-basic, java-empty, java-imports,
-        java-unnecessary, java-unusedcode.
+    <description>
+        Derived from the default ruleset of the Maven PMD Plugin, ported to PMD 7.
 
-        This ruleset might be used as a starting point for an own customized ruleset [0].
+        PMD 7 removed the rules of the old (pre PMD 6.0.0) java-basic / java-empty /
+        java-imports / java-unnecessary / java-unusedcode rulesets that had been
+        deprecated throughout the 6.x line. The removed references have been mapped to
+        their PMD 7 successors; see the inline notes.
 
-        [0] https://pmd.github.io/latest/pmd_userdocs_making_rulesets.html
+        https://docs.pmd-code.org/latest/pmd_userdocs_making_rulesets.html
     </description>
 
-	<rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP" />
-	<rule ref="category/java/bestpractices.xml/CheckResultSet" />
-    
-    <!-- this little fellow will complain about PACKAGE based imports -->
-    <!--<rule ref="category/java/bestpractices.xml/UnusedImports" /> -->
+    <!-- ══ bestpractices ═══════════════════════════════════════════════════════════ -->
 
-	<rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
-	<rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
-	<rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
-	<rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+    <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP" />
+    <rule ref="category/java/bestpractices.xml/CheckResultSet" />
 
-	<rule ref="category/java/codestyle.xml/ExtendsObject" />
-	<rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
-	<rule ref="category/java/codestyle.xml/TooManyStaticImports" />
-	<rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
-	<rule ref="category/java/codestyle.xml/UnnecessaryModifier" />
-	<rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
-	<rule ref="category/java/codestyle.xml/UselessParentheses" />
-	<rule ref="category/java/codestyle.xml/UselessQualifiedThis" />
-    
-		<!-- for Codazy -->
-	<rule ref="category/java/codestyle.xml/MethodNamingConventions">
-		<properties>
-			<property name="methodPattern" value="[a-z][a-zA-Z0-9]*" />
-			<property name="staticPattern" value="[a-z][a-zA-Z0-9]*" />
-			<property name="nativePattern" value="[a-z][a-zA-Z0-9]*" />
-			<property name="junit3TestPattern" value="test[A-Z0-9][a-zA-Z0-9]*" />
-			<property name="junit4TestPattern" value="[a-z][a-zA-Z0-9]*" />
-			<property name="junit5TestPattern" value="[a-z][a-zA-Z0-9]*" />
-		</properties>
-	</rule>
-	<rule ref="category/java/codestyle.xml/ClassNamingConventions" />
+    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
 
-	<rule ref="category/java/design.xml/CollapsibleIfStatements" />
-	<rule ref="category/java/design.xml/SimplifiedTernary" />
-	<rule ref="category/java/design.xml/UselessOverridingMethod" />
-	<rule ref="category/java/design.xml/AvoidThrowingNullPointerException" />
+    <!-- PMD 7: SwitchStmtsShouldHaveDefault is deprecated -> NonExhaustiveSwitch.
+         Still disabled: it also fires on switches over enums that cover every constant. -->
+    <!-- <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch" /> -->
 
-	<!--
-	<rule ref="category/java/design.xml/NPathComplexity">
-		<properties>
-			<property name="reportLevel" value="200" />
-		</properties>
-	</rule>
-	-->
+    <!-- ══ codestyle ═══════════════════════════════════════════════════════════════ -->
 
+    <!-- PMD 7: bestpractices/UnusedImports was REMOVED -> codestyle/UnnecessaryImport.
+         The successor is type-resolution based and no longer complains about
+         package-based imports, so it should be safe to re-enable once the auxclasspath
+         is complete. Left off for now to keep the port behaviour-neutral. -->
+    <!-- <rule ref="category/java/codestyle.xml/UnnecessaryImport" /> -->
 
-	<!-- for Codazy -->
-	<rule ref="category/java/design.xml/CyclomaticComplexity" />
-	<rule ref="category/java/design.xml/ExcessiveMethodLength" />
-	<!-- <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" /> -->
+    <rule ref="category/java/codestyle.xml/ExtendsObject" />
+    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
+    <rule ref="category/java/codestyle.xml/TooManyStaticImports" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryModifier" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
+    <rule ref="category/java/codestyle.xml/UselessParentheses" />
+    <rule ref="category/java/codestyle.xml/UselessQualifiedThis" />
 
-	<rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
-	<rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
-	<rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
-	<rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />
-	<rule ref="category/java/errorprone.xml/BrokenNullCheck" />
-	<rule ref="category/java/errorprone.xml/CheckSkipResult" />
-	<rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray" />
-	<rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
-	<rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
-	<rule ref="category/java/errorprone.xml/EmptyFinallyBlock" />
-	<rule ref="category/java/errorprone.xml/EmptyIfStmt" />
-	<rule ref="category/java/errorprone.xml/EmptyInitializer" />
-	<rule ref="category/java/errorprone.xml/EmptyStatementBlock" />
-	<rule ref="category/java/errorprone.xml/EmptyStatementNotInLoop" />
-	<rule ref="category/java/errorprone.xml/EmptySwitchStatements" />
-	<rule ref="category/java/errorprone.xml/EmptySynchronizedBlock" />
-	<rule ref="category/java/errorprone.xml/EmptyTryBlock" />
-	<rule ref="category/java/errorprone.xml/EmptyWhileStmt" />
-	<rule ref="category/java/errorprone.xml/JumbledIncrementer" />
-	<rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
-	<rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode" />
-	<rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock" />
-	<rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
-	<rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
-	<rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals" />
-	<rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
-    
-    <!-- for Codazy -->
-	<rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
-	<rule ref="category/java/multithreading.xml/DontCallThreadRun" />
-	<rule ref="category/java/multithreading.xml/DoubleCheckedLocking" />
+    <!-- PMD 7: the eight errorprone/Empty* rules were REMOVED and folded into this one
+         rule, which covers empty try / finally / switch / synchronized / if / while /
+         for / do-while bodies, empty initializers and empty scoping blocks.
+         Replaces: EmptyFinallyBlock, EmptyIfStmt, EmptyInitializer, EmptyStatementBlock,
+                   EmptySwitchStatements, EmptySynchronizedBlock, EmptyTryBlock,
+                   EmptyWhileStmt.
+         Note errorprone/EmptyCatchBlock is NOT part of it and stays separate (below). -->
+    <rule ref="category/java/codestyle.xml/EmptyControlStatement" />
 
-	<rule ref="category/java/performance.xml/BigIntegerInstantiation" />
+    <!-- PMD 7: errorprone/EmptyStatementNotInLoop was REMOVED -> UnnecessarySemicolon. -->
+    <rule ref="category/java/codestyle.xml/UnnecessarySemicolon" />
 
-    <!-- for Codazy -->
-	<!-- <rule ref="category/java/documentation.xml/UncommentedEmptyMethodBody" /> -->
+    <!-- for Codacy -->
+    <rule ref="category/java/codestyle.xml/MethodNamingConventions">
+        <properties>
+            <property name="methodPattern" value="[a-z][a-zA-Z0-9]*" />
+            <property name="staticPattern" value="[a-z][a-zA-Z0-9]*" />
+            <property name="nativePattern" value="[a-z][a-zA-Z0-9]*" />
+            <property name="junit3TestPattern" value="test[A-Z0-9][a-zA-Z0-9]*" />
+            <property name="junit4TestPattern" value="[a-z][a-zA-Z0-9]*" />
+            <!-- PMD >= 7.25.0 renamed this to junitJupiterTestPattern and deprecated
+                 junit5TestPattern. junit5TestPattern still works on 7.25+ (it only emits a
+                 deprecated-property warning), while junitJupiterTestPattern does not exist
+                 before 7.25.0 and hard-fails ruleset loading - so keep this name. -->
+            <property name="junit5TestPattern" value="[a-z][a-zA-Z0-9]*" />
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ClassNamingConventions" />
+
+    <!-- ══ design ══════════════════════════════════════════════════════════════════ -->
+
+    <rule ref="category/java/design.xml/CollapsibleIfStatements" />
+    <rule ref="category/java/design.xml/SimplifiedTernary" />
+    <rule ref="category/java/design.xml/UselessOverridingMethod" />
+    <rule ref="category/java/design.xml/AvoidThrowingNullPointerException" />
+
+    <!--
+    <rule ref="category/java/design.xml/NPathComplexity">
+        <properties>
+            <property name="reportLevel" value="200" />
+        </properties>
+    </rule>
+    -->
+
+    <!-- for Codacy -->
+    <rule ref="category/java/design.xml/CyclomaticComplexity" />
+
+    <!-- PMD 7: design/ExcessiveMethodLength was REMOVED -> NcssCount.
+         NcssCount counts non-commenting source STATEMENTS, not physical lines, so the
+         old `minimum` threshold does not carry over 1:1. It also reports classes, which
+         ExcessiveMethodLength never did - hence classReportLevel is pinned here.
+         IMPORTANT: existing @SuppressWarnings("PMD.ExcessiveMethodLength") annotations
+         are now dead and must become @SuppressWarnings("PMD.NcssCount"). -->
+    <rule ref="category/java/design.xml/NcssCount">
+        <properties>
+            <property name="methodReportLevel" value="100" />
+            <property name="classReportLevel" value="1500" />
+        </properties>
+    </rule>
+
+    <!-- ══ errorprone ══════════════════════════════════════════════════════════════ -->
+
+    <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
+    <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
+    <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
+    <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />
+    <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
+    <rule ref="category/java/errorprone.xml/CheckSkipResult" />
+    <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray" />
+    <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
+    <rule ref="category/java/errorprone.xml/JumbledIncrementer" />
+    <rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
+    <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode" />
+    <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock" />
+    <rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
+    <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
+    <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals" />
+
+    <!-- PMD 7.17.0 deprecated errorprone/UselessOperationOnImmutable (removed in PMD 8)
+         in favour of UselessPureMethodCall, which also exists since 7.17.0.
+         On PMD < 7.17.0 swap the two lines below. -->
+    <rule ref="category/java/errorprone.xml/UselessPureMethodCall" />
+    <!-- <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" /> -->
+
+    <!-- ══ multithreading ══════════════════════════════════════════════════════════ -->
+
+    <!-- for Codacy -->
+    <rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
+    <rule ref="category/java/multithreading.xml/DontCallThreadRun" />
+    <rule ref="category/java/multithreading.xml/DoubleCheckedLocking" />
+
+    <!-- ══ performance ═════════════════════════════════════════════════════════════ -->
+
+    <rule ref="category/java/performance.xml/BigIntegerInstantiation" />
+
+    <!-- ══ documentation ═══════════════════════════════════════════════════════════ -->
+
+    <!-- for Codacy -->
+    <!-- <rule ref="category/java/documentation.xml/UncommentedEmptyMethodBody" /> -->
 </ruleset>
