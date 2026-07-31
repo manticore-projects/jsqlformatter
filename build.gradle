@@ -275,9 +275,27 @@ tasks.withType(Test).configureEach {
     minHeapSize = "128m"
     maxHeapSize = "1G"
 
-    // Was `maxParallelForks = 100` + `forkEvery = 1`: a fresh 1 GB JVM per test class,
-    // up to 100 concurrently. Scale to the machine instead and let forks be reused.
-    maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(2))
+    // Deterministic until FormattingOptions is threaded through (see below).
+    // Once formatting state is per-call, raise this again.
+    maxParallelForks = 1
+
+    // Belt and braces: a fresh JVM per class makes static leakage structurally
+    // impossible. Costs a few seconds on a suite this size. Remove together
+    // with maxParallelForks = 1 once the refactor lands.
+    forkEvery = 1
+
+    // Stable, machine-independent environment.
+    systemProperty 'user.language', 'en'
+    systemProperty 'user.country', 'US'
+    systemProperty 'file.encoding', 'UTF-8'
+    systemProperty 'user.timezone', 'UTC'
+
+    // Opt-in randomised ordering for the nightly job:
+    //   ./gradlew test -PrandomTestOrder
+    if (project.hasProperty('randomTestOrder')) {
+        systemProperty 'junit.jupiter.testclass.order.default',
+                'org.junit.jupiter.api.ClassOrderer$Random'
+    }
 
     testLogging {
         events "failed"
