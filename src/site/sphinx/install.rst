@@ -2,17 +2,14 @@
 Installation of JSQLFormatter
 *****************************
 
-Git
-===================
-.. code:: Bash
-
-   git clone https://github.com/manticore-projects/jsqlformatter.git
-   cd jsqlformatter
-   ./gradlew publishToMavenLocal
+JSQLFormatter is published to Maven Central under the group
+``com.manticore-projects.jsqlformatter``. From release 5.4 it is licensed under
+the Apache License 2.0.
 
 
-Maven Repo
-===================
+==========================
+As a library
+==========================
 
 .. tab:: Maven Release
 
@@ -36,9 +33,10 @@ Maven Repo
                 <snapshots>
                     <enabled>true</enabled>
                 </snapshots>
-                <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             </repository>
         </repositories>
+
         <dependency>
             <groupId>com.manticore-projects.jsqlformatter</groupId>
             <artifactId>jsqlformatter</artifactId>
@@ -65,7 +63,7 @@ Maven Repo
 
         repositories {
             maven {
-                url = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
+                url = uri('https://central.sonatype.com/repository/maven-snapshots/')
             }
         }
 
@@ -73,36 +71,61 @@ Maven Repo
             implementation 'com.manticore-projects.jsqlformatter:jsqlformatter:|JSQLFORMATTER_SNAPSHOT_VERSION|'
         }
 
+.. note::
+
+   The legacy ``s01.oss.sonatype.org`` snapshot host has been decommissioned.
+   If your build still points at it, update to the URL above.
 
 
+==========================
 Download
-===================
+==========================
 
-Static Binaries
+Static binaries
 ---------------------------------------------
 
-.. list-table:: Static Binaries Direct Download Links
+.. list-table:: Direct download links
    :widths: 35 50 15
    :header-rows: 1
 
-   * - Operating System
+   * - Package
      - File
      - Size
-   * - Java Stable Release
+   * - Java stable release
      - |JSQLFORMATTER_STABLE_VERSION_LINK|
-     - (80 kB)
-   * - Java Development Snapshot
+     - 80 kB
+   * - Java development snapshot
      - |JSQLFORMATTER_SNAPSHOT_VERSION_LINK|
-     - (80 kB)
-   * - Java Fat JAR Devel. Snapshot
+     - 80 kB
+   * - Java fat JAR, development snapshot
      - |JSQLFORMATTER_FAT_SNAPSHOT_VERSION_LINK|
-     - (15 MB)
+     - 15 MB
+
+The slim JARs expect JSQLParser and its dependencies on the classpath. The fat
+JAR bundles everything and runs standalone -- use that one for the CLI unless
+you are managing dependencies yourself.
 
 .. note::
 
-  On MacOS, grant an exception for a blocked app by clicking the Open Anyway button in the General pane of Security & Privacy preferences.
+   On macOS, grant an exception for a blocked app by clicking **Open Anyway**
+   in the General pane of Security & Privacy preferences.
 
-Native Dynamic Libraries
+
+Native dynamic libraries
 ---------------------------------------------
 
-   Coming soon.
+Coming soon.
+
+
+==========================
+Build from source
+==========================
+
+.. code-block:: bash
+
+   git clone https://github.com/manticore-projects/jsqlformatter.git
+   cd jsqlformatter
+   ./gradlew publishToMavenLocal
+
+This installs the artifact into your local Maven repository, where a
+``mavenLocal()`` repository declaration will pick it up.

@@ -2,14 +2,29 @@
 Interactive Demo
 ****************
 
-Using latest JSQLParser version: |JSQLPARSER_SNAPSHOT_VERSION_LINK|
+Paste a statement, pick your options, and see the result immediately. The demo
+runs the current development build against
+|JSQLPARSER_SNAPSHOT_VERSION_LINK|.
 
 .. raw:: html
 
-	<iframe id="vboxFrame" src="../_static/jsqlformatter_demo.html" height="480" width="100%"></iframe></div>
+	<iframe id="jsqlformatterFrame"
+	        src="../_static/jsqlformatter_demo.html"
+	        height="560"
+	        width="100%"
+	        style="border:0;border-radius:8px;"
+	        title="JSQLFormatter interactive demo"></iframe>
 	<script>
-	  let url    = "../_static/jsqlformatter_demo.html";
-	  let params = "?"+window.location.search.substr(1);
-	  let iframeUrl = url+params;
-	  vboxFrame.src = iframeUrl;
+	  (function () {
+	    var frame = document.getElementById("jsqlformatterFrame");
+	    var query = window.location.search;
+	    if (frame && query.length > 1) {
+	      frame.src = "../_static/jsqlformatter_demo.html?" + query.substring(1);
+	    }
+	  })();
 	</script>
+
+.. note::
+
+   The demo is also reachable standalone at
+   `jsqlformatter.manticore-projects.com <http://jsqlformatter.manticore-projects.com>`_.

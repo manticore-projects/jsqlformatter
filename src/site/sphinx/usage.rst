@@ -2,93 +2,163 @@
 How to use it
 *****************
 
------------------
-Static Binaries
------------------
+=================
+As a Java library
+=================
 
-.. tab:: JVM
+The entry point is ``com.manticore.jsqlformatter.JSQLFormatter``. A single
+static call covers the common case:
 
-  .. code:: Bash
+.. code-block:: java
 
-     java -jar JSQLFormatterCLI.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
-
-.. tab:: Linux Shell
-
-  .. code:: Bash
-
-     ./JSQLFormatterCLI [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
-
-.. tab:: Windows Power Shell
-
-  .. code:: Bash
-
-     JSQLFormatterCLI.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html]   [-t <arg> | -2 | -8]   [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>] 
-
-..........................
-Command Line Options (CLI)
-..........................
---inputFile, -i <arg>           The input SQL file or folder.
---outputFile, -o <arg>          The out SQL file for the formatted statements.
---format, -f <arg>              The output-format [PLAIN* ANSI HTML RTF]
---ansi                          Output ANSI annotated text.
---html                          Output HTML annotated text.
---indentWidth, -t <arg>         The Indent Width [2 4* 8]
- -2                             Indent with 2 characters.
- -8                             Indent with 8 characters.
---keywordSpelling <arg>         Spelling of keywords. [UPPER* LOWER CAMEL KEEP]
---objectSpelling <arg>          Spelling of object names. [UPPER* LOWER CAMEL KEEP]
---functionSpelling <arg>        Spelling of function names. [UPPER* LOWER CAMEL KEEP]
---separation <arg>              Position of the field separator. [BEFORE* AFTER]
---squareBracketQuotation <arg>  Interpret Square Brackets "[]" as quotes instead of arrays. [AUTO* YES NO]
---statementTerminator <arg>     Set the statement terminator. [SEMICOLON* NONE GO BACKSLASH]
- 
-.. note::
-
-  You can provide the SQL Statement as an argument to the program, e. g.
-   
-  .. code:: Bash
-        
-    java -jar JSQLFormatterCLI.jar "select * from dual;"
-
-.. note::
-
-  You can provide the formatting options as comment in front of the sql statement
-   
-  .. code:: SQL
-        
-    -- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
-    SELECT 'something' FROM DUAL;
-       
-     
-.. warning::
-
-  On Windows 10, you will need to active ANSI output first
-        
-  .. code:: Shell
-   
-    Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1     
-      
-        
-
------------------
-Dynamic Libraries
------------------
-
-.. tab:: Java
-
-  .. code:: Java
-
-    import com.manticore.jsqlformatter.JSqlFormatter;
+    import com.manticore.jsqlformatter.JSQLFormatter;
 
     class Sample {
         public static void main(String[] args) {
-            String formattedSql = JSqlFormatter.format("select * from dual;");
+            String formattedSql = JSQLFormatter.format("select * from dual;");
+            System.out.println(formattedSql);
         }
     }
 
-.. tab:: C++
+Formatting options are passed as trailing ``key=value`` arguments, using the
+same names as the CLI flags and the inline directive:
 
-  .. code:: python
+.. code-block:: java
+
+    String formattedSql = JSQLFormatter.format(
+            "select * from dual;",
+            "indentWidth=2",
+            "keywordSpelling=LOWER",
+            "separation=AFTER");
+
+.. note::
+
+   The class name is ``JSQLFormatter``, all caps. Earlier revisions of this
+   page showed ``JSqlFormatter``, which will not compile.
+
+
+=======================
+From the command line
+=======================
+
+.. tab:: JVM
+
+  .. code-block:: bash
+
+     java -jar JSQLFormatterCLI.jar [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html] [-t <arg> | -2 | -8] [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
+
+.. tab:: Linux Shell
+
+  .. code-block:: bash
+
+     ./JSQLFormatterCLI [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html] [-t <arg> | -2 | -8] [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
+
+.. tab:: Windows PowerShell
+
+  .. code-block:: powershell
+
+     JSQLFormatterCLI.exe [-i <arg>] [-o <arg>] [-f <arg> | --ansi | --html] [-t <arg> | -2 | -8] [--keywordSpelling <arg>] [--functionSpelling <arg>] [--objectSpelling <arg>] [--separation <arg>] [--squareBracketQuotation <arg>] [--statementTerminator <arg>]
+
+Typical invocations:
+
+.. code-block:: bash
+
+   # format a file, ANSI highlighted, straight to the terminal
+   java -jar JSQLFormatterCLI.jar -i queries.sql --ansi
+
+   # reformat a whole folder into one target file, 2-space indent, lowercase keywords
+   java -jar JSQLFormatterCLI.jar -i ./sql/ -o formatted.sql -2 --keywordSpelling LOWER
+
+   # format a statement passed directly as an argument
+   java -jar JSQLFormatterCLI.jar "select * from dual;"
+
+
+..........................
+Command line options
+..........................
+
+.. list-table::
+   :widths: 28 42 30
+   :header-rows: 1
+
+   * - Option
+     - Description
+     - Values (default marked ``*``)
+   * - ``--inputFile``, ``-i``
+     - The input SQL file or folder
+     - path
+   * - ``--outputFile``, ``-o``
+     - The output SQL file for the formatted statements
+     - path
+   * - ``--format``, ``-f``
+     - The output format
+     - ``PLAIN*`` ``ANSI`` ``HTML`` ``RTF``
+   * - ``--ansi``
+     - Shorthand for ANSI annotated output
+     -
+   * - ``--html``
+     - Shorthand for HTML annotated output
+     -
+   * - ``--indentWidth``, ``-t``
+     - The indent width
+     - ``2`` ``4*`` ``8``
+   * - ``-2`` / ``-8``
+     - Shorthand for indent width 2 or 8
+     -
+   * - ``--keywordSpelling``
+     - Spelling of keywords
+     - ``UPPER*`` ``LOWER`` ``CAMEL`` ``KEEP``
+   * - ``--functionSpelling``
+     - Spelling of function names
+     - ``UPPER`` ``LOWER`` ``CAMEL*`` ``KEEP``
+   * - ``--objectSpelling``
+     - Spelling of object names
+     - ``UPPER`` ``LOWER*`` ``CAMEL`` ``KEEP``
+   * - ``--separation``
+     - Position of the field separator
+     - ``BEFORE*`` ``AFTER``
+   * - ``--squareBracketQuotation``
+     - Interpret square brackets ``[]`` as quotes instead of arrays
+     - ``AUTO*`` ``YES`` ``NO``
+   * - ``--statementTerminator``
+     - The statement terminator
+     - ``SEMICOLON*`` ``NONE`` ``GO`` ``BACKSLASH``
+
+.. warning::
+
+   On Windows 10 you need to enable ANSI output before ``--ansi`` will render:
+
+   .. code-block:: powershell
+
+      Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1
+
+
+=======================
+Options inside the SQL
+=======================
+
+Any statement can carry its own formatting options in a leading comment. This
+is the most useful feature for repositories that serve more than one house
+style, because different statements in the same file can follow different
+conventions.
+
+.. code-block:: sql
+
+    -- @JSQLFormatter(indentWidth=8, keywordSpelling=UPPER, functionSpelling=CAMEL, objectSpelling=LOWER, separation=BEFORE)
+    SELECT 'something' FROM DUAL;
+
+The directive accepts the same keys as the CLI flags, and applies to every
+statement following it until the next directive.
+
+
+=========================
+From C and other natives
+=========================
+
+The GraalVM shared library exposes ``format`` through the standard isolate
+API.
+
+.. code-block:: c
 
     #include <stdlib.h>
     #include <stdio.h>
@@ -113,4 +183,3 @@ Dynamic Libraries
 
         return 0;
     }
-
