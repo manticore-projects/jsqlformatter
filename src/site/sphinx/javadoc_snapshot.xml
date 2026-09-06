@@ -204,7 +204,14 @@
             </field>
         </class>
         <class name="JSQLFormatter" qualified="com.manticore.jsqlformatter.JSQLFormatter" scope="public" abstract="false" error="false" exception="false" externalizable="false" serializable="false">
-            <comment>A powerful Java SQL Formatter based on the JSQLParser.</comment>
+            <comment>A powerful Java SQL Formatter based on the JSQLParser.
+
+ &lt;p&gt;
+ Internally, the formatting work is split between this class (public API + stateless helpers +
+ enums + format-options state), ,{@link Renderer}, (output buffer + cross-cutting helpers),
+ ,{@link FormatContext}, (immutable per-frame context), and four visitor classes
+ (,{@link StatementFormatter},, ,{@link SelectFormatter},, ,{@link FromItemFormatter},,
+ ,{@link ExpressionFormatter},) that replace the legacy ,{@code if/instanceof}, chains.</comment>
             <tag name="author" text="@author &lt;a href=&quot;mailto:andreas@manticore-projects.com&quot;&gt;Andreas Reichel&lt;/a&gt;"/>
             <tag name="version" text="@version 0.1"/>
             <class qualified="java.lang.Object"/>
@@ -299,32 +306,13 @@
                 </parameter>
                 <return qualified="void"/>
             </method>
-            <method name="appendDecodeExpressionsList" signature="void (net.sf.jsqlparser.expression.operators.relational.ExpressionList&lt;?&gt;,com.manticore.jsqlformatter.JSQLFormatter.BreakLine,java.lang.StringBuilder,int)" qualified="appendDecodeExpressionsList" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="parameters">
-                    <type qualified="net.sf.jsqlparser.expression.operators.relational.ExpressionList&lt;?&gt;">
-                        <generic qualified="?">
-                            <wildcard/>
-                        </generic>
-                    </type>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
             <method name="toCamelCase" signature="java.lang.String (java.lang.String)" qualified="toCamelCase" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="s">
                     <type qualified="java.lang.String"/>
                 </parameter>
                 <return qualified="java.lang.String"/>
             </method>
-            <method name="appendKeyWord" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendKeyWord" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendKeyWord" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendKeyWord" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -342,7 +330,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendNormalizingTrailingWhiteSpace" signature="java.lang.StringBuilder (java.lang.StringBuilder,java.lang.String)" qualified="appendNormalizingTrailingWhiteSpace" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendNormalizingTrailingWhiteSpace" signature="java.lang.StringBuilder (java.lang.StringBuilder,java.lang.String)" qualified="appendNormalizingTrailingWhiteSpace" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -351,13 +339,13 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendNormalizedLineBreak" signature="java.lang.StringBuilder (java.lang.StringBuilder)" qualified="appendNormalizedLineBreak" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendNormalizedLineBreak" signature="java.lang.StringBuilder (java.lang.StringBuilder)" qualified="appendNormalizedLineBreak" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendHint" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendHint" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendHint" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendHint" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -375,7 +363,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendOperator" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendOperator" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendOperator" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendOperator" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -393,7 +381,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendValue" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendValue" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendValue" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendValue" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -411,7 +399,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendAlias" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendAlias" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendAlias" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendAlias" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -429,7 +417,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendAlias" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,net.sf.jsqlparser.expression.Alias,java.lang.String,java.lang.String)" qualified="appendAlias" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendAlias" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,net.sf.jsqlparser.expression.Alias,java.lang.String,java.lang.String)" qualified="appendAlias" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -447,7 +435,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendObjectName" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendObjectName" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendObjectName" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendObjectName" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -465,7 +453,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendFunction" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendFunction" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendFunction" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendFunction" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -483,7 +471,7 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="appendType" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendType" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="appendType" signature="java.lang.StringBuilder (java.lang.StringBuilder,com.manticore.jsqlformatter.JSQLFormatter.OutputFormat,java.lang.String,java.lang.String,java.lang.String)" qualified="appendType" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -501,13 +489,13 @@
                 </parameter>
                 <return qualified="java.lang.StringBuilder"/>
             </method>
-            <method name="getLastLineLength" signature="int (java.lang.StringBuilder)" qualified="getLastLineLength" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="getLastLineLength" signature="int (java.lang.StringBuilder)" qualified="getLastLineLength" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
                 <return qualified="int"/>
             </method>
-            <method name="getSubIndent" signature="int (java.lang.StringBuilder,boolean)" qualified="getSubIndent" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+            <method name="getSubIndent" signature="int (java.lang.StringBuilder,boolean)" qualified="getSubIndent" scope="" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
                 </parameter>
@@ -515,24 +503,6 @@
                     <type qualified="boolean"/>
                 </parameter>
                 <return qualified="int"/>
-            </method>
-            <method name="appendDelete" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.delete.Delete,int)" qualified="appendDelete" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="delete">
-                    <type qualified="net.sf.jsqlparser.statement.delete.Delete"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
             </method>
             <method name="getAbsoluteFile" signature="java.io.File (java.lang.String)" qualified="getAbsoluteFile" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
                 <parameter name="filename">
@@ -580,6 +550,13 @@
                     </argument>
                 </annotation>
             </method>
+            <method name="isHandledStatement" signature="boolean (net.sf.jsqlparser.statement.Statement)" qualified="isHandledStatement" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <comment>True iff our visitor framework knows how to dispatch this statement type.</comment>
+                <parameter name="statement">
+                    <type qualified="net.sf.jsqlparser.statement.Statement"/>
+                </parameter>
+                <return qualified="boolean"/>
+            </method>
             <method name="formatToJava" signature="java.lang.StringBuilder (java.lang.String,int,java.lang.String[])" qualified="formatToJava" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="true">
                 <parameter name="sqlStr">
                     <type qualified="java.lang.String"/>
@@ -602,126 +579,6 @@
                     <argument name="value" primitive="false" array="true">
                         <type qualified="java.lang.String[]" dimension="1"/>
                         <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendMerge" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.merge.Merge,int)" qualified="appendMerge" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="merge">
-                    <type qualified="net.sf.jsqlparser.statement.merge.Merge"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendOutputClaus" signature="void (net.sf.jsqlparser.statement.OutputClause,java.lang.StringBuilder,int)" qualified="appendOutputClaus" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="outputClause">
-                    <type qualified="net.sf.jsqlparser.statement.OutputClause"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendMergeUpdate" signature="void (net.sf.jsqlparser.statement.merge.MergeUpdate,java.lang.StringBuilder,int)" qualified="appendMergeUpdate" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="update">
-                    <type qualified="net.sf.jsqlparser.statement.merge.MergeUpdate"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendMergeInsert" signature="void (net.sf.jsqlparser.statement.merge.MergeInsert,java.lang.StringBuilder,int,int)" qualified="appendMergeInsert" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="insert">
-                    <type qualified="net.sf.jsqlparser.statement.merge.MergeInsert"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="i">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendInsert" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.insert.Insert,int)" qualified="appendInsert" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="insert">
-                    <type qualified="net.sf.jsqlparser.statement.insert.Insert"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendUpdate" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.update.Update,int)" qualified="appendUpdate" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="update">
-                    <type qualified="net.sf.jsqlparser.statement.update.Update"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendUpdateSets" signature="void (java.lang.StringBuilder,java.util.List&lt;net.sf.jsqlparser.statement.update.UpdateSet&gt;,int)" qualified="appendUpdateSets" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="updateSets">
-                    <type qualified="java.util.List&lt;net.sf.jsqlparser.statement.update.UpdateSet&gt;">
-                        <generic qualified="net.sf.jsqlparser.statement.update.UpdateSet"/>
-                    </type>
-                </parameter>
-                <parameter name="subIndent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendSelect" signature="void (net.sf.jsqlparser.statement.select.Select,java.lang.StringBuilder,int,boolean,boolean)" qualified="appendSelect" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="select">
-                    <type qualified="net.sf.jsqlparser.statement.select.Select"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="breakLineBefore">
-                    <type qualified="boolean"/>
-                </parameter>
-                <parameter name="indentFirstLine">
-                    <type qualified="boolean"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                        <value>PMD.ExcessiveMethodLength</value>
                     </argument>
                 </annotation>
             </method>
@@ -779,29 +636,9 @@
                 <return qualified="void"/>
                 <exception qualified="java.lang.UnsupportedOperationException"/>
             </method>
-            <method name="appendOrderByElements" signature="void (java.util.List&lt;net.sf.jsqlparser.statement.select.OrderByElement&gt;,java.lang.StringBuilder,int)" qualified="appendOrderByElements" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="orderByElements">
-                    <type qualified="java.util.List&lt;net.sf.jsqlparser.statement.select.OrderByElement&gt;">
-                        <generic qualified="net.sf.jsqlparser.statement.select.OrderByElement"/>
-                    </type>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendHavingExpression" signature="void (net.sf.jsqlparser.expression.Expression,java.lang.StringBuilder,int)" qualified="appendHavingExpression" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="havingExpression">
-                    <type qualified="net.sf.jsqlparser.expression.Expression"/>
+            <method name="appendMergeUpdate" signature="void (net.sf.jsqlparser.statement.merge.MergeUpdate,java.lang.StringBuilder,int)" qualified="appendMergeUpdate" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <parameter name="update">
+                    <type qualified="net.sf.jsqlparser.statement.merge.MergeUpdate"/>
                 </parameter>
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
@@ -811,87 +648,9 @@
                 </parameter>
                 <return qualified="void"/>
             </method>
-            <method name="appendGroupByElement" signature="void (net.sf.jsqlparser.statement.select.GroupByElement,java.lang.StringBuilder,int)" qualified="appendGroupByElement" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="groupByElement">
-                    <type qualified="net.sf.jsqlparser.statement.select.GroupByElement"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <exception qualified="java.lang.UnsupportedOperationException"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendKeywordedExpression" signature="void (java.lang.String,net.sf.jsqlparser.expression.Expression,java.lang.StringBuilder,int)" qualified="appendKeywordedExpression" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="keyword">
-                    <type qualified="java.lang.String"/>
-                </parameter>
-                <parameter name="expression">
-                    <type qualified="net.sf.jsqlparser.expression.Expression"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendWhere" signature="void (net.sf.jsqlparser.expression.Expression,java.lang.StringBuilder,int)" qualified="appendWhere" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="whereExpression">
-                    <type qualified="net.sf.jsqlparser.expression.Expression"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendQualify" signature="void (net.sf.jsqlparser.expression.Expression,java.lang.StringBuilder,int)" qualified="appendQualify" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="qualifyExpression">
-                    <type qualified="net.sf.jsqlparser.expression.Expression"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendJoins" signature="void (java.util.List&lt;net.sf.jsqlparser.statement.select.Join&gt;,java.lang.StringBuilder,int)" qualified="appendJoins" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="joins">
-                    <type qualified="java.util.List&lt;net.sf.jsqlparser.statement.select.Join&gt;">
-                        <generic qualified="net.sf.jsqlparser.statement.select.Join"/>
-                    </type>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendWithItem" signature="void (net.sf.jsqlparser.statement.select.WithItem,java.lang.StringBuilder,int,int,int)" qualified="appendWithItem" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="withItem">
-                    <type qualified="net.sf.jsqlparser.statement.select.WithItem"/>
+            <method name="appendMergeInsert" signature="void (net.sf.jsqlparser.statement.merge.MergeInsert,java.lang.StringBuilder,int,int)" qualified="appendMergeInsert" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <parameter name="insert">
+                    <type qualified="net.sf.jsqlparser.statement.merge.MergeInsert"/>
                 </parameter>
                 <parameter name="builder">
                     <type qualified="java.lang.StringBuilder"/>
@@ -902,287 +661,7 @@
                 <parameter name="i">
                     <type qualified="int"/>
                 </parameter>
-                <parameter name="n">
-                    <type qualified="int"/>
-                </parameter>
                 <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendRowConstructor" signature="void (java.lang.StringBuilder,int,net.sf.jsqlparser.expression.RowConstructor&lt;?&gt;)" qualified="appendRowConstructor" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="rowConstructor">
-                    <type qualified="net.sf.jsqlparser.expression.RowConstructor&lt;?&gt;">
-                        <generic qualified="?">
-                            <wildcard/>
-                        </generic>
-                    </type>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendStringList" signature="void (java.util.Collection&lt;java.lang.String&gt;,java.lang.StringBuilder,int,boolean,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="appendStringList" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="strings">
-                    <type qualified="java.util.Collection&lt;java.lang.String&gt;">
-                        <generic qualified="java.lang.String"/>
-                    </type>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="commaSeparated">
-                    <type qualified="boolean"/>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendString" signature="void (java.lang.String,java.lang.StringBuilder,int,int,int,boolean,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="appendString" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="s">
-                    <type qualified="java.lang.String"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="i">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="n">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="commaSeparated">
-                    <type qualified="boolean"/>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendExpression" signature="void (net.sf.jsqlparser.expression.Expression,net.sf.jsqlparser.expression.Alias,java.lang.StringBuilder,int,int,int,boolean,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="appendExpression" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="expression">
-                    <type qualified="net.sf.jsqlparser.expression.Expression"/>
-                </parameter>
-                <parameter name="alias">
-                    <type qualified="net.sf.jsqlparser.expression.Alias"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="i">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="n">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="commaSeparated">
-                    <type qualified="boolean"/>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                        <value>PMD.ExcessiveMethodLength</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendExpressionList" signature="void (net.sf.jsqlparser.expression.operators.relational.ExpressionList&lt;?&gt;,java.lang.StringBuilder,int,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="appendExpressionList" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="expressionList">
-                    <type qualified="net.sf.jsqlparser.expression.operators.relational.ExpressionList&lt;?&gt;">
-                        <generic qualified="?">
-                            <wildcard/>
-                        </generic>
-                    </type>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendExpressionsList" signature="void (java.util.List&lt;? extends net.sf.jsqlparser.expression.Expression&gt;,java.lang.StringBuilder,int,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="appendExpressionsList" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="expressions">
-                    <type qualified="java.util.List&lt;? extends net.sf.jsqlparser.expression.Expression&gt;">
-                        <generic qualified="? extends net.sf.jsqlparser.expression.Expression">
-                            <wildcard>
-<extendsBound qualified="net.sf.jsqlparser.expression.Expression"/>
-                            </wildcard>
-                        </generic>
-                    </type>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="breakLine">
-                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendFromItem" signature="void (net.sf.jsqlparser.statement.select.FromItem,java.lang.StringBuilder,int,int,int)" qualified="appendFromItem" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="fromItem">
-                    <type qualified="net.sf.jsqlparser.statement.select.FromItem"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="i">
-                    <type qualified="int"/>
-                </parameter>
-                <parameter name="n">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendTable" signature="void (net.sf.jsqlparser.schema.Table,net.sf.jsqlparser.expression.Alias,java.lang.StringBuilder)" qualified="appendTable" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="table">
-                    <type qualified="net.sf.jsqlparser.schema.Table"/>
-                </parameter>
-                <parameter name="alias">
-                    <type qualified="net.sf.jsqlparser.expression.Alias"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendSetOperation" signature="void (net.sf.jsqlparser.statement.select.SetOperation,java.lang.StringBuilder,int)" qualified="appendSetOperation" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="setOperation">
-                    <type qualified="net.sf.jsqlparser.statement.select.SetOperation"/>
-                </parameter>
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendTruncate" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.truncate.Truncate)" qualified="appendTruncate" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="truncate">
-                    <type qualified="net.sf.jsqlparser.statement.truncate.Truncate"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendCreateTable" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.create.table.CreateTable,int)" qualified="appendCreateTable" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="createTable">
-                    <type qualified="net.sf.jsqlparser.statement.create.table.CreateTable"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                        <value>PMD.ExcessiveMethodLength</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendCreateIndex" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.create.index.CreateIndex,int)" qualified="appendCreateIndex" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="createIndex">
-                    <type qualified="net.sf.jsqlparser.statement.create.index.CreateIndex"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                    </argument>
-                </annotation>
-            </method>
-            <method name="appendCreateView" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.create.view.CreateView,int)" qualified="appendCreateView" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="createView">
-                    <type qualified="net.sf.jsqlparser.statement.create.view.CreateView"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-            </method>
-            <method name="appendAlter" signature="void (java.lang.StringBuilder,net.sf.jsqlparser.statement.alter.Alter,int)" qualified="appendAlter" scope="private" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
-                <parameter name="builder">
-                    <type qualified="java.lang.StringBuilder"/>
-                </parameter>
-                <parameter name="alter">
-                    <type qualified="net.sf.jsqlparser.statement.alter.Alter"/>
-                </parameter>
-                <parameter name="indent">
-                    <type qualified="int"/>
-                </parameter>
-                <return qualified="void"/>
-                <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
-                    <argument name="value" primitive="false" array="true">
-                        <type qualified="java.lang.String[]" dimension="1"/>
-                        <value>PMD.CyclomaticComplexity</value>
-                        <value>PMD.ExcessiveMethodLength</value>
-                    </argument>
-                </annotation>
             </method>
             <annotation name="SuppressWarnings" qualified="java.lang.SuppressWarnings">
                 <argument name="value" primitive="false" array="true">
@@ -1279,24 +758,202 @@
                 <constant></constant>
             </field>
         </class>
+        <class name="FormatContext" qualified="com.manticore.jsqlformatter.FormatContext" scope="public" abstract="false" error="false" exception="false" externalizable="false" serializable="false">
+            <comment>Immutable context object pushed down through the AST during formatting.
+
+ &lt;p&gt;
+ Replaces the (indent, i, n, commaSeparated, breakLine, alias, ...) parameter chains that the
+ legacy procedural formatter threaded through every render method. A visitor receives a single
+ ,{@code FormatContext}, argument and derives child contexts via the ,{@code with*}, factory methods
+ before recursing.
+
+ &lt;p&gt;
+ Instances are immutable. ,{@code with*}, methods return new instances; the caller's context is
+ never mutated. This guarantees that sibling AST nodes always see the same context their parent
+ intended.</comment>
+            <tag name="author" text="@author &lt;a href=&quot;mailto:andreas@manticore-projects.com&quot;&gt;Andreas Reichel&lt;/a&gt;"/>
+            <class qualified="java.lang.Object"/>
+            <constructor name="FormatContext" signature="void (int,int,int,boolean,com.manticore.jsqlformatter.JSQLFormatter.BreakLine,net.sf.jsqlparser.expression.Alias,boolean,boolean)" qualified="&lt;init&gt;" scope="private" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="indent">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="i">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="n">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="commaSeparated">
+                    <type qualified="boolean"/>
+                </parameter>
+                <parameter name="breakLine">
+                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                </parameter>
+                <parameter name="alias">
+                    <type qualified="net.sf.jsqlparser.expression.Alias"/>
+                </parameter>
+                <parameter name="breakLineBefore">
+                    <type qualified="boolean"/>
+                </parameter>
+                <parameter name="indentFirstLine">
+                    <type qualified="boolean"/>
+                </parameter>
+            </constructor>
+            <method name="root" signature="com.manticore.jsqlformatter.FormatContext ()" qualified="root" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <comment>Root context: indent 0, single-element list, no break, no alias.</comment>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="of" signature="com.manticore.jsqlformatter.FormatContext (int)" qualified="of" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <comment>Convenience constructor for a single-element rendering at the given indent.</comment>
+                <parameter name="indent">
+                    <type qualified="int"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="of" signature="com.manticore.jsqlformatter.FormatContext (int,int,int,boolean,com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="of" scope="public" abstract="false" final="false" native="false" synchronized="false" static="true" varArgs="false">
+                <comment>Convenience constructor matching the legacy ,{@code appendExpression}, call site.</comment>
+                <parameter name="indent">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="i">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="n">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="commaSeparated">
+                    <type qualified="boolean"/>
+                </parameter>
+                <parameter name="breakLine">
+                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="withIndent" signature="com.manticore.jsqlformatter.FormatContext (int)" qualified="withIndent" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newIndent">
+                    <type qualified="int"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="nested" signature="com.manticore.jsqlformatter.FormatContext ()" qualified="nested" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <comment>Equivalent to ,{@code withIndent(indent + 1)},.</comment>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="atPosition" signature="com.manticore.jsqlformatter.FormatContext (int,int)" qualified="atPosition" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newI">
+                    <type qualified="int"/>
+                </parameter>
+                <parameter name="newN">
+                    <type qualified="int"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="withBreakLine" signature="com.manticore.jsqlformatter.FormatContext (com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="withBreakLine" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newBreakLine">
+                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="withCommaSeparated" signature="com.manticore.jsqlformatter.FormatContext (boolean)" qualified="withCommaSeparated" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newCommaSeparated">
+                    <type qualified="boolean"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="withAlias" signature="com.manticore.jsqlformatter.FormatContext (net.sf.jsqlparser.expression.Alias)" qualified="withAlias" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newAlias">
+                    <type qualified="net.sf.jsqlparser.expression.Alias"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="withSelectFraming" signature="com.manticore.jsqlformatter.FormatContext (boolean,boolean)" qualified="withSelectFraming" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <parameter name="newBreakLineBefore">
+                    <type qualified="boolean"/>
+                </parameter>
+                <parameter name="newIndentFirstLine">
+                    <type qualified="boolean"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="asScalar" signature="com.manticore.jsqlformatter.FormatContext (com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="asScalar" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <comment>Returns a context appropriate for rendering an inner expression that should not behave as a
+ list element. Resets position to (0, 1), clears the alias, and disables comma separation.</comment>
+                <parameter name="newBreakLine">
+                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <method name="inheritingPosition" signature="com.manticore.jsqlformatter.FormatContext (com.manticore.jsqlformatter.JSQLFormatter.BreakLine)" qualified="inheritingPosition" scope="public" abstract="false" final="false" native="false" synchronized="false" static="false" varArgs="false">
+                <comment>Returns a context appropriate for rendering an inner expression that inherits the parent's list
+ position (i, n) \u2014 used by AndExpression, OrExpression, BinaryExpression sub-expressions that
+ need to know whether they are at the head of an outer list.</comment>
+                <parameter name="newBreakLine">
+                    <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                </parameter>
+                <return qualified="com.manticore.jsqlformatter.FormatContext"/>
+            </method>
+            <field name="indent" qualified="indent" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="int"/>
+                <comment>The current indentation depth in tab-stops (each tab is ,{@code indentString.length()}, chars).</comment>
+                <constant></constant>
+            </field>
+            <field name="i" qualified="i" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="int"/>
+                <comment>Position of the current node within its parent list (0-based). For non-list contexts use 0.</comment>
+                <constant></constant>
+            </field>
+            <field name="n" qualified="n" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="int"/>
+                <comment>Total number of siblings in the parent list. For non-list contexts use 1.</comment>
+                <constant></constant>
+            </field>
+            <field name="commaSeparated" qualified="commaSeparated" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="boolean"/>
+                <comment>When ,{@code true},, the renderer emits commas between siblings according to the global
+ Separation.</comment>
+                <constant></constant>
+            </field>
+            <field name="breakLine" qualified="breakLine" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="com.manticore.jsqlformatter.JSQLFormatter.BreakLine"/>
+                <comment>Line-break policy for the current rendering context.</comment>
+                <constant></constant>
+            </field>
+            <field name="alias" qualified="alias" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="net.sf.jsqlparser.expression.Alias"/>
+                <comment>Alias to render after the expression body (used by select items and similar).</comment>
+                <constant></constant>
+            </field>
+            <field name="breakLineBefore" qualified="breakLineBefore" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="boolean"/>
+                <comment>For Select rendering: whether to emit a leading line break before the SELECT keyword. Carries
+ the legacy ,{@code breakLineBefore}, parameter through the visitor.</comment>
+                <constant></constant>
+            </field>
+            <field name="indentFirstLine" qualified="indentFirstLine" scope="public" volatile="false" transient="false" static="false" final="true">
+                <type qualified="boolean"/>
+                <comment>For Select rendering: whether to indent the first line. Carries the legacy
+ ,{@code indentFirstLine}, parameter through the visitor.</comment>
+                <constant></constant>
+            </field>
+        </class>
         <class name="BuildInfo" qualified="com.manticore.jsqlformatter.BuildInfo" scope="public" abstract="false" error="false" exception="false" externalizable="false" serializable="false">
             <class qualified="java.lang.Object"/>
-            <constructor name="BuildInfo" signature="void ()" qualified="&lt;init&gt;" scope="public" final="false" native="false" synchronized="false" static="false" varArgs="false"/>
+            <constructor name="BuildInfo" signature="void ()" qualified="&lt;init&gt;" scope="private" final="false" native="false" synchronized="false" static="false" varArgs="false"/>
             <field name="NAME" qualified="NAME" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
                 <constant>JSQLFormatter</constant>
             </field>
             <field name="VERSION" qualified="VERSION" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>5.3-4-gd9d1c68-SNAPSHOT</constant>
+                <constant>5.4-1-g6ed7fe5</constant>
             </field>
             <field name="GIT_COMMIT" qualified="GIT_COMMIT" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>d9d1c68</constant>
+                <constant>6ed7fe5</constant>
             </field>
             <field name="BUILD_TIME" qualified="BUILD_TIME" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>2025-11-24T00:46:59.900276365Z</constant>
+                <constant>2026-07-31T12:13:43+07:00</constant>
             </field>
         </class>
     </package>

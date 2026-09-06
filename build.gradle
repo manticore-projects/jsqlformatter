@@ -44,7 +44,7 @@ dependencies {
     // Pinned, not ranged. Gradle caches dynamic-version resolution for 24h, so an
     // open range resolves differently on a warm desktop and a cold CI runner --
     // which shows up as tests that pass locally and fail on GitHub.
-    implementation 'com.manticore-projects.jsqlformatter:jsqlparser:5.3.242'
+    implementation 'com.manticore-projects.jsqlformatter:jsqlparser:[5.3.336,)'
     implementation 'com.diogonunes:JColor:5.5.1'
 
     testImplementation platform('org.junit:junit-bom:5.+')

@@ -41,6 +41,7 @@ import net.sf.jsqlparser.expression.ExtractExpression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.HexValue;
 import net.sf.jsqlparser.expression.IntervalExpression;
+import net.sf.jsqlparser.expression.IntervalQualifier;
 import net.sf.jsqlparser.expression.JdbcNamedParameter;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.JsonAggregateFunction;
@@ -800,10 +801,52 @@ final class ExpressionFormatter extends ExpressionVisitorAdapter<Void> {
     } else {
       JSQLFormatter.appendValue(builder, fmt, intervalExpression.getParameter(), "", "");
     }
-    if (intervalExpression.getIntervalType() != null) {
+    // JSqlParser represents the unit in one of two mutually exclusive ways:
+    // - getIntervalQualifier() for the standard form, INTERVAL 1 MINUTE, DAY(9) TO SECOND, ..
+    // - getIntervalType() only for the non-standard single-identifier form (MySQL INTERVAL 1 foo)
+    // Setting either one clears the other, so reading only the legacy field silently drops the
+    // unit of every standard interval.
+    IntervalQualifier qualifier = intervalExpression.getIntervalQualifier();
+    if (qualifier != null) {
+      appendIntervalQualifier(fmt, qualifier);
+    } else if (intervalExpression.getIntervalType() != null) {
       JSQLFormatter.appendKeyWord(builder, fmt, intervalExpression.getIntervalType(), " ", "");
     }
     return null;
+  }
+
+  /**
+   * Renders an {@link IntervalQualifier} field by field rather than through its {@code toString()},
+   * so that the field names follow the configured keyword spelling: {@code DAY(9) TO SECOND} with
+   * {@code keywordSpelling=LOWER} has to come out as {@code day(9) to second}.
+   *
+   * <p>
+   * Shapes covered: {@code MINUTE}, {@code SECOND(2, 4)}, {@code DAY TO SECOND},
+   * {@code DAY(9) TO SECOND} and {@code DAY TO SECOND(6)}. Note the single-field case, where the
+   * fractional seconds precision joins the leading precision inside one pair of brackets.
+   */
+  private void appendIntervalQualifier(OutputFormat fmt, IntervalQualifier qualifier) {
+    if (qualifier.getLeadingField() != null) {
+      JSQLFormatter.appendKeyWord(builder, fmt, qualifier.getLeadingField(), " ", "");
+    }
+
+    if (qualifier.getLeadingFieldPrecision() != null) {
+      builder.append("(").append(qualifier.getLeadingFieldPrecision());
+      // SECOND(2, 4): a single-field qualifier carries both precisions in one bracket
+      if (qualifier.getTrailingField() == null
+          && qualifier.getFractionalSecondsPrecision() != null) {
+        builder.append(", ").append(qualifier.getFractionalSecondsPrecision());
+      }
+      builder.append(")");
+    }
+
+    if (qualifier.getTrailingField() != null) {
+      JSQLFormatter.appendKeyWord(builder, fmt, "TO", " ", " ");
+      JSQLFormatter.appendKeyWord(builder, fmt, qualifier.getTrailingField(), "", "");
+      if (qualifier.getFractionalSecondsPrecision() != null) {
+        builder.append("(").append(qualifier.getFractionalSecondsPrecision()).append(")");
+      }
+    }
   }
 
   @Override

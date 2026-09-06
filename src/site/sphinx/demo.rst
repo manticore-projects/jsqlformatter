@@ -24,7 +24,11 @@ runs the current development build against
 	  })();
 	</script>
 
+
 .. note::
 
    The demo is also reachable standalone at
    `jsqlformatter.manticore-projects.com <http://jsqlformatter.manticore-projects.com>`_.
+
+
+Delivered by `Suramadu <https://github.com/manticore-projects/suramadu>`_, a fork of WebSwing v20.2.5 under the `AGPL v3 <https://www.gnu.org/licenses/agpl-3.0.en.html>`_.
