@@ -30,6 +30,7 @@ import net.sf.jsqlparser.expression.BooleanValue;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.CollateExpression;
+import net.sf.jsqlparser.expression.ColumnsTransformer;
 import net.sf.jsqlparser.expression.ConnectByPriorOperator;
 import net.sf.jsqlparser.expression.ConnectByRootOperator;
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
@@ -736,23 +737,7 @@ final class ExpressionFormatter extends ExpressionVisitorAdapter<Void> {
     FormatContext ctx = (FormatContext) context;
     OutputFormat fmt = JSQLFormatter.getOutputFormat();
     JSQLFormatter.appendObjectName(builder, fmt, "*", "", "");
-
-    if (allColumns.getExceptColumns() != null && !allColumns.getExceptColumns().isEmpty()) {
-      JSQLFormatter.appendKeyWord(builder, fmt, allColumns.getExceptKeyword(), " ", "( ");
-      renderer.appendExpressionsList(allColumns.getExceptColumns(),
-          FormatContext.of(ctx.indent).withBreakLine(BreakLine.AS_NEEDED));
-      builder.append(" )");
-    }
-
-    if (allColumns.getReplaceExpressions() != null
-        && !allColumns.getReplaceExpressions().isEmpty()) {
-      JSQLFormatter.appendKeyWord(builder, fmt, "REPLACE", " ", "( ");
-      int subIndent =
-          JSQLFormatter.getSubIndent(builder, allColumns.getReplaceExpressions().size() > 3);
-      renderer.appendSelectItemList(allColumns.getReplaceExpressions(),
-          FormatContext.of(subIndent, ctx.i, 1, false, BreakLine.AS_NEEDED));
-      builder.append(" )");
-    }
+    appendColumnsTransformers(allColumns.getTransformers(), ctx, fmt);
     return null;
   }
 
@@ -760,27 +745,63 @@ final class ExpressionFormatter extends ExpressionVisitorAdapter<Void> {
   public <S> Void visit(AllTableColumns allTableColumns, S context) {
     FormatContext ctx = (FormatContext) context;
     OutputFormat fmt = JSQLFormatter.getOutputFormat();
-    JSQLFormatter.appendObjectName(builder, fmt, allTableColumns.getTable().getFullyQualifiedName(),
-        "", ".*");
 
-    if (allTableColumns.getExceptColumns() != null
-        && !allTableColumns.getExceptColumns().isEmpty()) {
-      JSQLFormatter.appendKeyWord(builder, fmt, allTableColumns.getExceptKeyword(), " ", "( ");
-      renderer.appendExpressionsList(allTableColumns.getExceptColumns(),
-          FormatContext.of(ctx.indent).withBreakLine(BreakLine.AS_NEEDED));
-      builder.append(" )");
+    String qualifier =
+        allTableColumns.getReturningQualifier() != null ? allTableColumns.getReturningQualifier()
+            : allTableColumns.getTable() != null
+                ? allTableColumns.getTable().getFullyQualifiedName()
+                : null;
+
+    if (qualifier != null) {
+      JSQLFormatter.appendObjectName(builder, fmt, qualifier, "", ".*");
+    } else {
+      JSQLFormatter.appendObjectName(builder, fmt, "*", "", "");
     }
 
-    if (allTableColumns.getReplaceExpressions() != null
-        && !allTableColumns.getReplaceExpressions().isEmpty()) {
-      JSQLFormatter.appendKeyWord(builder, fmt, "REPLACE", " ", "( ");
-      int subIndent =
-          JSQLFormatter.getSubIndent(builder, allTableColumns.getReplaceExpressions().size() > 3);
-      renderer.appendSelectItemList(allTableColumns.getReplaceExpressions(),
-          FormatContext.of(subIndent, ctx.i, 1, false, BreakLine.AS_NEEDED));
-      builder.append(" )");
-    }
+    appendColumnsTransformers(allTableColumns.getTransformers(), ctx, fmt);
     return null;
+  }
+
+  private void appendColumnsTransformers(List<ColumnsTransformer> transformers, FormatContext ctx,
+      OutputFormat fmt) {
+    if (transformers == null || transformers.isEmpty()) {
+      return;
+    }
+
+    for (ColumnsTransformer transformer : transformers) {
+      switch (transformer.getType()) {
+        case APPLY:
+          JSQLFormatter.appendKeyWord(builder, fmt, "APPLY", " ", "( ");
+          transformer.getApplyExpression().accept(this, ctx);
+          builder.append(" )");
+          break;
+
+        case EXCEPT:
+        case EXCLUDE:
+          if (transformer.getExceptColumns() != null && !transformer.getExceptColumns().isEmpty()) {
+            JSQLFormatter.appendKeyWord(builder, fmt, transformer.getType().name(), " ", "( ");
+            renderer.appendExpressionsList(transformer.getExceptColumns(),
+                FormatContext.of(ctx.indent).withBreakLine(BreakLine.AS_NEEDED));
+            builder.append(" )");
+          }
+          break;
+
+        case REPLACE:
+          if (transformer.getReplaceItems() != null && !transformer.getReplaceItems().isEmpty()) {
+            JSQLFormatter.appendKeyWord(builder, fmt, "REPLACE", " ", "( ");
+            int subIndent =
+                JSQLFormatter.getSubIndent(builder, transformer.getReplaceItems().size() > 3);
+            renderer.appendSelectItemList(transformer.getReplaceItems(),
+                FormatContext.of(subIndent, ctx.i, 1, false, BreakLine.AS_NEEDED));
+            builder.append(" )");
+          }
+          break;
+
+        default:
+          throw new IllegalStateException(
+              "Unhandled ColumnsTransformerType: " + transformer.getType());
+      }
+    }
   }
 
   // ===================================================================================
