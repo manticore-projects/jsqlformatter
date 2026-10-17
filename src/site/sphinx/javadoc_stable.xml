@@ -945,15 +945,15 @@
             </field>
             <field name="VERSION" qualified="VERSION" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>5.4.2</constant>
+                <constant>5.4.2-1-g33fe50e</constant>
             </field>
             <field name="GIT_COMMIT" qualified="GIT_COMMIT" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>6776fe0</constant>
+                <constant>33fe50e</constant>
             </field>
             <field name="BUILD_TIME" qualified="BUILD_TIME" scope="public" volatile="false" transient="false" static="true" final="true">
                 <type qualified="java.lang.String"/>
-                <constant>2026-09-27T15:49:58+07:00</constant>
+                <constant>2026-09-27T15:52:07+07:00</constant>
             </field>
         </class>
     </package>

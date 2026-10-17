@@ -39,10 +39,14 @@ import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.ExcludeConstraint;
-import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
+import net.sf.jsqlparser.statement.create.table.ForeignKeyConstraint;
+import net.sf.jsqlparser.statement.create.table.ForeignKeyReference;
 import net.sf.jsqlparser.statement.create.table.Index;
+import net.sf.jsqlparser.statement.create.table.IndexOption;
+import net.sf.jsqlparser.statement.create.table.KeyConstraint;
 import net.sf.jsqlparser.statement.create.table.NamedConstraint;
 import net.sf.jsqlparser.statement.create.table.RowMovement;
+import net.sf.jsqlparser.statement.create.table.TableElement;
 import net.sf.jsqlparser.statement.create.view.CreateView;
 import net.sf.jsqlparser.statement.create.view.ForceOption;
 import net.sf.jsqlparser.statement.create.view.TemporaryOption;
@@ -60,8 +64,10 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.UpdateSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Hub object that owns the {@link StringBuilder} target and the four AST visitors.
@@ -855,7 +861,7 @@ final class Renderer {
   // visitor interfaces that warrant another visitor layer)
   // ===================================================================================
 
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength"})
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NcssCount"})
   void appendCreateTable(CreateTable createTable, int indent) {
     int i = 0;
     JSQLFormatter.appendNormalizedLineBreak(builder);
@@ -885,7 +891,13 @@ final class Renderer {
         table.getFullyQualifiedName(), "", "");
 
     List<ColumnDefinition> columnDefinitions = createTable.getColumnDefinitions();
-    List<Index> indexes = createTable.getIndexes();
+    List<TableElement> constraintsAndIndexes = new ArrayList<>();
+    if (createTable.getTableConstraints() != null) {
+      constraintsAndIndexes.addAll(createTable.getTableConstraints());
+    }
+    if (createTable.getIndexes() != null) {
+      constraintsAndIndexes.addAll(createTable.getIndexes());
+    }
 
     if (columnDefinitions != null && !columnDefinitions.isEmpty()) {
       builder.append(" (");
@@ -945,7 +957,7 @@ final class Renderer {
         switch (JSQLFormatter.getSeparation()) {
           case AFTER:
             JSQLFormatter.appendNormalizingTrailingWhiteSpace(builder,
-                i < columnDefinitions.size() + indexes.size() - 1 ? ", " : "");
+                i < columnDefinitions.size() + constraintsAndIndexes.size() - 1 ? ", " : "");
             break;
           default:
             break;
@@ -953,8 +965,8 @@ final class Renderer {
         i++;
       }
 
-      if (indexes != null && !indexes.isEmpty()) {
-        for (Index index : indexes) {
+      if (constraintsAndIndexes != null && !constraintsAndIndexes.isEmpty()) {
+        for (TableElement element : constraintsAndIndexes) {
           JSQLFormatter.appendNormalizedLineBreak(builder);
           builder.append(JSQLFormatter.getIndentString().repeat(indent + 1));
 
@@ -966,12 +978,12 @@ final class Renderer {
               break;
           }
 
-          appendCreateTableIndex(index, indent);
+          appendCreateTableElement(element, indent);
 
           switch (JSQLFormatter.getSeparation()) {
             case AFTER:
               JSQLFormatter.appendNormalizingTrailingWhiteSpace(builder,
-                  i < columnDefinitions.size() + indexes.size() - 1 ? ", " : "");
+                  i < columnDefinitions.size() + constraintsAndIndexes.size() - 1 ? ", " : "");
               break;
             default:
               break;
@@ -1009,15 +1021,19 @@ final class Renderer {
     }
   }
 
-  @SuppressWarnings({"PMD.CyclomaticComplexity"})
-  private void appendCreateTableIndex(Index index, int indent) {
-    if (index instanceof ForeignKeyIndex) {
-      ForeignKeyIndex foreignKeyIndex = (ForeignKeyIndex) index;
-      String type = foreignKeyIndex.getType();
-      String name = foreignKeyIndex.getName();
-      List<String> columnsNames = foreignKeyIndex.getColumnsNames();
-      List<String> idxSpec = foreignKeyIndex.getIndexSpec();
-      String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
+
+  // Replaces appendCreateTableIndex(Index, int).
+  // JSqlParser master (5.4+): constraints are no longer Index subclasses.
+  // ForeignKeyIndex -> ForeignKeyConstraint (extends NamedConstraint, holds a ForeignKeyReference).
+  // Caller must iterate createTable.getTableElements() (declaration order) or
+  // columnDefinitions + indexes + tableConstraints, and pass each TableElement here.
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NcssCount"})
+  private void appendCreateTableElement(TableElement element, int indent) {
+    if (element instanceof ForeignKeyConstraint) {
+      ForeignKeyConstraint foreignKey = (ForeignKeyConstraint) element;
+      String type = foreignKey.getType(); // "FOREIGN KEY"
+      String name = foreignKey.getName();
+      List<String> columnsNames = foreignKey.getColumnsNames();
 
       if (name != null) {
         JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CONSTRAINT", "",
@@ -1029,60 +1045,105 @@ final class Renderer {
         builder.append(JSQLFormatter.getIndentString());
       }
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), type, "", " ");
+      if (foreignKey.getIndexName() != null) {
+        JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(),
+            foreignKey.getIndexName(), "", " ");
+      }
       builder.append("( ");
       int subIndent = JSQLFormatter.getSubIndent(builder, columnsNames.size() > 2);
       BreakLine bl = columnsNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
       appendStringList(columnsNames, subIndent, true, bl);
       builder.append(" )");
-      if (idxSpec != null && !idxSpecText.isEmpty()) {
-        JSQLFormatter.appendHint(builder, JSQLFormatter.getOutputFormat(), idxSpecText, " ", "");
-      }
 
-      Table foreignTable = foreignKeyIndex.getTable();
-      List<String> referencedColumnNames = foreignKeyIndex.getReferencedColumnNames();
+      ForeignKeyReference reference = foreignKey.getReference();
+      Table foreignTable = reference.getTable();
+      List<String> referencedColumnNames = reference.getReferencedColumnNames();
       JSQLFormatter.appendNormalizedLineBreak(builder);
       builder.append(JSQLFormatter.getIndentString().repeat(indent + 2));
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "REFERENCES", "", " ");
       JSQLFormatter.appendObjectName(builder, JSQLFormatter.getOutputFormat(),
-          foreignTable.getFullyQualifiedName(), "", " ");
+          foreignTable.getFullyQualifiedName(), "", "");
 
-      builder.append("( ");
-      subIndent = JSQLFormatter.getSubIndent(builder, referencedColumnNames.size() > 2);
-      bl = referencedColumnNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
-      appendStringList(referencedColumnNames, subIndent, true, bl);
-      builder.append(" )");
+      if (referencedColumnNames != null && !referencedColumnNames.isEmpty()) {
+        builder.append(" ( ");
+        subIndent = JSQLFormatter.getSubIndent(builder, referencedColumnNames.size() > 2);
+        bl = referencedColumnNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+        appendStringList(referencedColumnNames, subIndent, true, bl);
+        builder.append(" )");
+      }
+
+      if (reference.getMatchType() != null) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(),
+            "MATCH " + reference.getMatchType(), " ", "");
+      }
 
       ReferentialAction updateAction =
-          foreignKeyIndex.getReferentialAction(ReferentialAction.Type.UPDATE);
+          foreignKey.getReferentialAction(ReferentialAction.Type.UPDATE);
       if (updateAction != null) {
         JSQLFormatter.appendNormalizedLineBreak(builder);
         builder.append(JSQLFormatter.getIndentString().repeat(indent + 3));
         builder.append(updateAction);
       }
       ReferentialAction deleteAction =
-          foreignKeyIndex.getReferentialAction(ReferentialAction.Type.DELETE);
+          foreignKey.getReferentialAction(ReferentialAction.Type.DELETE);
       if (deleteAction != null) {
         JSQLFormatter.appendNormalizedLineBreak(builder);
         builder.append(JSQLFormatter.getIndentString().repeat(indent + 3));
         builder.append(deleteAction);
       }
+      if (foreignKey.getConstraintAttributes() != null) {
+        foreignKey.getConstraintAttributes().appendTo(builder);
+      }
 
-    } else if (index instanceof CheckConstraint) {
-      CheckConstraint checkConstraint = (CheckConstraint) index;
-      String contraintName = checkConstraint.getName();
+    } else if (element instanceof CheckConstraint) {
+      CheckConstraint checkConstraint = (CheckConstraint) element;
+      String constraintName = checkConstraint.getName();
       Expression expression = checkConstraint.getExpression();
-      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CONSTRAINT", "", " ");
-      JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), contraintName, "", "");
-      JSQLFormatter.appendNormalizedLineBreak(builder);
-      builder.append(JSQLFormatter.getIndentString().repeat(indent + 2));
-      builder.append(" CHECK (").append(expression).append(")");
+      if (constraintName != null) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CONSTRAINT", "",
+            " ");
+        JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), constraintName, "", "");
+        JSQLFormatter.appendNormalizedLineBreak(builder);
+        builder.append(JSQLFormatter.getIndentString().repeat(indent + 2));
+      }
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CHECK", " ", " ");
+      builder.append("(").append(expression).append(")");
+      if (checkConstraint.isNoInherit()) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "NO INHERIT", " ",
+            "");
+      }
+      if (checkConstraint.getConstraintAttributes() != null) {
+        checkConstraint.getConstraintAttributes().appendTo(builder);
+      }
 
-    } else if (index instanceof NamedConstraint) {
-      NamedConstraint namedConstraint = (NamedConstraint) index;
-      String type = namedConstraint.getType();
-      String name = namedConstraint.getName();
-      List<String> columnsNames = namedConstraint.getColumnsNames();
-      List<String> idxSpec = namedConstraint.getIndexSpec();
+    } else if (element instanceof ExcludeConstraint) {
+      ExcludeConstraint excludeConstraint = (ExcludeConstraint) element;
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "EXCLUDE", "", "");
+      if (excludeConstraint.getUsing() != null) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(),
+            "USING " + excludeConstraint.getUsing(), " ", "");
+      }
+      List<String> columnsNames = excludeConstraint.getColumnsNames();
+      if (!columnsNames.isEmpty()) {
+        builder.append(" ( ");
+        int subIndent = JSQLFormatter.getSubIndent(builder, columnsNames.size() > 2);
+        BreakLine bl = columnsNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+        appendStringList(columnsNames, subIndent, true, bl);
+        builder.append(" )");
+      }
+      Expression expression = excludeConstraint.getExpression();
+      if (expression != null) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "WHERE", " ", " ");
+        builder.append("(").append(expression).append(")");
+      }
+
+    } else if (element instanceof KeyConstraint) {
+      // PRIMARY KEY / UNIQUE table constraint (former NamedConstraint branch)
+      KeyConstraint keyConstraint = (KeyConstraint) element;
+      String type = keyConstraint.getType();
+      String name = keyConstraint.getName();
+      List<String> columnsNames = keyConstraint.getColumnsNames();
+      List<String> idxSpec = keyConstraint.getIndexSpec();
       String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
 
       if (name != null) {
@@ -1095,6 +1156,10 @@ final class Renderer {
         builder.append(JSQLFormatter.getIndentString());
       }
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), type, "", " ");
+      if (keyConstraint.getIndexName() != null) {
+        JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(),
+            keyConstraint.getIndexName(), "", " ");
+      }
       builder.append("( ");
       int subIndent = JSQLFormatter.getSubIndent(builder, columnsNames.size() > 2);
       BreakLine bl = columnsNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
@@ -1104,38 +1169,48 @@ final class Renderer {
         JSQLFormatter.appendHint(builder, JSQLFormatter.getOutputFormat(), idxSpecText, " ", "");
       }
 
-    } else if (index instanceof ExcludeConstraint) {
-      ExcludeConstraint excludeConstraint = (ExcludeConstraint) index;
-      Expression expression = excludeConstraint.getExpression();
-      builder.append("EXCLUDE WHERE ");
-      builder.append("(");
-      builder.append(expression);
-      builder.append(")");
+    } else if (element instanceof NamedConstraint) {
+      // DefaultConstraint, NotNullConstraint, future constraint kinds:
+      // let the AST node render itself
+      builder.append(element);
 
-    } else if (index != null) {
+    } else if (element instanceof Index) {
+      Index index = (Index) element;
       String type = index.getType();
       String name = index.getName();
-      List<Index.ColumnParams> columnParams = index.getColumns();
+      List<String> columnsNames = index.getColumnsNames();
       List<String> idxSpec = index.getIndexSpec();
       String idxSpecText = PlainSelect.getStringList(idxSpec, false, false);
 
-      builder.append(type);
-      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), type, "", " ");
-      if (name != null) {
-        JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), name, "", "");
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), type, "", "");
+      String indexKeyword = index.getIndexKeyword();
+      if (indexKeyword != null && (type == null
+          || !type.toUpperCase(Locale.ROOT).endsWith(indexKeyword.toUpperCase(Locale.ROOT)))) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), indexKeyword, " ",
+            "");
       }
-      builder.append(" ").append(PlainSelect.getStringList(columnParams, true, true))
+      if (name != null) {
+        JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), name, " ", "");
+      }
+      if (index.getUsing() != null) {
+        JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(),
+            "USING " + index.getUsing(), " ", "");
+      }
+      builder.append(" ").append(PlainSelect.getStringList(columnsNames, true, true))
           .append(!idxSpecText.isEmpty() ? " " + idxSpecText : "");
     }
   }
 
   @SuppressWarnings({"PMD.CyclomaticComplexity"})
+  // JSqlParser master (5.4+): Index.ColumnParams is gone — columns are List<KeyElement>.
+  // index.getColumnsNames() returns a rendered snapshot (KeyElement::toString), so expression
+  // keys, ASC/DESC, NULLS ordering and opclasses survive; it never returns null anymore.
   void appendCreateIndex(CreateIndex createIndex, int indent) {
     Index index = createIndex.getIndex();
     Table table = createIndex.getTable();
 
     List<String> tailParameters = createIndex.getTailParameters();
-    List<Index.ColumnParams> columnsParameters = index.getColumns();
+    List<String> columnsNames = index.getColumnsNames();
 
     JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CREATE", "", " ");
 
@@ -1143,42 +1218,87 @@ final class Renderer {
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), index.getType(), "",
           " ");
     }
+    if (index.getClustering() != null) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(),
+          index.getClustering().toString(), "", " ");
+    }
+    if (createIndex.isNullFiltered()) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "NULL_FILTERED", "",
+          " ");
+    }
 
     JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "INDEX", "", " ");
+    if (createIndex.isConcurrently()) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "CONCURRENTLY", "",
+          " ");
+    }
     if (createIndex.isUsingIfNotExists()) {
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "IF NOT EXISTS", "",
           " ");
     }
-    JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), index.getName(), "", "");
+    if (index.getName() != null) {
+      JSQLFormatter.appendAlias(builder, JSQLFormatter.getOutputFormat(), index.getName(), "", "");
+    }
 
     JSQLFormatter.appendNormalizedLineBreak(builder);
     builder.append(JSQLFormatter.getIndentString().repeat(indent + 1));
+    if (index.getUsing() != null && createIndex.isIndexTypeBeforeOn()) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "USING", "", " ");
+      builder.append(index.getUsing()).append(" ");
+    }
     JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "ON", "", " ");
+    if (createIndex.isOnly()) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "ONLY", "", " ");
+    }
     JSQLFormatter.appendObjectName(builder, JSQLFormatter.getOutputFormat(),
         table.getFullyQualifiedName(), "", "");
 
-    if (index.getUsing() != null) {
+    if (index.getUsing() != null && !createIndex.isIndexTypeBeforeOn()) {
       JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "USING", "  ", " ");
       builder.append(index.getUsing());
     }
 
-    if (index.getColumnsNames() != null) {
+    if (!columnsNames.isEmpty()) {
       builder.append("( ");
-      int subIndent = JSQLFormatter.getSubIndent(builder, columnsParameters.size() > 2);
-      BreakLine bl = columnsParameters.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
+      int subIndent = JSQLFormatter.getSubIndent(builder, columnsNames.size() > 2);
+      BreakLine bl = columnsNames.size() > 2 ? BreakLine.AFTER_FIRST : BreakLine.NEVER;
 
       int i = 0;
-      for (Index.ColumnParams param : columnsParameters) {
-        appendString(param.getColumnName(), subIndent, i, columnsParameters.size(), true, bl);
+      for (String columnName : columnsNames) {
+        appendString(columnName, subIndent, i, columnsNames.size(), true, bl);
         i++;
       }
       builder.append(" )");
+    }
 
-      if (tailParameters != null) {
-        builder.append(" ");
-        for (String param : tailParameters) {
-          JSQLFormatter.appendHint(builder, JSQLFormatter.getOutputFormat(), param, "", " ");
-        }
+    // PostgreSQL tail
+    if (createIndex.getIncludeColumns() != null) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "INCLUDE", " ", " ");
+      builder.append("( ").append(String.join(", ", createIndex.getIncludeColumns())).append(" )");
+    }
+    if (createIndex.getNullsDistinct() != null) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(),
+          createIndex.getNullsDistinct() ? "NULLS DISTINCT" : "NULLS NOT DISTINCT", " ", "");
+    }
+    if (createIndex.getStorageParameters() != null) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "WITH", " ", " ");
+      IndexOption.appendListTo(builder, createIndex.getStorageParameters(), builder::append);
+    }
+    if (createIndex.getTableSpace() != null) {
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "TABLESPACE", " ", " ");
+      builder.append(createIndex.getTableSpace());
+    }
+    if (createIndex.getWhere() != null) {
+      JSQLFormatter.appendNormalizedLineBreak(builder);
+      builder.append(JSQLFormatter.getIndentString().repeat(indent + 1));
+      JSQLFormatter.appendKeyWord(builder, JSQLFormatter.getOutputFormat(), "WHERE", "", " ");
+      builder.append(createIndex.getWhere());
+    }
+
+    if (tailParameters != null) {
+      builder.append(" ");
+      for (String param : tailParameters) {
+        JSQLFormatter.appendHint(builder, JSQLFormatter.getOutputFormat(), param, "", " ");
       }
     }
   }
